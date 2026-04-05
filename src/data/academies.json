@@ -1,0 +1,1027 @@
+[
+  {
+    "id": "3000042012",
+    "name": "아이오영어학원",
+    "subject": "영어",
+    "location": "위례",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 25~35만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "경기도 성남시 수정구 위례광장로 310, B동 504호 (창곡동, 우성트램타워)",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "초1 ~ 고3",
+    "classSize": "15명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 30만원대",
+    "distance": "학원가 중심 (도보 5~10분)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "3000022102",
+    "name": "위례이룸영어학원",
+    "subject": "영어",
+    "location": "송파",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 25~35만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "서울특별시 송파구 위례광장로 199, 601-1호, 602-1호 (장지동, 성희프라자)",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "초1 ~ 고3",
+    "classSize": "10명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 30만원대",
+    "distance": "학원가 주변 (도보 10~20분)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "naver-심슨어학원위례캠퍼스",
+    "name": "심슨어학원 위례캠퍼스",
+    "subject": "영어",
+    "location": "위례",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 25~35만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "경기도 성남시 수정구 위례광장로 310, 위례우성트램타워 B동 7층",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "초1 ~ 고3",
+    "classSize": "30명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 30만원대",
+    "distance": "학원가 중심 (도보 5~10분)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "naver-아발론랭콘위례캠퍼스",
+    "name": "아발론랭콘 위례캠퍼스",
+    "subject": "영어",
+    "location": "위례",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 25~35만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "경기도 성남시 수정구 위례동로 135-6, 이너매스위례 8층 801~803호",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "초1 ~ 중3",
+    "classSize": "16명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 30만원대",
+    "distance": "학원가 주변 (도보 10~20분)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "naver-리드101영어학원위례점",
+    "name": "리드101영어학원 위례점",
+    "subject": "영어",
+    "location": "위례",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 15~25만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "경기도 성남시 수정구 위례광장로 310, 우성트램타워 A동 5층",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "초1 ~ 중3",
+    "classSize": "10명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 20만원대",
+    "distance": "학원가 중심 (도보 5~10분)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "3000029761",
+    "name": "삼성영어위례학원",
+    "subject": "영어",
+    "location": "송파",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 25~35만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "서울특별시 송파구 위례광장로 188, 709호, 715호 (장지동)",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "초1 ~ 중3",
+    "classSize": "9명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 30만원대",
+    "distance": "학원가 주변 (도보 10~20분)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "naver-브레인나우스튜디오송파위례직영점",
+    "name": "브레인나우스튜디오 송파위례직영점",
+    "subject": "영어",
+    "location": "위례",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 25~35만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "경기도 성남시 수정구 위례광장로 300, 위례중앙타워 710호",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "정보 준비중",
+    "classSize": "3명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 30만원대",
+    "distance": "학원가 중심 (도보 5~10분)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "3000048817",
+    "name": "비욘드잉글리쉬북위례학원",
+    "subject": "영어",
+    "location": "하남",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 25~35만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "경기도 하남시 위례학암로14번길 35, 경서타워1 601호 (학암동)",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "초1 ~ 중3",
+    "classSize": "12명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 30만원대",
+    "distance": "외곽 지역 (도보 20분+)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "3000032714",
+    "name": "위례센클영어도서관어학원",
+    "subject": "영어",
+    "location": "위례",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 25~35만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "경기도 성남시 수정구 위례동로 147, 604호 (창곡동, 위례건아타워)",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "초1 ~ 중3",
+    "classSize": "10명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 30만원대",
+    "distance": "학원가 주변 (도보 10~20분)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "3000069288",
+    "name": "올타어학원",
+    "subject": "영어",
+    "location": "하남",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 35~50만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "경기도 하남시 위례대로 256, 403호 (학암동)",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "초1 ~ 초6",
+    "classSize": "16명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 40만원대",
+    "distance": "외곽 지역 (도보 20분+)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "naver-닥터정이클래스위례학원",
+    "name": "닥터정이클래스위례학원",
+    "subject": "영어",
+    "location": "송파",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 25~35만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "서울특별시 송파구 위례순환로 387 (장지동)",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "초1 ~ 초6",
+    "classSize": "20명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 30만원대",
+    "distance": "외곽 지역 (도보 20분+)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "naver-리딩비어학원성남위례점",
+    "name": "리딩비어학원 성남위례점",
+    "subject": "영어",
+    "location": "위례",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 25~35만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "경기도 성남시 수정구 위례동로 141, 703호 (창곡동, 우성메디피아)",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "초1 ~ 고3",
+    "classSize": "12명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 30만원대",
+    "distance": "학원가 주변 (도보 10~20분)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "naver-잉글리쉬위드맘위례",
+    "name": "잉글리쉬위드맘 위례",
+    "subject": "영어",
+    "location": "하남",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 15~25만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "경기도 하남시 위례학암로14번길 31, 경서타워2 4층 405호 (학암동)",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "초1 ~ 초6",
+    "classSize": "1명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 20만원대",
+    "distance": "외곽 지역 (도보 20분+)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "naver-위례글로리영어학원",
+    "name": "위례글로리영어학원",
+    "subject": "영어",
+    "location": "위례",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 25~35만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "경기도 성남시 수정구 위례광장로 300, 340호 (창곡동, 위례중앙타워)",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "중1 ~ 고3",
+    "classSize": "6명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 30만원대",
+    "distance": "학원가 중심 (도보 5~10분)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "naver-링키영어하남위례롯데캐슬점",
+    "name": "링키영어 하남위례롯데캐슬점",
+    "subject": "영어",
+    "location": "하남",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 15~25만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "경기도 하남시 위례중앙로 215, 6410동 (학암동, 위례롯데캐슬)",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "초1 ~ 초6",
+    "classSize": "8명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 20만원대",
+    "distance": "외곽 지역 (도보 20분+)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "naver-스마트해법영어위례광장학원",
+    "name": "스마트해법영어 위례광장학원",
+    "subject": "영어",
+    "location": "송파",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 15~25만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "서울특별시 송파구 위례광장로 200, 에스비트램스퀘어 9층 904호",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "초1 ~ 중3",
+    "classSize": "25명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 20만원대",
+    "distance": "학원가 주변 (도보 10~20분)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "naver-eie고려대어학원북위례캠퍼스",
+    "name": "EiE고려대어학원 북위례캠퍼스",
+    "subject": "영어",
+    "location": "하남",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 25~35만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "경기도 하남시 위례학암로 18, 가하프라자 5층",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "초1 ~ 중3",
+    "classSize": "10명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 30만원대",
+    "distance": "외곽 지역 (도보 20분+)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "naver-프라우드리더스위례영어학원",
+    "name": "프라우드 리더스 위례 영어학원",
+    "subject": "영어",
+    "location": "송파",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 25~35만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "서울특별시 송파구 위례광장로 200, 7층 701호 (장지동)",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "초1 ~ 고3",
+    "classSize": "10명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 30만원대",
+    "distance": "학원가 주변 (도보 10~20분)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "naver-싸인잉글리쉬위례점",
+    "name": "싸인잉글리쉬 위례점",
+    "subject": "영어",
+    "location": "하남",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 15~25만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "경기도 하남시 위례중앙로 215, 6410동 (학암동, 위례롯데캐슬)",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "초1 ~ 초6",
+    "classSize": "8명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 20만원대",
+    "distance": "외곽 지역 (도보 20분+)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "naver-폴리어학원위례캠퍼스",
+    "name": "폴리어학원 위례캠퍼스",
+    "subject": "영어",
+    "location": "송파",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 35~50만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "서울특별시 송파구 위례순환로 387, 5층",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "초1 ~ 중3",
+    "classSize": "12명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 40만원대",
+    "distance": "외곽 지역 (도보 20분+)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "3000037345",
+    "name": "사라영어학원",
+    "subject": "영어",
+    "location": "송파",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 25~35만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "서울특별시 송파구 위례광장로 188, 511호, 512호, 514호 (장지동, 아이온스퀘어)",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "초1 ~ 고3",
+    "classSize": "8명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 30만원대",
+    "distance": "학원가 주변 (도보 10~20분)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "naver-아이보람위례센터",
+    "name": "아이보람 위례센터",
+    "subject": "영어",
+    "location": "위례",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 15~25만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "경기도 성남시 수정구 위례동로 153, 에이플타워 806호",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "초1 ~ 초6",
+    "classSize": "1명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 20만원대",
+    "distance": "학원가 주변 (도보 10~20분)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "naver-비욘드잉글리쉬송파위례",
+    "name": "비욘드잉글리쉬 송파위례",
+    "subject": "영어",
+    "location": "송파",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 25~35만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "서울특별시 송파구 위례광장로 230, 위례2차아이파크 상가 2층",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "초1 ~ 초6",
+    "classSize": "12명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 30만원대",
+    "distance": "학원가 주변 (도보 10~20분)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "naver-잉크레더블위례원",
+    "name": "잉크레더블 위례원",
+    "subject": "영어",
+    "location": "위례",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 25~35만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "경기도 성남시 수정구 위례동로 135, 신성위캐슬타워 403호",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "초1 ~ 초6",
+    "classSize": "10명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 30만원대",
+    "distance": "학원가 주변 (도보 10~20분)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  },
+  {
+    "id": "3000032148",
+    "name": "서강영어학원",
+    "subject": "영어",
+    "location": "위례",
+    "rating": 0,
+    "reviewCount": 0,
+    "priceRange": "월 25~35만원",
+    "tags": [],
+    "description": "정보 준비중",
+    "phone": "정보 준비중",
+    "address": "경기도 성남시 수정구 위례광장로 320, 916호 (창곡동, 아이에스센트럴타워)",
+    "schedule": "정보 준비중",
+    "summary": "정보 준비중",
+    "targetGrade": "초1 ~ 고3",
+    "classSize": "12명 이하",
+    "teachingStyle": "정보 준비중",
+    "monthlyCost": "월 30만원대",
+    "distance": "학원가 중심 (도보 5~10분)",
+    "parking": false,
+    "curriculum": {
+      "elementary": [
+        "정보 준비중"
+      ],
+      "middle": [
+        "정보 준비중"
+      ],
+      "high": [
+        "정보 준비중"
+      ]
+    },
+    "learningFlow": [
+      "정보 준비중"
+    ],
+    "teacherCount": 0,
+    "teacherProfiles": [],
+    "additionalCosts": [],
+    "refundPolicy": "정보 준비중",
+    "reviewKeywords": [],
+    "reviews": []
+  }
+]

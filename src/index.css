@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+:root {
+  --font-lora: "Noto Sans KR", sans-serif;
+  --font-inter: "Inter", sans-serif;
+  --color-brand-gray: hsl(240 4% 46%);
+  --color-primary: hsl(250 95% 65%);
+}
+
+@theme {
+  --font-lora: var(--font-lora);
+  --font-inter: var(--font-inter);
+  --color-brand-gray: var(--color-brand-gray);
+  --color-primary: hsl(250 95% 65%);
+}
+
+.font-lora {
+  font-family: var(--font-lora);
+}
+.font-inter {
+  font-family: var(--font-inter);
+}
+.text-brand-gray {
+  color: var(--color-brand-gray);
+}
+
+.liquid-glass {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.12);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.liquid-glass:hover {
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.2),
+    0 12px 24px -8px rgba(0, 0, 0, 0.4);
+}
+
+.liquid-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent, rgba(255, 255, 255, 0.3));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: var(--font-inter);
+}
+
+.app-container {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.bottom-nav-padding {
+  padding-bottom: 70px;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.35s ease-out forwards;
+}

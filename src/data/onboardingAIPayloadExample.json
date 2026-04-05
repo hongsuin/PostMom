@@ -1,0 +1,25 @@
+{
+  "child_profile": {
+    "grade": "elementary",
+    "english_level": "average",
+    "difficulties": ["lacks_interest", "low_confidence"]
+  },
+  "weighted_signals": {
+    "fun_enjoyment": 0.5,
+    "skill_improvement": 0.3,
+    "teacher_kindness_passion": 0.2
+  },
+  "learning_style": {
+    "class_type": "small_group",
+    "teaching_style": "balanced"
+  },
+  "constraints": {
+    "budget": "300_400",
+    "distance": "10min"
+  },
+  "trust_factor": "child_enjoys",
+  "metadata": {
+    "source": "postmom_onboarding",
+    "version": "1.0"
+  }
+}
