@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 
@@ -108,6 +109,8 @@ const REVIEWS = [
 ];
 
 export default function Home() {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
   return (
     <div className="w-full font-inter bg-white">
       {/* ── NAVIGATION ─────────────────────────────────── */}
@@ -118,7 +121,7 @@ export default function Home() {
             PostMom
           </Link>
 
-          {/* Nav links */}
+          {/* Nav links (desktop) */}
           <nav className="hidden items-center gap-8 lg:flex">
             {NAV_LINKS.map((link) => (
               <Link
@@ -145,9 +148,78 @@ export default function Home() {
             >
               무료로 시작하기
             </Link>
+
+            {/* Hamburger (mobile) */}
+            <button
+              className="flex flex-col justify-center items-center gap-1.5 p-1 lg:hidden"
+              onClick={() => setDrawerOpen(true)}
+              aria-label="메뉴 열기"
+            >
+              <span className="block h-0.5 w-6 bg-white" />
+              <span className="block h-0.5 w-6 bg-white" />
+              <span className="block h-0.5 w-6 bg-white" />
+            </button>
           </div>
         </div>
       </header>
+
+      {/* Overlay */}
+      {drawerOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/40"
+          onClick={() => setDrawerOpen(false)}
+        />
+      )}
+
+      {/* Left Drawer */}
+      <aside
+        className={`fixed top-0 left-0 z-50 h-full w-72 bg-white shadow-xl transition-transform duration-300 ease-in-out ${
+          drawerOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+          <Link
+            to="/"
+            className="font-lora text-xl font-semibold tracking-tight text-slate-900"
+            onClick={() => setDrawerOpen(false)}
+          >
+            PostMom
+          </Link>
+          <button
+            onClick={() => setDrawerOpen(false)}
+            aria-label="메뉴 닫기"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        <nav className="flex flex-col px-4 py-6 gap-1">
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.label}
+              to={link.to}
+              onClick={() => setDrawerOpen(false)}
+              className="flex items-center rounded-lg px-4 py-3 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="absolute bottom-0 left-0 right-0 border-t border-slate-100 px-4 py-5">
+          <Link
+            to="/login"
+            onClick={() => setDrawerOpen(false)}
+            className="block w-full rounded-lg border border-slate-200 py-2.5 text-center text-sm font-medium text-slate-600 hover:bg-slate-50"
+          >
+            로그인
+          </Link>
+        </div>
+      </aside>
 
       {/* ── HERO ────────────────────────────────────────── */}
       <section className="relative min-h-screen w-full overflow-hidden bg-slate-900">
