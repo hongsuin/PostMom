@@ -476,16 +476,16 @@ export default function Home() {
       {/* ── STATS BAR ───────────────────────────────────── */}
       <section className="border-b border-slate-100 bg-white py-12" aria-label="주요 통계">
         <div className="mx-auto max-w-[1400px] px-8 xl:px-12">
-          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+          <dl className="grid grid-cols-2 gap-8 md:grid-cols-4">
             {STATS.map((stat) => (
               <div key={stat.label} className="text-center">
-                <p className="font-lora text-4xl font-semibold text-slate-900 xl:text-5xl">
+                <dd className="font-lora text-4xl font-semibold text-slate-900 xl:text-5xl">
                   {stat.value}
-                </p>
-                <p className="mt-1.5 text-sm font-medium text-slate-500">{stat.label}</p>
+                </dd>
+                <dt className="mt-1.5 text-sm font-medium text-slate-500">{stat.label}</dt>
               </div>
             ))}
-          </div>
+          </dl>
         </div>
       </section>
 
