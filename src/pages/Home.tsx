@@ -281,7 +281,10 @@ export default function Home() {
       </aside>
 
       {/* ── HERO ────────────────────────────────────────── */}
-      <section className="relative min-h-screen w-full overflow-hidden bg-slate-900">
+      <section
+        className="relative min-h-screen w-full overflow-hidden bg-slate-900"
+        aria-labelledby="hero-heading"
+      >
         {/* Video background */}
         {reducedMotion || lowPerf ? (
           <div
@@ -331,7 +334,8 @@ export default function Home() {
               </motion.div>
 
               <motion.h1
-                className="font-lora text-5xl font-semibold leading-[1.1] tracking-tight text-white xl:text-6xl 2xl:text-7xl"
+                id="hero-heading"
+                className="font-lora text-5xl font-semibold leading-[1.1] tracking-tight text-white xl:text-5xl 2xl:text-6xl"
                 initial={{ opacity: 0, y: 24, filter: 'blur(4px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 transition={{ duration: 0.8, ease: EASE, delay: 0.1 }}
@@ -470,7 +474,7 @@ export default function Home() {
       </section>
 
       {/* ── STATS BAR ───────────────────────────────────── */}
-      <section className="border-b border-slate-100 bg-white py-12">
+      <section className="border-b border-slate-100 bg-white py-12" aria-label="주요 통계">
         <div className="mx-auto max-w-[1400px] px-8 xl:px-12">
           <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
             {STATS.map((stat) => (
@@ -486,14 +490,14 @@ export default function Home() {
       </section>
 
       {/* ── FEATURES ────────────────────────────────────── */}
-      <section className="bg-slate-50 py-24">
+      <section className="bg-slate-50 py-24" aria-labelledby="features-heading">
         <div className="mx-auto max-w-[1400px] px-8 xl:px-12">
           {/* Header */}
           <div className="mb-16 max-w-2xl">
             <span className="mb-3 inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
               핵심 기능
             </span>
-            <h2 className="font-lora text-4xl font-semibold text-slate-900 xl:text-5xl">
+            <h2 id="features-heading" className="font-lora text-4xl font-semibold text-slate-900 xl:text-5xl">
               왜 PostMom을
               <br />
               선택할까요?
@@ -527,14 +531,14 @@ export default function Home() {
       </section>
 
       {/* ── HOW IT WORKS ────────────────────────────────── */}
-      <section id="how" className="bg-white py-24">
+      <section id="how" className="bg-white py-24" aria-labelledby="how-heading">
         <div className="mx-auto max-w-[1400px] px-8 xl:px-12">
           {/* Header */}
           <div className="mb-16 text-center">
             <span className="mb-3 inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
               이용 방법
             </span>
-            <h2 className="font-lora text-4xl font-semibold text-slate-900 xl:text-5xl">
+            <h2 id="how-heading" className="font-lora text-4xl font-semibold text-slate-900 xl:text-5xl">
               단 4단계로 끝납니다
             </h2>
             <p className="mt-4 text-lg text-slate-500">
@@ -577,7 +581,7 @@ export default function Home() {
       </section>
 
       {/* ── REVIEWS ─────────────────────────────────────── */}
-      <section className="bg-slate-50 py-24">
+      <section className="bg-slate-50 py-24" aria-labelledby="reviews-heading">
         <div className="mx-auto max-w-[1400px] px-8 xl:px-12">
           {/* Header */}
           <div className="mb-16 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -585,7 +589,7 @@ export default function Home() {
               <span className="mb-3 inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
                 실제 후기
               </span>
-              <h2 className="font-lora text-4xl font-semibold text-slate-900 xl:text-5xl">
+              <h2 id="reviews-heading" className="font-lora text-4xl font-semibold text-slate-900 xl:text-5xl">
                 학부모들의 이야기
               </h2>
             </div>
@@ -631,7 +635,7 @@ export default function Home() {
       </section>
 
       {/* ── FINAL CTA ───────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-slate-900 py-28">
+      <section className="relative overflow-hidden bg-slate-900 py-28" aria-labelledby="cta-heading">
         {/* Decorative blobs */}
         <div
           className="pointer-events-none absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full opacity-25 blur-3xl"
@@ -646,7 +650,7 @@ export default function Home() {
           <span className="mb-4 inline-block rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-medium text-white/70">
             무료로 시작 · 카드 불필요
           </span>
-          <h2 className="font-lora text-4xl font-semibold text-white xl:text-5xl">
+          <h2 id="cta-heading" className="font-lora text-4xl font-semibold text-white xl:text-5xl">
             지금 바로 시작하세요
           </h2>
           <p className="mt-5 text-lg text-white/60">
