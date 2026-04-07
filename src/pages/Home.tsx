@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { User } from 'lucide-react';
 
@@ -109,8 +109,22 @@ const REVIEWS = [
   },
 ];
 
+function scrollToHash(hash: string) {
+  const id = hash.replace('#', '');
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
+}
+
 export default function Home() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { hash } = useLocation();
+
+  useEffect(() => {
+    if (!hash) return;
+    // 페이지 첫 진입 시 DOM이 준비된 후 스크롤
+    const raf = requestAnimationFrame(() => scrollToHash(hash));
+    return () => cancelAnimationFrame(raf);
+  }, [hash]);
 
   return (
     <div className="w-full font-inter bg-white">
