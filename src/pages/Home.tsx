@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { User } from 'lucide-react';
@@ -117,14 +117,49 @@ function scrollToHash(hash: string) {
 
 export default function Home() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [lowPerf, setLowPerf] = useState(false);
   const { hash } = useLocation();
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     if (!hash) return;
-    // 페이지 첫 진입 시 DOM이 준비된 후 스크롤
     const raf = requestAnimationFrame(() => scrollToHash(hash));
     return () => cancelAnimationFrame(raf);
   }, [hash]);
+
+  // prefers-reduced-motion 감지
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const apply = (reduced: boolean) => {
+      setReducedMotion(reduced);
+      const video = videoRef.current;
+      if (!video) return;
+      if (reduced) video.pause();
+      else video.play().catch(() => {});
+    };
+    apply(mq.matches);
+    const handler = (e: MediaQueryListEvent) => apply(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  // 저사양 기기 감지
+  useEffect(() => {
+    const nav = navigator as Navigator & {
+      deviceMemory?: number;
+      connection?: { effectiveType?: string; saveData?: boolean };
+    };
+    const isLowMemory = (nav.deviceMemory ?? 8) < 4;
+    const isLowCPU = (navigator.hardwareConcurrency ?? 8) < 4;
+    const conn = nav.connection;
+    const isSaveData = conn?.saveData === true;
+    const isSlowNetwork = conn?.effectiveType === 'slow-2g' || conn?.effectiveType === '2g';
+
+    if (isLowMemory || isLowCPU || isSaveData || isSlowNetwork) {
+      setLowPerf(true);
+    }
+  }, []);
 
   return (
     <div className="w-full font-inter bg-white">
@@ -248,15 +283,26 @@ export default function Home() {
       {/* ── HERO ────────────────────────────────────────── */}
       <section className="relative min-h-screen w-full overflow-hidden bg-slate-900">
         {/* Video background */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 h-full w-full object-cover"
-        >
-          <source src="/correctvideo.mp4" type="video/mp4" />
-        </video>
+        {reducedMotion || lowPerf ? (
+          <div
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(135deg, #1e293b 0%, #312e81 60%, #0f0a28 100%)',
+            }}
+          />
+        ) : (
+          <video
+            ref={videoRef}
+            autoPlay
+            loop
+            muted
+            playsInline
+            poster="/첫프레임.png"
+            className="absolute inset-0 h-full w-full object-cover"
+          >
+            <source src="/correctvideo.mp4" type="video/mp4" />
+          </video>
+        )}
 
         {/* Overlay */}
         <div
