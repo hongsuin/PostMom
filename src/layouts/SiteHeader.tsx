@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { User } from 'lucide-react';
 
 const NAV_LINKS = [
   { label: '학원 찾기', to: '/academies' },
@@ -54,6 +55,15 @@ export default function SiteHeader() {
               className="rounded-full bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:opacity-90 hover:scale-[1.03] active:scale-[0.97]"
             >
               AI 비교 시작
+            </Link>
+
+            {/* Login icon (mobile) */}
+            <Link
+              to="/login"
+              className="flex items-center justify-center p-1 text-slate-700 lg:hidden"
+              aria-label="로그인"
+            >
+              <User size={22} />
             </Link>
 
             {/* Hamburger (mobile) */}

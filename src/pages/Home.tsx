@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
+import { User } from 'lucide-react';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -142,11 +143,20 @@ export default function Home() {
             >
               로그인
             </Link>
-            <Link
+            {/* <Link
               to="/onboarding/1"
               className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-slate-900 shadow-md transition-all hover:bg-slate-100 hover:scale-[1.03] active:scale-[0.97]"
             >
               무료로 시작하기
+            </Link> */}
+
+            {/* Login icon (mobile) */}
+            <Link
+              to="/login"
+              className="flex items-center justify-center p-1 text-white lg:hidden"
+              aria-label="로그인"
+            >
+              <User size={22} />
             </Link>
 
             {/* Hamburger (mobile) */}
