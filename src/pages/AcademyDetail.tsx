@@ -86,7 +86,7 @@ export default function AcademyDetail() {
       <div className="mx-auto max-w-[1400px] px-8 py-8 xl:px-12">
         <div className="flex gap-8">
           {/* ── LEFT COLUMN ──────────────────────────────── */}
-          <div className="flex-1 min-w-0 space-y-5">
+          <div className="flex-1 min-w-0 space-y-5 pb-28 lg:pb-0">
             {/* Quick stats */}
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
               {[
@@ -206,6 +206,48 @@ export default function AcademyDetail() {
                 ))}
               </div>
             </SectionCard>
+            {/* 연락처 & 위치 (mobile only) */}
+            <div className="lg:hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <p className="mb-4 text-sm font-semibold text-slate-800">연락처 & 위치</p>
+              <div className="space-y-3 text-sm">
+                <div className="flex items-start gap-2.5 text-slate-600">
+                  <Phone size={14} className="mt-0.5 shrink-0 text-primary" />
+                  {academy.phone}
+                </div>
+                <div className="flex items-start gap-2.5 text-slate-600">
+                  <MapPin size={14} className="mt-0.5 shrink-0 text-primary" />
+                  {academy.address}
+                </div>
+                <div className="flex items-start gap-2.5 text-slate-600">
+                  <Clock size={14} className="mt-0.5 shrink-0 text-primary" />
+                  <span className="leading-relaxed">{academy.schedule}</span>
+                </div>
+              </div>
+              <div className="mt-4 flex h-28 items-center justify-center rounded-xl bg-slate-100 text-sm text-slate-400">
+                지도 영역
+              </div>
+            </div>
+
+            {/* 수강료 안내 (mobile only) */}
+            <div className="lg:hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <p className="mb-4 text-sm font-semibold text-slate-800">수강료 안내</p>
+              <div className="space-y-2.5 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500">월 수강료</span>
+                  <span className="font-bold text-primary">{academy.priceRange}</span>
+                </div>
+                {academy.additionalCosts.map((cost, i) => (
+                  <div key={i} className="flex items-center justify-between text-slate-500">
+                    <span>{cost.item}</span>
+                    <span>{cost.cost}</span>
+                  </div>
+                ))}
+                <div className="flex items-start gap-2 border-t border-slate-100 pt-3">
+                  <Shield size={13} className="mt-0.5 shrink-0 text-green-500" />
+                  <p className="text-xs text-slate-500">{academy.refundPolicy}</p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* ── RIGHT SIDEBAR ────────────────────────────── */}
@@ -278,6 +320,24 @@ export default function AcademyDetail() {
               </div>
             </div>
           </aside>
+        </div>
+      </div>
+
+      {/* ── MOBILE BOTTOM CTA ────────────────────────────── */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white px-4 py-3 lg:hidden">
+        <div className="mx-auto flex max-w-lg gap-3">
+          <Link
+            to={`/consult/${academy.id}`}
+            className="flex flex-1 items-center justify-center rounded-xl bg-primary py-3 text-sm font-semibold text-white shadow-md shadow-primary/25 transition-all hover:opacity-90"
+          >
+            상담 신청하기
+          </Link>
+          <Link
+            to={`/leveltest/${academy.id}`}
+            className="flex flex-1 items-center justify-center rounded-xl bg-slate-900 py-3 text-sm font-semibold text-white transition-all hover:bg-slate-800"
+          >
+            레벨테스트 신청
+          </Link>
         </div>
       </div>
     </div>
