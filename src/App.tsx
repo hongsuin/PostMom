@@ -15,6 +15,7 @@ import ConsultComplete from './pages/ConsultComplete';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import MyPage from './pages/MyPage';
+import AuthCallback from './pages/AuthCallback';
 
 import OnboardingStep1 from './features/onboarding/pages/OnboardingStep1';
 import OnboardingStep2 from './features/onboarding/pages/OnboardingStep2';
@@ -44,6 +45,7 @@ export default function App() {
         {/* Auth - no layout */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/consult/complete" element={<ConsultComplete />} />
         <Route path="/compare/result" element={<AICompareResult />} />
 

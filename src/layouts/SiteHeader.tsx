@@ -1,6 +1,8 @@
-import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { User } from 'lucide-react';
+import { getSupabaseBrowserClient } from '../lib/supabase';
+import type { Session } from '@supabase/supabase-js';
 
 const NAV_LINKS = [
   { label: '학원 찾기', to: '/academies' },
@@ -10,7 +12,22 @@ const NAV_LINKS = [
 
 export default function SiteHeader() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
+
+  useEffect(() => {
+    const supabase = getSupabaseBrowserClient();
+    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => setSession(s));
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    const supabase = getSupabaseBrowserClient();
+    await supabase.auth.signOut();
+    navigate('/login');
+  };
 
   return (
     <>
@@ -44,12 +61,21 @@ export default function SiteHeader() {
 
           {/* Right */}
           <div className="flex items-center gap-3">
-            <Link
-              to="/login"
-              className="hidden text-sm font-medium text-slate-500 transition-colors hover:text-slate-900 lg:block"
-            >
-              로그인
-            </Link>
+            {session ? (
+              <button
+                onClick={() => void handleLogout()}
+                className="hidden text-sm font-medium text-slate-500 transition-colors hover:text-slate-900 lg:block"
+              >
+                로그아웃
+              </button>
+            ) : (
+              <Link
+                to="/login"
+                className="hidden text-sm font-medium text-slate-500 transition-colors hover:text-slate-900 lg:block"
+              >
+                로그인
+              </Link>
+            )}
             <Link
               to="/onboarding/1"
               className="rounded-full bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:opacity-90 hover:scale-[1.03] active:scale-[0.97]"
@@ -57,14 +83,24 @@ export default function SiteHeader() {
               AI 비교 시작
             </Link>
 
-            {/* Login icon (mobile) */}
-            <Link
-              to="/login"
-              className="flex items-center justify-center p-1 text-slate-700 lg:hidden"
-              aria-label="로그인"
-            >
-              <User size={22} />
-            </Link>
+            {/* Login/Logout icon (mobile) */}
+            {session ? (
+              <button
+                onClick={() => void handleLogout()}
+                className="flex items-center justify-center p-1 text-slate-700 lg:hidden"
+                aria-label="로그아웃"
+              >
+                <User size={22} />
+              </button>
+            ) : (
+              <Link
+                to="/login"
+                className="flex items-center justify-center p-1 text-slate-700 lg:hidden"
+                aria-label="로그인"
+              >
+                <User size={22} />
+              </Link>
+            )}
 
             {/* Hamburger (mobile) */}
             <button
@@ -138,13 +174,22 @@ export default function SiteHeader() {
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 border-t border-slate-100 px-4 py-5">
-          <Link
-            to="/login"
-            onClick={() => setDrawerOpen(false)}
-            className="block w-full rounded-lg border border-slate-200 py-2.5 text-center text-sm font-medium text-slate-600 hover:bg-slate-50"
-          >
-            로그인
-          </Link>
+          {session ? (
+            <button
+              onClick={() => { setDrawerOpen(false); void handleLogout(); }}
+              className="block w-full rounded-lg border border-slate-200 py-2.5 text-center text-sm font-medium text-slate-600 hover:bg-slate-50"
+            >
+              로그아웃
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              onClick={() => setDrawerOpen(false)}
+              className="block w-full rounded-lg border border-slate-200 py-2.5 text-center text-sm font-medium text-slate-600 hover:bg-slate-50"
+            >
+              로그인
+            </Link>
+          )}
         </div>
       </aside>
     </>
