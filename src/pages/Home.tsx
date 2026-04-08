@@ -219,24 +219,14 @@ export default function Home() {
               </Link>
             )}
 
-            {/* Login/Logout icon (mobile) */}
-            {session ? (
-              <button
-                onClick={() => void handleLogout()}
-                className="flex items-center justify-center p-1 text-white lg:hidden"
-                aria-label="로그아웃"
-              >
-                <User size={22} />
-              </button>
-            ) : (
-              <Link
-                to="/login"
-                className="flex items-center justify-center p-1 text-white lg:hidden"
-                aria-label="로그인"
-              >
-                <User size={22} />
-              </Link>
-            )}
+            {/* MyPage / Login icon (mobile) */}
+            <Link
+              to={session ? '/mypage' : '/login'}
+              className="flex items-center justify-center p-1 text-white lg:hidden"
+              aria-label={session ? '마이페이지' : '로그인'}
+            >
+              <User size={22} />
+            </Link>
 
             {/* Hamburger (mobile) */}
             <button
