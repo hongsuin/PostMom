@@ -203,14 +203,7 @@ export default function Home() {
 
           {/* Auth + CTA */}
           <div className="flex items-center gap-3">
-            {session ? (
-              <button
-                onClick={() => void handleLogout()}
-                className="hidden text-sm font-medium text-white/70 transition-colors hover:text-white lg:block"
-              >
-                로그아웃
-              </button>
-            ) : (
+            {!session && (
               <Link
                 to="/login"
                 className="hidden text-sm font-medium text-white/70 transition-colors hover:text-white lg:block"
@@ -219,10 +212,10 @@ export default function Home() {
               </Link>
             )}
 
-            {/* MyPage / Login icon (mobile) */}
+            {/* MyPage / Login icon */}
             <Link
               to={session ? '/mypage' : '/login'}
-              className="flex items-center justify-center p-1 text-white lg:hidden"
+              className="flex items-center justify-center p-1 text-white transition-colors hover:text-white/70"
               aria-label={session ? '마이페이지' : '로그인'}
             >
               <User size={22} />
@@ -290,14 +283,7 @@ export default function Home() {
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 border-t border-slate-100 px-4 py-5">
-          {session ? (
-            <button
-              onClick={() => { setDrawerOpen(false); void handleLogout(); }}
-              className="block w-full rounded-lg border border-slate-200 py-2.5 text-center text-sm font-medium text-slate-600 hover:bg-slate-50"
-            >
-              로그아웃
-            </button>
-          ) : (
+          {!session && (
             <Link
               to="/login"
               onClick={() => setDrawerOpen(false)}
