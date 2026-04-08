@@ -136,7 +136,7 @@ export default function Home() {
   const handleLogout = async () => {
     const supabase = getSupabaseBrowserClient();
     await supabase.auth.signOut();
-    navigate('/login');
+    navigate('/');
   };
 
   useEffect(() => {
@@ -374,14 +374,12 @@ export default function Home() {
 
               <motion.h1
                 id="hero-heading"
-                className="font-lora text-5xl font-semibold leading-[1.1] tracking-tight text-white xl:text-5xl 2xl:text-6xl"
+                className="font-lora text-5xl font-semibold leading-[1.1] tracking-tight text-white xl:text-5xl 2xl:text-5.5xl"
                 initial={{ opacity: 0, y: 24, filter: 'blur(4px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 transition={{ duration: 0.8, ease: EASE, delay: 0.1 }}
               >
-                우리 아이에게 맞는
-                <br />
-                학원 선택,
+                우리 아이에게 맞는 학원,
                 <br />
                 이제는{' '}
                 데이터로.
@@ -441,19 +439,19 @@ export default function Home() {
 
             {/* Right: glass card */}
             <motion.div
-              className="liquid-glass hidden rounded-3xl p-7 text-white lg:block"
+              className="liquid-glass hidden rounded-3xl p-5 text-white lg:block w-[320px] flex-shrink-0"
               initial={{ opacity: 0, y: 24, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.9, ease: EASE, delay: 0.3 }}
             >
-              <div className="mb-5 flex items-center justify-between">
-                <h3 className="font-lora text-lg font-medium">AI 추천 미리보기</h3>
-                <span className="rounded-full bg-green-800/20 px-3 py-1 text-xs font-medium text-white/400">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="font-lora text-base font-medium">AI 추천 미리보기</h3>
+                <span className="rounded-full bg-green-800/20 px-2.5 py-0.5 text-xs font-medium text-white/70">
                   분석 완료
                 </span>
               </div>
 
-              <div className="space-y-3.5">
+              <div className={`space-y-2.5 transition-all duration-300 ${!session ? 'blur-sm select-none pointer-events-none' : ''}`}>
                 {[
                   ['지역', '위례'],
                   ['학년', '초등 4학년'],
@@ -463,7 +461,7 @@ export default function Home() {
                 ].map(([label, val]) => (
                   <div
                     key={label}
-                    className="flex justify-between border-b border-white/12 pb-3 text-sm"
+                    className="flex justify-between border-b border-white/12 pb-2 text-xs"
                   >
                     <span className="text-white/60">{label}</span>
                     <span className="font-medium">{val}</span>
@@ -471,29 +469,38 @@ export default function Home() {
                 ))}
               </div>
 
-              <div className="mt-5 rounded-2xl bg-white/8 p-4 space-y-2.5">
-                <p className="text-xs font-semibold uppercase tracking-widest text-white/50">
+              <div className={`mt-4 rounded-2xl bg-white/8 p-3 space-y-2 transition-all duration-300 ${!session ? 'blur-sm select-none pointer-events-none' : ''}`}>
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-white/50">
                   추천 결과
                 </p>
                 {['위례 YBM 어학원 ★★★★★', '위례 파고다 주니어 ★★★★☆', '위례 정상어학원 ★★★★☆'].map(
                   (academy) => (
                     <div
                       key={academy}
-                      className="flex items-center gap-2 rounded-xl bg-white/8 px-3 py-2 text-sm"
+                      className="flex items-center gap-2 rounded-xl bg-white/8 px-3 py-1.5 text-xs"
                     >
-                      <span className="h-2 w-2 rounded-full bg-purple-400 flex-shrink-0" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-purple-400 flex-shrink-0" />
                       {academy}
                     </div>
                   )
                 )}
               </div>
 
-              <Link
-                to="/onboarding/1"
-                className="mt-5 block w-full rounded-2xl bg-white/15 py-3 text-center text-sm font-semibold text-white transition-all hover:bg-white/22"
-              >
-                우리 아이 맞춤 분석 시작하기 →
-              </Link>
+              {session ? (
+                <Link
+                  to="/onboarding/1"
+                  className="mt-4 block w-full rounded-2xl bg-white/15 py-2.5 text-center text-xs font-semibold text-white transition-all hover:bg-white/22"
+                >
+                  우리 아이 맞춤 분석 시작하기 →
+                </Link>
+              ) : (
+                <Link
+                  to="/login"
+                  className="mt-4 block w-full rounded-2xl bg-white py-2.5 text-center text-xs font-semibold text-slate-900 transition-all hover:bg-white/90"
+                >
+                  로그인하고 결과 확인하기 →
+                </Link>
+              )}
             </motion.div>
           </div>
         </div>

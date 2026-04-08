@@ -26,7 +26,7 @@ export default function SiteHeader() {
   const handleLogout = async () => {
     const supabase = getSupabaseBrowserClient();
     await supabase.auth.signOut();
-    navigate('/login');
+    navigate('/');
   };
 
   return (
