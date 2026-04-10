@@ -342,7 +342,7 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: EASE }}
               >
-                <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
+                <span className="h-1.5 w-1.5 rounded-full bg-green-400/60" />
                 <span className="text-xs font-medium text-white/80">
                   현재 350+ 학원 파트너와 함께합니다
                 </span>
@@ -379,9 +379,9 @@ export default function Home() {
               >
                 <Link
                   to="/learning-test"
-                  className="rounded-full bg-white px-6 py-3 text-base font-semibold text-slate-900 shadow-xl transition-all hover:scale-[1.03] hover:bg-slate-50 active:scale-[0.97]"
+                  className="rounded-full bg-green-400/20 backdrop-blur-md border border-green-300/40 px-6 py-3 text-base font-medium text-white shadow-xl transition-all hover:scale-[1.03] hover:bg-green-400/45 active:scale-[0.97]"
                 >
-                  POSTMOM 학습유형 분석하기 →
+                  POSTMOM 학습유형 분석하기 
                 </Link>
                 <Link
                   to="/academies"
@@ -421,7 +421,7 @@ export default function Home() {
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="font-lora text-base font-medium">내 카드</h3>
                 {session && (
-                  <span className="rounded-full bg-green-800/20 px-2.5 py-0.5 text-xs font-medium text-white/70">
+                  <span className="rounded-full bg-green-400/30 px-2.5 py-0.5 text-xs font-medium text-white/70">
                     분석 완료
                   </span>
                 )}
@@ -468,7 +468,7 @@ export default function Home() {
                     to={`/academies/${id}`}
                     className="flex items-center gap-2 rounded-xl bg-white/8 px-3 py-1.5 text-xs hover:bg-white/15 transition-colors cursor-pointer"
                   >
-                    <span className="h-1.5 w-1.5 rounded-full bg-purple-400 flex-shrink-0" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-green-400 flex-shrink-0" />
                     {label}
                   </Link>
                 ))}
@@ -493,8 +493,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── STATS BAR ───────────────────────────────────── */}
-      <section className="border-b border-slate-100 bg-white py-12" aria-label="주요 통계">
+      {false && (<><section className="border-b border-slate-100 bg-white py-12" aria-label="주요 통계"> {/*여기 false -> true로 바꾸면 나옴*/ }
         <div className="mx-auto max-w-[1400px] px-8 xl:px-12">
           <dl className="grid grid-cols-2 gap-8 md:grid-cols-4">
             {STATS.map((stat) => (
@@ -693,9 +692,9 @@ export default function Home() {
             </Link>
           </div>
         </div>
-      </section>
+      </section></>)}
 
-      {/* ── FOOTER ──────────────────────────────────────── */}
+      {/* ── FOOTER ────────────────────────────────────────── */}
       <footer className="border-t border-slate-200 bg-white py-14">
         <div className="mx-auto max-w-[1400px] px-8 xl:px-12">
           <div className="grid grid-cols-1 gap-10 md:grid-cols-[2fr_1fr_1fr_1fr]">

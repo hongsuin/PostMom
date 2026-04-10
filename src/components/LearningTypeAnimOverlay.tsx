@@ -80,7 +80,7 @@ export default function LearningTypeAnimOverlay() {
   // left edge of icon = cx - iconW/2 ≈ cx - 11
   // Card sits 16px to the left of the icon's left edge, centred vertically.
   const startX = iconCenter.cx - 11 - CARD_W - 16;  // card right edge 16px left of icon
-  const startY = iconCenter.cy - CARD_H / 2 + 48;   // 48px below nav bar
+  const startY = iconCenter.cy - CARD_H / 2 + 25;   // 48px below nav bar
 
   // On mobile, startX could go negative — clamp to 8px
   const clampedX = Math.max(8, startX);
