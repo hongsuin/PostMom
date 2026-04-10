@@ -413,7 +413,7 @@ export default function Home() {
 
             {/* Right: glass card */}
             <motion.div
-              className="liquid-glass hidden rounded-3xl p-5 text-white lg:block w-[320px] flex-shrink-0 ml-auto"
+              className="liquid-glass rounded-3xl p-5 text-white w-full lg:w-[320px] flex-shrink-0 ml-auto"
               initial={{ opacity: 0, y: 24, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.9, ease: EASE, delay: 0.3 }}
@@ -447,17 +447,20 @@ export default function Home() {
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-white/50">
                   추천 결과
                 </p>
-                {['위례 YBM 어학원 ★★★★★', '위례 파고다 주니어 ★★★★☆', '위례 정상어학원 ★★★★☆'].map(
-                  (academy) => (
-                    <div
-                      key={academy}
-                      className="flex items-center gap-2 rounded-xl bg-white/8 px-3 py-1.5 text-xs"
-                    >
-                      <span className="h-1.5 w-1.5 rounded-full bg-purple-400 flex-shrink-0" />
-                      {academy}
-                    </div>
-                  )
-                )}
+                {[
+                  { label: '심슨어학원 위례캠퍼스 ★★★★★', id: 'naver-심슨어학원위례캠퍼스' },
+                  { label: '아발론랭콘 위례캠퍼스 ★★★★☆', id: 'naver-아발론랭콘위례캠퍼스' },
+                  { label: '리드101영어학원 위례점 ★★★★☆', id: 'naver-리드101영어학원위례점' },
+                ].map(({ label, id }) => (
+                  <Link
+                    key={id}
+                    to={`/academies/${id}`}
+                    className="flex items-center gap-2 rounded-xl bg-white/8 px-3 py-1.5 text-xs hover:bg-white/15 transition-colors cursor-pointer"
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-purple-400 flex-shrink-0" />
+                    {label}
+                  </Link>
+                ))}
               </div>
 
 
