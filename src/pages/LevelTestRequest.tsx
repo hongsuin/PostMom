@@ -59,7 +59,7 @@ export default function LevelTestRequest() {
         ))}
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1.5">자녀 학년</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1.5">자녀 나이</label>
           <select
             value={form.grade}
             onChange={e => setForm(f => ({ ...f, grade: e.target.value }))}
@@ -90,7 +90,7 @@ export default function LevelTestRequest() {
 
         <button
           onClick={handleSubmit}
-          className="w-full bg-primary text-white py-4 rounded-2xl font-semibold text-sm hover:bg-primary/90 transition-colors"
+          className="w-full bg-slate-900 text-white py-4 rounded-2xl font-semibold text-sm hover:bg-slate-800 transition-colors"
         >
           레벨테스트 신청하기
         </button>
