@@ -25,7 +25,7 @@ export interface Academy {
   additionalCosts: Array<{ item: string; cost: string }>;
   refundPolicy: string;
   reviewKeywords: string[];
-  reviews: Array<{ author: string; text: string; rating: number; keywords: string[] }>;
+  reviews: Array<{ author: string; text: string; rating: number; keywords: string[]; userType?: 'student' | 'parent' | 'academy' }>;
 }
 
 export interface CommunityPost {

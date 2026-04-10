@@ -231,6 +231,9 @@ PHASE 1  →  PHASE 2  →  PHASE 3  →  PHASE 4  →  PHASE 5
 - [x] `CommunityHome.tsx` — 작성자 뱃지 추가
 - [x] `CommunityPost.tsx` — 작성자 뱃지 추가
 
-### PHASE 5 (추후)
-- [ ] 리뷰 작성 UI 개발
-- [ ] 유형별 키워드 멀티셀렉트
+### PHASE 5
+- [x] `mockData.ts` Academy.reviews에 userType 필드 추가
+- [x] `AcademyDetail.tsx` 리뷰 작성 UI 개발 (별점, 키워드, 텍스트, 제출)
+- [x] 유형별 키워드 멀티셀렉트 (REVIEW_KEYWORDS 연동)
+- [x] 기존 리뷰에 UserTypeBadge 표시
+- [x] 로그인 상태 체크 (비로그인 시 작성 버튼 → 로그인 링크)

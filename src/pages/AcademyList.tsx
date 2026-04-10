@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Star, MapPin, Clock, ChevronRight, SlidersHorizontal } from 'lucide-react';
 import { academies } from '../data/mockData';
+import { useReviewStore, calcAvgRating } from '../store/reviewStore';
 
 const SUBJECTS = ['전체', '수학', '영어']; //새 과목 생기면 여기에 추가
 const LOCATIONS = ['전체 지역', '위례', '송파', '하남']; //새 지역 여기 추가
@@ -18,6 +19,7 @@ export default function AcademyList() {
   const [activeSubject, setActiveSubject] = useState('전체');
   const [activeLocation, setActiveLocation] = useState('전체 지역');
   const [sortBy, setSortBy] = useState('평점 높은 순');
+  const { getReviews } = useReviewStore();
 
   const filtered = academies.filter((a) => {
     const matchSearch =
@@ -194,7 +196,9 @@ export default function AcademyList() {
                       </div>
                       <div className="flex items-center gap-1 rounded-lg bg-yellow-50 px-2.5 py-1.5">
                         <Star size={13} className="fill-yellow-400 text-yellow-400" />
-                        <span className="text-sm font-bold text-slate-800">{academy.rating}</span>
+                        <span className="text-sm font-bold text-slate-800">
+                          {calcAvgRating(academy.reviews, getReviews(academy.id), academy.rating)}
+                        </span>
                       </div>
                     </div>
 
