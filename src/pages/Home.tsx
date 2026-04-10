@@ -208,7 +208,7 @@ export default function Home() {
                 to="/login"
                 className="hidden text-sm font-medium text-white/70 transition-colors hover:text-white lg:block"
               >
-                로그인
+                Login
               </Link>
             )}
 
@@ -420,9 +420,11 @@ export default function Home() {
             >
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="font-lora text-base font-medium">내 카드</h3>
-                <span className="rounded-full bg-green-800/20 px-2.5 py-0.5 text-xs font-medium text-white/70">
-                  수정하기
-                </span>
+                {session && (
+                  <span className="rounded-full bg-green-800/20 px-2.5 py-0.5 text-xs font-medium text-white/70">
+                    분석 완료
+                  </span>
+                )}
               </div>
 
               <div className={`space-y-2.5 transition-all duration-300 ${!session ? 'blur-sm select-none pointer-events-none' : ''}`}>
@@ -442,6 +444,15 @@ export default function Home() {
                   </div>
                 ))}
               </div>
+
+              {!session && (
+                <Link
+                  to="/login"
+                  className="mt-4 flex w-full items-center justify-center rounded-2xl bg-white/20 py-2.5 text-sm font-semibold text-white backdrop-blur-sm hover:bg-white/30 transition-colors"
+                >
+                  Login
+                </Link>
+              )}
 
               <div className={`mt-4 rounded-2xl bg-white/8 p-3 space-y-2 transition-all duration-300 ${!session ? 'blur-sm select-none pointer-events-none' : ''}`}>
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-white/50">

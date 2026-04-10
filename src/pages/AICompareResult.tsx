@@ -16,24 +16,24 @@ interface AcademyResult {
 
 const mockResults: AcademyResult[] = [
   {
-    id: '1',
-    name: '매쓰피아 수학학원',
+    id: 'naver-심슨어학원위례캠퍼스',
+    name: '심슨어학원 위례캠퍼스',
     rating: 4.8,
     matchScore: 92,
     reasons: ['통학 거리 12분으로 조건 충족', '숙제 관리 강점 → 학습 습관 개선에 적합', '예산 범위 내 (월 30만원)', '문제해결력 향상 프로그램 보유'],
     curriculumFit: 95, teachingQuality: 90, priceFit: 88, distanceFit: 92
   },
   {
-    id: '2',
-    name: '수학의 정석',
+    id: 'naver-아발론랭콘위례캠퍼스',
+    name: '아발론랭콘 위례캠퍼스',
     rating: 4.6,
     matchScore: 85,
     reasons: ['통학 거리 18분으로 가까운 편', '개별 맞춤 커리큘럼 제공', '예산 범위 내 (월 28만원)', '학습 목표 달성률 높음'],
     curriculumFit: 88, teachingQuality: 85, priceFit: 90, distanceFit: 78
   },
   {
-    id: '3',
-    name: '빛나는 수학',
+    id: 'naver-리드101영어학원위례점',
+    name: '리드101영어학원 위례점',
     rating: 4.7,
     matchScore: 78,
     reasons: ['통학 거리 25분으로 약간 먼 편', '실력 향상 프로그램 우수', '예산 범위 내 (월 32만원)', '소규모 클래스 운영'],
