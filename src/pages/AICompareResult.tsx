@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Star, CheckCircle, ArrowLeft, TrendingUp } from 'lucide-react';
+import { Star, CheckCircle, ArrowLeft, TrendingUp, LayoutGrid } from 'lucide-react';
 import { useOnboardingStore } from '../store/onboardingStore';
 
 interface AcademyResult {
@@ -68,7 +68,7 @@ export default function AICompareResult() {
         {/* Header */}
         <header className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-primary/20 z-40 px-5 h-14 flex items-center gap-3">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/compare')}
             className="hover:bg-primary/10 rounded-full p-1.5 transition-colors"
           >
             <ArrowLeft size={20} className="text-primary" />
@@ -89,6 +89,15 @@ export default function AICompareResult() {
               우선순위에 맞춰 3개 학원을 비교하여 가장 적합한 옵션을 추천해 드립니다.
             </p>
           </div>
+
+          {/* 이전 화면으로 버튼 */}
+          <button
+            onClick={() => navigate('/compare')}
+            className="flex items-center gap-2 text-sm text-slate-500 hover:text-primary transition-colors"
+          >
+            <ArrowLeft size={15} />
+            학원 비교 화면으로 돌아가기
+          </button>
 
           {/* 학원 카드들 */}
           {mockResults.map((academy, idx) => (
@@ -162,6 +171,23 @@ export default function AICompareResult() {
               </Link>
             </div>
           ))}
+          {/* 하단 네비게이션 버튼 */}
+          <div className="grid grid-cols-2 gap-3 pt-2 pb-4">
+            <button
+              onClick={() => navigate('/compare')}
+              className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white py-3.5 text-sm font-semibold text-slate-700 hover:border-primary hover:text-primary transition-colors"
+            >
+              <ArrowLeft size={15} />
+              다시 선택하기
+            </button>
+            <Link
+              to="/academies"
+              className="flex items-center justify-center gap-2 rounded-2xl bg-slate-900 py-3.5 text-sm font-semibold text-white hover:bg-slate-800 transition-colors"
+            >
+              <LayoutGrid size={15} />
+              학원 전체보기
+            </Link>
+          </div>
         </div>
       </div>
     </div>

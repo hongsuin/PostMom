@@ -16,6 +16,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import MyPage from './pages/MyPage';
 import AuthCallback from './pages/AuthCallback';
+import LearningTypeTest from './pages/LearningTypeTest';
 
 import OnboardingStep1 from './features/onboarding/pages/OnboardingStep1';
 import OnboardingStep2 from './features/onboarding/pages/OnboardingStep2';
@@ -29,6 +30,7 @@ import AdminLeadList from './features/admin/pages/AdminLeadList';
 import AdminLeadDetail from './features/admin/pages/AdminLeadDetail';
 import AdminProfile from './features/admin/pages/AdminProfile';
 import AdminCredit from './features/admin/pages/AdminCredit';
+import AdminPreview from './features/admin/pages/AdminPreview';
 
 export default function App() {
   return (
@@ -46,6 +48,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/learning-test" element={<LearningTypeTest />} />
         <Route path="/consult/complete" element={<ConsultComplete />} />
         <Route path="/compare/result" element={<AICompareResult />} />
 
@@ -56,6 +59,7 @@ export default function App() {
           <Route path="leads/:id" element={<AdminLeadDetail />} />
           <Route path="profile" element={<AdminProfile />} />
           <Route path="credit" element={<AdminCredit />} />
+          <Route path="preview" element={<AdminPreview />} />
         </Route>
 
         {/* Landing - no layout */}

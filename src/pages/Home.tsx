@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { User } from 'lucide-react';
 import { getSupabaseBrowserClient } from '../lib/supabase';
@@ -123,7 +123,7 @@ export default function Home() {
   const [lowPerf, setLowPerf] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
   const { hash } = useLocation();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -133,11 +133,11 @@ export default function Home() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleLogout = async () => {
-    const supabase = getSupabaseBrowserClient();
-    await supabase.auth.signOut();
-    navigate('/');
-  };
+  // const handleLogout = async () => {
+  //   const supabase = getSupabaseBrowserClient();
+  //   await supabase.auth.signOut();
+  //   navigate('/');
+  // };
 
   useEffect(() => {
     if (!hash) return;
@@ -380,10 +380,10 @@ export default function Home() {
                 transition={{ duration: 0.8, ease: EASE, delay: 0.38 }}
               >
                 <Link
-                  to="/onboarding/1"
+                  to="/learning-test"
                   className="rounded-full bg-white px-8 py-4 text-base font-semibold text-slate-900 shadow-xl transition-all hover:scale-[1.03] hover:bg-slate-50 active:scale-[0.97]"
                 >
-                  POSTMOM 비교 무료로 시작 →
+                  POSTMOM 학습유형 분석하기 →
                 </Link>
                 <Link
                   to="/academies"
@@ -464,7 +464,7 @@ export default function Home() {
 
               {session ? (
                 <Link
-                  to="/onboarding/1"
+                  to="/learning-test"
                   className="mt-4 block w-full rounded-2xl bg-white/15 py-2.5 text-center text-xs font-semibold text-white transition-all hover:bg-white/22"
                 >
                   우리 아이 맞춤 분석 시작하기 →
@@ -682,7 +682,7 @@ export default function Home() {
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
-              to="/onboarding/1"
+              to="/learning-test"
               className="rounded-full bg-white px-10 py-4 text-base font-semibold text-slate-900 shadow-xl transition-all hover:scale-[1.03] hover:bg-slate-50 active:scale-[0.97]"
             >
               AI 비교 무료로 시작하기

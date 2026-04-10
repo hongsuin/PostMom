@@ -92,6 +92,16 @@ export const communityPosts: CommunityPost[] = [
   },
 ];
 
+// 로그인한 학원 운영자 정보 (단일 학원)
+export const myAcademy = {
+  name: '매쓰피아 수학학원',
+  subject: '수학',
+  owner: '김수학',
+  phone: '031-123-4567',
+  address: '경기 성남시 수정구 위례중앙로 100',
+  email: 'admin@postmom.kr',
+};
+
 export const adminLeads: Lead[] = [
   {
     id: '1',
@@ -106,10 +116,10 @@ export const adminLeads: Lead[] = [
   },
   {
     id: '2',
-    academyName: '영어나라 어학원',
+    academyName: '매쓰피아 수학학원',
     parentName: '이*수',
     childGrade: '초6',
-    subject: '영어',
+    subject: '수학',
     requestType: '레벨테스트',
     status: '진행중',
     date: '2026-03-14',
@@ -117,10 +127,10 @@ export const adminLeads: Lead[] = [
   },
   {
     id: '3',
-    academyName: '사이언스랩',
+    academyName: '매쓰피아 수학학원',
     parentName: '박*민',
     childGrade: '중1',
-    subject: '과학',
+    subject: '수학',
     requestType: '상담',
     status: '완료',
     date: '2026-03-12',
