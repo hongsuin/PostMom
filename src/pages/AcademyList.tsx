@@ -119,7 +119,7 @@ export default function AcademyList() {
                   to="/onboarding/1"
                   className="flex items-center justify-center gap-2 rounded-xl bg-primary/10 px-4 py-3 text-sm font-semibold text-primary transition-all hover:bg-primary/15"
                 >
-                  ✨ AI 맞춤 추천 받기
+                  P·M 맞춤 추천 받기
                 </Link>
               </div>
             </div>

@@ -23,11 +23,7 @@ export default function SiteHeader() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleLogout = async () => {
-    const supabase = getSupabaseBrowserClient();
-    await supabase.auth.signOut();
-    navigate('/');
-  };
+ 
 
   return (
     <>
@@ -66,15 +62,15 @@ export default function SiteHeader() {
                 to="/login"
                 className="hidden text-sm font-medium text-slate-500 transition-colors hover:text-slate-900 lg:block"
               >
-                로그인
+                login
               </Link>
             )}
-            <Link
+            {/* <Link
               to="/onboarding/1"
-              className="rounded-full bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:opacity-90 hover:scale-[1.03] active:scale-[0.97]"
+              className="rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary shadow-sm transition-all hover:opacity-90 hover:scale-[1.03] active:scale-[0.97]"
             >
-              AI 비교 시작
-            </Link>
+              P·M 추천 받기
+            </Link> */}
 
             {/* MyPage / Login icon — id used as animation anchor by LearningTypeAnimOverlay */}
             <Link
@@ -164,7 +160,7 @@ export default function SiteHeader() {
               onClick={() => setDrawerOpen(false)}
               className="block w-full rounded-lg border border-slate-200 py-2.5 text-center text-sm font-medium text-slate-600 hover:bg-slate-50"
             >
-              로그인
+              login
             </Link>
           )}
         </div>
