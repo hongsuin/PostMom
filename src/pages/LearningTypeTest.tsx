@@ -272,11 +272,13 @@ export default function LearningTypeTest() {
     updateData({ learningType: selectedType });
     setSaved(true);
     setPending(selectedType, 'save');
+    window.scrollTo(0, 0);
     navigate('/academies');
   };
 
   const handleSkip = () => {
     if (selectedType) setPending(selectedType, 'skip');
+    window.scrollTo(0, 0);
     navigate('/academies');
   };
 
