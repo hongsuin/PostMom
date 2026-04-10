@@ -1,6 +1,7 @@
 import { useParams, Link } from 'react-router-dom';
 import { Heart, MessageCircle, ChevronRight, ChevronLeft, Star, Send, Tag } from 'lucide-react';
 import { communityPosts, academies } from '../data/mockData';
+import UserTypeBadge from '../components/UserTypeBadge';
 
 const TAG_COLORS: Record<string, string> = {
   수학: 'bg-blue-50 text-blue-700',
@@ -91,7 +92,10 @@ export default function CommunityPost() {
                   {post.author[0]}
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-slate-800">{post.author}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold text-slate-800">{post.author}</p>
+                    <UserTypeBadge userType={post.userType} />
+                  </div>
                   <p className="text-xs text-slate-400">{post.date}</p>
                 </div>
               </div>

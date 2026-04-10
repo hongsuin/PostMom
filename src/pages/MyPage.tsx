@@ -6,6 +6,8 @@ import type { Session } from '@supabase/supabase-js';
 import { useOnboardingStore } from '../store/onboardingStore';
 import { LEARNING_TYPES, TYPE_KEY_LIST } from '../data/learningTypes';
 import type { TypeKey } from '../data/learningTypes';
+import { getUserType, USER_TYPE_META } from '../types/user';
+import UserTypeBadge from '../components/UserTypeBadge';
 
 export default function MyPage() {
   const navigate = useNavigate();
@@ -30,11 +32,8 @@ export default function MyPage() {
     updateData({ learningType: value });
   };
 
-  const menuItems = [
-    { icon: BookOpen, label: '상담 내역', badge: '2' },
-    { icon: MessageCircle, label: '내 게시글', badge: '' },
-    { icon: Bell, label: '알림 설정', badge: '' },
-  ];
+  const userType = getUserType(session);
+  const userTypeMeta = USER_TYPE_META[userType];
 
   const displayName =
     session?.user?.user_metadata?.full_name ??
@@ -44,6 +43,12 @@ export default function MyPage() {
 
   const currentLearningType = data.learningType;
   const currentTypeData = currentLearningType ? LEARNING_TYPES[currentLearningType] : null;
+
+  const menuItems = [
+    { icon: BookOpen, label: '상담 내역', badge: '2' },
+    { icon: MessageCircle, label: '내 게시글', badge: '' },
+    { icon: Bell, label: '알림 설정', badge: '' },
+  ];
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -63,65 +68,74 @@ export default function MyPage() {
           {/* 프로필 카드 */}
           <div className="lg:col-span-1">
             <div className="bg-gradient-to-br from-primary to-primary/80 rounded-2xl p-6 text-white">
+
               {/* 유저 정보 */}
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center shrink-0">
                   <User size={32} className="text-white" />
                 </div>
-                <div>
-                  <p className="font-lora font-semibold text-xl">{displayName}</p>
-                  {email && <p className="text-sm opacity-75 mt-0.5">{email}</p>}
-                </div>
-              </div>
-
-              {/* 학습 유형 섹션 */}
-              <div className="mt-5 pt-5 border-t border-white/20">
-                <div className="flex items-center gap-2 mb-2">
-                  <Brain size={14} className="text-white/80" />
-                  <p className="text-xs font-semibold text-white/80 uppercase tracking-wider">
-                    학습 유형
-                  </p>
-                </div>
-
-                {/* 현재 유형 표시 */}
-                {currentTypeData && (
-                  <div className="flex items-center gap-2 mb-2.5">
-                    <span className="text-lg">{currentTypeData.emoji}</span>
-                    <span className="text-sm font-semibold text-white">
-                      {currentTypeData.name}
-                    </span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-lora font-semibold text-xl">{displayName}</p>
+                    {/* 유형 뱃지 (학부모/학원만 표시) */}
+                    {userType !== 'student' && (
+                      <span className="inline-flex items-center rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-medium text-white border border-white/30">
+                        {userTypeMeta.emoji} {userTypeMeta.label}
+                      </span>
+                    )}
                   </div>
-                )}
-
-                {/* 유형 선택 select */}
-                <select
-                  value={currentLearningType}
-                  onChange={handleLearningTypeChange}
-                  className="w-full rounded-xl bg-white/15 border border-white/30 text-white text-sm px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-white/40 cursor-pointer appearance-none"
-                  style={{ backgroundImage: 'none' }}
-                >
-                  <option value="" className="text-slate-800 bg-white">
-                    {currentLearningType ? '유형 변경하기' : '아직 테스트하지 않았어요'}
-                  </option>
-                  {TYPE_KEY_LIST.map((key) => {
-                    const t = LEARNING_TYPES[key];
-                    return (
-                      <option key={key} value={key} className="text-slate-800 bg-white">
-                        {t.emoji} {t.name}
-                      </option>
-                    );
-                  })}
-                </select>
-
-                {/* 테스트 링크 */}
-                <Link
-                  to="/learning-test"
-                  className="mt-2.5 flex items-center justify-center gap-1 text-xs text-white/70 hover:text-white transition-colors"
-                >
-                  <Brain size={11} />
-                  {currentLearningType ? '테스트 다시 하기 →' : '학습 유형 테스트하기 →'}
-                </Link>
+                  {email && <p className="text-sm opacity-75 mt-0.5 truncate">{email}</p>}
+                </div>
               </div>
+
+              {/* 학습 유형 섹션 — 학원/기업은 표시 안 함 */}
+              {userType !== 'academy' && (
+                <div className="mt-5 pt-5 border-t border-white/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Brain size={14} className="text-white/80" />
+                    <p className="text-xs font-semibold text-white/80 uppercase tracking-wider">
+                      학습 유형
+                    </p>
+                  </div>
+
+                  {currentTypeData && (
+                    <div className="flex items-center gap-2 mb-2.5">
+                      <span className="text-lg">{currentTypeData.emoji}</span>
+                      <span className="text-sm font-semibold text-white">
+                        {currentTypeData.name}
+                      </span>
+                    </div>
+                  )}
+
+                  <select
+                    value={currentLearningType}
+                    onChange={handleLearningTypeChange}
+                    className="w-full rounded-xl bg-white/15 border border-white/30 text-white text-sm px-3 py-2.5
+                      focus:outline-none focus:ring-2 focus:ring-white/40 cursor-pointer appearance-none"
+                    style={{ backgroundImage: 'none' }}
+                  >
+                    <option value="" className="text-slate-800 bg-white">
+                      {currentLearningType ? '유형 변경하기' : '아직 테스트하지 않았어요'}
+                    </option>
+                    {TYPE_KEY_LIST.map((key) => {
+                      const t = LEARNING_TYPES[key];
+                      return (
+                        <option key={key} value={key} className="text-slate-800 bg-white">
+                          {t.emoji} {t.name}
+                        </option>
+                      );
+                    })}
+                  </select>
+
+                  <Link
+                    to="/learning-test"
+                    className="mt-2.5 flex items-center justify-center gap-1 text-xs text-white/70 hover:text-white transition-colors"
+                  >
+                    <Brain size={11} />
+                    {currentLearningType ? '테스트 다시 하기 →' : '학습 유형 테스트하기 →'}
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
 
@@ -141,7 +155,9 @@ export default function MyPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     {badge && (
-                      <span className="bg-primary text-white text-xs px-2 py-0.5 rounded-full font-medium">{badge}</span>
+                      <span className="bg-primary text-white text-xs px-2 py-0.5 rounded-full font-medium">
+                        {badge}
+                      </span>
                     )}
                     <ChevronRight size={16} className="text-slate-300" />
                   </div>
@@ -149,12 +165,15 @@ export default function MyPage() {
               ))}
             </div>
 
-            <Link
-              to="/admin"
-              className="block bg-slate-900 text-white px-6 py-4 rounded-2xl text-sm font-semibold text-center hover:bg-slate-800 transition-colors"
-            >
-              관리자 페이지로 이동 →
-            </Link>
+            {/* 관리자 대시보드 — 학원/기업만 표시 */}
+            {userType === 'academy' && (
+              <Link
+                to="/admin"
+                className="block bg-slate-900 text-white px-6 py-4 rounded-2xl text-sm font-semibold text-center hover:bg-slate-800 transition-colors"
+              >
+                관리자 페이지로 이동 →
+              </Link>
+            )}
 
             <button
               onClick={() => void handleLogout()}

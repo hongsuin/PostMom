@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { MessageCircle, Heart, Pencil, TrendingUp, Tag, ChevronRight } from 'lucide-react';
 import { communityPosts } from '../data/mockData';
+import UserTypeBadge from '../components/UserTypeBadge';
 
 const POPULAR_TAGS = ['수학', '영어', '과학', '위례', '분당', '후기', '비교', '선행', '중학교'];
 
@@ -93,6 +94,7 @@ export default function CommunityHome() {
                       {post.author[0]}
                     </div>
                     <span className="font-medium text-slate-700">{post.author}</span>
+                    <UserTypeBadge userType={post.userType} />
                   </div>
 
                   <div className="flex items-center gap-5 text-xs text-slate-400">
