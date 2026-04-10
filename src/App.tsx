@@ -1,4 +1,13 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
 import LearningTypeAnimOverlay from './components/LearningTypeAnimOverlay';
 import UserLayout from './layouts/UserLayout';
 import AdminLayout from './layouts/AdminLayout';
@@ -36,6 +45,7 @@ import AdminPreview from './features/admin/pages/AdminPreview';
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         {/* Onboarding - no bottom nav */}
         <Route path="/onboarding/1" element={<OnboardingStep1 />} />

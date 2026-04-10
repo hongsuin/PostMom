@@ -32,7 +32,7 @@ export default function LevelTestRequest() {
     <div className="min-h-screen">
       <Header title="레벨테스트 신청" showBack />
 
-      <div className="px-5 pt-5 pb-8 space-y-4">
+      <div className="mx-auto max-w-[1400px] px-8 pt-5 pb-8 xl:px-12 space-y-4">
         {/* 학원 정보 */}
         <div className="bg-primary/10 rounded-2xl p-4">
           <p className="text-sm font-semibold text-primary">{academy.name}</p>
