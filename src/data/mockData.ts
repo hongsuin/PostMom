@@ -33,6 +33,7 @@ export interface CommunityPost {
   title: string;
   content: string;
   author: string;
+  userType?: 'student' | 'parent' | 'academy';
   date: string;
   likes: number;
   comments: number;

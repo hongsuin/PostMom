@@ -22,9 +22,9 @@
 
 | 유형 키 | 표시 이름 | 이모지 | 한 줄 설명 |
 |---|---|---|---|
-| `student` | 학생 / 일반 | 🎒 | 리뷰 확인 및 학원 검색 |
-| `parent` | 학부모 | 👨‍👩‍👧 | 우리 아이 학원 찾기 |
-| `academy` | 학원 / 기업 | 🏫 | 학원 프로필 관리 및 리드 확인 |
+| `student` | 학생 / 일반 | 리뷰 확인 및 학원 검색 |
+| `parent` | 학부모 | 우리 아이 학원 찾기 |
+| `academy` | 학원 / 기업 | 학원 프로필 관리 및 리드 확인 |
 
 ---
 
@@ -257,11 +257,126 @@ export function getUserType(session: Session | null): UserType {
 
 ---
 
-## 10. 미결 사항
+## 10. 확정 사항
 
-| 항목 | 결정 필요 |
+### 10-1. 가입 후 이동 경로
+
+| 유형 | 이동 경로 |
 |---|---|
-| 가입 후 이동 경로 | 온보딩(`/onboarding/1`) vs 바로 홈(`/`) — 유형별로 다르게? |
-| 유형 변경 가능 여부 | 마이페이지에서 유형 변경 허용? (특히 `academy` → `parent` 등) |
-| 학원 가입 추가 정보 | 학원명, 사업자번호 등 추가 입력 필드 필요 여부 |
-| 커뮤니티 뱃지 데이터 | 현재 mock 데이터에 `userType` 필드 없음 → 추가 필요 |
+| `student` | `/onboarding/1` |
+| `parent` | `/onboarding/1` |
+| `academy` | `/` (홈) |
+
+### 10-2. 유형 변경
+- **불가** — 마이페이지에서 유형 변경 기능 없음. 현 단계에서 미지원.
+
+### 10-3. 학원 가입 추가 입력 필드
+학원/기업 유형 선택 시 STEP 2 폼에 아래 필드 추가:
+
+| 필드 | 필수 여부 | 비고 |
+|---|---|---|
+| 학원명 | 선택 | text input |
+| 사업자 번호 | 선택 | text input (숫자 10자리) |
+| 사업자 등록증 | 선택 | file input (PDF/이미지) |
+
+> 테스트 단계이므로 모두 선택 입력 — 빈 값으로도 가입 가능
+
+### 10-4. 커뮤니티 뱃지 데이터 — mock 수정 방법
+
+#### 문제
+현재 `CommunityPost` 인터페이스와 mock 데이터에 `userType` 필드가 없어 뱃지를 표시할 수 없음.
+
+#### 수정해야 할 곳 2곳
+
+**① `src/data/mockData.ts` — 인터페이스 + 데이터에 `userType` 추가**
+
+```typescript
+// Before
+export interface CommunityPost {
+  id: string;
+  title: string;
+  content: string;
+  author: string;
+  date: string;
+  likes: number;
+  comments: number;
+  tags: string[];
+  mentionedAcademies: string[];
+}
+
+// After
+export interface CommunityPost {
+  id: string;
+  title: string;
+  content: string;
+  author: string;
+  userType?: 'student' | 'parent' | 'academy';  // ← 추가
+  date: string;
+  likes: number;
+  comments: number;
+  tags: string[];
+  mentionedAcademies: string[];
+}
+```
+
+```typescript
+// communityPosts 배열에 userType 추가 (예시)
+{
+  id: '1',
+  title: '매쓰피아 수학학원 1년 다닌 후기',
+  author: '위례맘123',
+  userType: 'parent',   // ← 학부모 뱃지
+  ...
+},
+{
+  id: '2',
+  title: '영어나라 vs 다른 영어학원 비교해봤어요',
+  author: '분당학부모',
+  userType: 'parent',   // ← 학부모 뱃지
+  ...
+},
+{
+  id: '3',
+  title: '중학교 입학 전 과학 선행 어디가 좋을까요?',
+  author: '새내기맘',
+  userType: 'student',  // ← 뱃지 없음
+  ...
+},
+```
+
+**② `Academy.reviews` 배열도 동일하게 수정 (학원 상세 페이지 리뷰에 뱃지 표시 시)**
+
+```typescript
+// academies.json의 reviews 배열 항목에 userType 추가
+reviews: Array<{
+  author: string;
+  text: string;
+  rating: number;
+  keywords: string[];
+  userType?: 'student' | 'parent' | 'academy';  // ← 추가
+}>
+```
+
+#### 뱃지 렌더링 공통 컴포넌트
+
+```tsx
+// src/components/UserTypeBadge.tsx (신규 생성)
+import type { UserType } from '../types/user';
+
+const BADGE = {
+  parent:  { label: '학부모', style: 'bg-blue-50 text-blue-600 border border-blue-200' },
+  academy: { label: '학원',   style: 'bg-amber-50 text-amber-600 border border-amber-200' },
+} as const;
+
+export default function UserTypeBadge({ userType }: { userType?: UserType }) {
+  if (!userType || userType === 'student') return null;
+  const b = BADGE[userType];
+  return (
+    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${b.style}`}>
+      {b.label}
+    </span>
+  );
+}
+```
+
+이후 `CommunityHome.tsx`, `CommunityPost.tsx` 작성자 이름 옆에 `<UserTypeBadge userType={post.userType} />` 한 줄만 추가하면 됨.
