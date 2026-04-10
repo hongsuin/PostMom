@@ -332,7 +332,7 @@ export default function Home() {
         />
 
         {/* Hero content */}
-        <div className="relative z-10 mx-auto flex min-h-screen max-w-[1400px] items-center px-8 pb-20 pt-28 xl:px-12">
+        <div className="relative z-10 mx-auto flex min-h-screen max-w-[1400px] items-start lg:items-center px-8 pb-20 pt-36 lg:pt-28 xl:px-12">
           <div className="grid w-full grid-cols-1 items-center gap-16 lg:grid-cols-[1fr_420px] xl:grid-cols-[1fr_480px]">
             {/* Left: headline + CTAs */}
             <div>
@@ -350,7 +350,7 @@ export default function Home() {
 
               <motion.h1
                 id="hero-heading"
-                className="font-lora text-5xl font-semibold leading-[1.1] tracking-tight text-white xl:text-5xl 2xl:text-5.5xl"
+                className="font-lora text-3xl font-semibold leading-[1.1] tracking-tight text-white xl:text-3xl 2xl:text-4xl"
                 initial={{ opacity: 0, y: 24, filter: 'blur(4px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 transition={{ duration: 0.8, ease: EASE, delay: 0.1 }}
@@ -362,15 +362,13 @@ export default function Home() {
               </motion.h1>
 
               <motion.p
-                className="mt-6 max-w-xl text-lg leading-relaxed text-white/70"
+                className="mt-6 max-w-xl text-sm leading-relaxed text-white/70"
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: EASE, delay: 0.25 }}
               >
-                광고보다 실제 후기, 감보다 비교 데이터.
-                <br />
                 PostMom으로 지역·학년·과목·예산에
-                맞는 학원을 실제 데이터로 비교하고 <br/>상담까지 경험해보세요
+                맞는 학원을 <br/>실제 데이터로 비교하고 상담까지 경험해보세요
               </motion.p>
 
               <motion.div
@@ -381,20 +379,20 @@ export default function Home() {
               >
                 <Link
                   to="/learning-test"
-                  className="rounded-full bg-white px-8 py-4 text-base font-semibold text-slate-900 shadow-xl transition-all hover:scale-[1.03] hover:bg-slate-50 active:scale-[0.97]"
+                  className="rounded-full bg-white px-6 py-3 text-base font-semibold text-slate-900 shadow-xl transition-all hover:scale-[1.03] hover:bg-slate-50 active:scale-[0.97]"
                 >
                   POSTMOM 학습유형 분석하기 →
                 </Link>
                 <Link
                   to="/academies"
-                  className="liquid-glass rounded-full px-8 py-4 text-base font-medium text-white transition-all hover:scale-[1.03] active:scale-[0.97]"
+                  className="liquid-glass rounded-full px-6 py-3 text-base font-medium text-white transition-all hover:scale-[1.03] active:scale-[0.97]"
                 >
                   우리 동네 학원 찾기
                 </Link>
               </motion.div>
 
               {/* Trust badges */}
-              <motion.div
+              {/* <motion.div
                 className="mt-8 flex flex-wrap items-center gap-3"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -410,20 +408,20 @@ export default function Home() {
                     </span>
                   )
                 )}
-              </motion.div>
+              </motion.div> */}
             </div>
 
             {/* Right: glass card */}
             <motion.div
-              className="liquid-glass hidden rounded-3xl p-5 text-white lg:block w-[320px] flex-shrink-0"
+              className="liquid-glass hidden rounded-3xl p-5 text-white lg:block w-[320px] flex-shrink-0 ml-auto"
               initial={{ opacity: 0, y: 24, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.9, ease: EASE, delay: 0.3 }}
             >
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="font-lora text-base font-medium">AI 추천 미리보기</h3>
+                <h3 className="font-lora text-base font-medium">내 카드</h3>
                 <span className="rounded-full bg-green-800/20 px-2.5 py-0.5 text-xs font-medium text-white/70">
-                  분석 완료
+                  수정하기
                 </span>
               </div>
 
@@ -433,7 +431,7 @@ export default function Home() {
                   ['학년', '초등 4학년'],
                   ['과목', '영어'],
                   ['예산', '월 40만원 이하'],
-                  ['중요 기준', '밀착케어 / 후기 신뢰도'],
+                  ['중요 기준', '밀착케어'],
                 ].map(([label, val]) => (
                   <div
                     key={label}
@@ -462,21 +460,7 @@ export default function Home() {
                 )}
               </div>
 
-              {session ? (
-                <Link
-                  to="/learning-test"
-                  className="mt-4 block w-full rounded-2xl bg-white/15 py-2.5 text-center text-xs font-semibold text-white transition-all hover:bg-white/22"
-                >
-                  우리 아이 맞춤 분석 시작하기 →
-                </Link>
-              ) : (
-                <Link
-                  to="/login"
-                  className="mt-4 block w-full rounded-2xl bg-white py-2.5 text-center text-xs font-semibold text-slate-900 transition-all hover:bg-white/90"
-                >
-                  로그인하고 결과 확인하기 →
-                </Link>
-              )}
+
             </motion.div>
           </div>
         </div>

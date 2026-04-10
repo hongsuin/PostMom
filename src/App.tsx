@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import LearningTypeAnimOverlay from './components/LearningTypeAnimOverlay';
 import UserLayout from './layouts/UserLayout';
 import AdminLayout from './layouts/AdminLayout';
 
@@ -67,6 +68,7 @@ export default function App() {
 
         {/* User with bottom nav */}
         <Route element={<UserLayout />}>
+
           <Route path="/academies" element={<AcademyList />} />
           <Route path="/academies/:id" element={<AcademyDetail />} />
           <Route path="/compare" element={<AICompare />} />
@@ -77,6 +79,8 @@ export default function App() {
           <Route path="/mypage" element={<MyPage />} />
         </Route>
       </Routes>
+      {/* Global overlay — persists across route transitions for learning type animation */}
+      <LearningTypeAnimOverlay />
     </BrowserRouter>
   );
 }

@@ -76,8 +76,9 @@ export default function SiteHeader() {
               AI 비교 시작
             </Link>
 
-            {/* MyPage / Login icon */}
+            {/* MyPage / Login icon — id used as animation anchor by LearningTypeAnimOverlay */}
             <Link
+              id="user-icon-anchor"
               to={session ? '/mypage' : '/login'}
               className="flex items-center justify-center p-1 text-slate-700 transition-colors hover:text-slate-900"
               aria-label={session ? '마이페이지' : '로그인'}
