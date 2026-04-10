@@ -143,9 +143,9 @@
 | 컨테이너 너비 | `max-w-lg` (온보딩과 동일) |
 | 배경 | **비디오 배경 + 그라디언트 오버레이** (아래 참조) |
 | 카드 | `rounded-2xl`, `border-2`, `shadow` |
-| 선택 상태 | `border-[hsl(250,95%,65%)]` + 배경 강조 |
-| 버튼 Primary | 보라색 배경 `bg-[hsl(250,95%,65%)]` |
-| 버튼 Secondary | 흰 배경 + 보라색 border/텍스트 |
+| 선택 상태 | `border-primary` + 배경 강조 |
+| 버튼 Primary | 초록색 배경 `bg-primary` (`hsl(130 79% 41%)`) |
+| 버튼 Secondary | 흰 배경 + 초록색 border/텍스트 |
 | 진행 바 | 온보딩 5구간 바와 동일 스타일 |
 | 폰트 | 온보딩 동일 (소제목, h3, body) |
 

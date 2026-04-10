@@ -42,7 +42,7 @@ export default function OnboardingLayout({
               <div
                 key={i}
                 className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
-                  i + 1 <= step ? 'bg-[hsl(250,95%,65%)]' : 'bg-slate-200'
+                  i + 1 <= step ? 'bg-primary' : 'bg-slate-200'
                 }`}
               />
             ))}

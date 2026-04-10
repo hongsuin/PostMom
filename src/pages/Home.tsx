@@ -658,11 +658,11 @@ export default function Home() {
         {/* Decorative blobs */}
         <div
           className="pointer-events-none absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full opacity-25 blur-3xl"
-          style={{ background: 'radial-gradient(circle, hsl(250 95% 65%) 0%, transparent 70%)' }}
+          style={{ background: 'radial-gradient(circle, hsl(130 79% 41%) 0%, transparent 70%)' }}
         />
         <div
           className="pointer-events-none absolute -bottom-32 -right-32 h-[400px] w-[400px] rounded-full opacity-20 blur-3xl"
-          style={{ background: 'radial-gradient(circle, hsl(250 95% 65%) 0%, transparent 70%)' }}
+          style={{ background: 'radial-gradient(circle, hsl(130 79% 41%) 0%, transparent 70%)' }}
         />
 
         <div className="relative mx-auto max-w-[800px] px-8 text-center xl:px-12">
