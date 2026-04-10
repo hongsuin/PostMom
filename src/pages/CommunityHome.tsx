@@ -5,15 +5,15 @@ import { communityPosts } from '../data/mockData';
 const POPULAR_TAGS = ['수학', '영어', '과학', '위례', '분당', '후기', '비교', '선행', '중학교'];
 
 const TAG_COLORS: Record<string, string> = {
-  수학: 'bg-blue-50 text-blue-700',
-  영어: 'bg-green-50 text-green-700',
-  과학: 'bg-orange-50 text-orange-700',
-  위례: 'bg-purple-50 text-purple-700',
-  분당: 'bg-pink-50 text-pink-700',
-  후기: 'bg-yellow-50 text-yellow-700',
-  비교: 'bg-cyan-50 text-cyan-700',
-  선행: 'bg-red-50 text-red-700',
-  중학교: 'bg-indigo-50 text-indigo-700',
+  수학: 'bg-sky-50 text-sky-00',
+  영어: 'bg-emerald-50 text-emerald-700',
+  과학: 'bg-amber-50 text-amber-700',
+  위례: 'bg-violet-50 text-violet-700',
+  분당: 'bg-rose-50 text-rose-700',
+  후기: 'bg-lime-50 text-lime-700',
+  비교: 'bg-teal-50 text-teal-700',
+  선행: 'bg-orange-50 text-orange-700',
+  중학교: 'bg-fuchsia-50 text-fuchsia-700',
 };
 
 function formatDate(dateStr: string) {
@@ -123,7 +123,7 @@ export default function CommunityHome() {
           <aside className="hidden w-64 shrink-0 lg:block xl:w-72">
             <div className="sticky top-24 space-y-5">
               {/* Write CTA */}
-              <div className="rounded-2xl bg-gradient-to-br from-primary to-purple-600 p-6 text-white">
+              <div className="rounded-2xl bg-gradient-to-br from-green-500 to-primary p-6 text-white">
                 <p className="mb-1 font-semibold">학원 후기를 공유해주세요</p>
                 <p className="mb-4 text-sm text-white/75">
                   내 경험이 다른 학부모에게 큰 도움이 됩니다

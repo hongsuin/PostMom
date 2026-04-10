@@ -4,8 +4,8 @@
 :root {
   --font-lora: "Noto Sans KR", sans-serif;
   --font-inter: "Inter", sans-serif;
-  --color-brand-gray: hsl(240 4% 46%);
-  --color-primary: hsl(250 95% 65%);
+  --color-brand-gray: hsl(133, 9%, 70%);
+  --color-primary: hsl(130, 79%, 41%);
 }
 
 @theme {
