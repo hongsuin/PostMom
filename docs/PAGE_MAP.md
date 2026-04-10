@@ -18,6 +18,8 @@
 | `/` | `src/pages/Home.tsx` | 랜딩 페이지 |
 | `/login` | `src/pages/Login.tsx` | 로그인 |
 | `/signup` | `src/pages/Signup.tsx` | 회원가입 |
+| `/auth/callback` | `src/pages/AuthCallback.tsx` | Supabase OAuth 콜백 처리 |
+| `/learning-test` | `src/pages/LearningTypeTest.tsx` | 학습 유형 테스트 (인트로 → 질문 → 결과) |
 | `/consult/complete` | `src/pages/ConsultComplete.tsx` | 상담 신청 완료 |
 | `/compare/result` | `src/pages/AICompareResult.tsx` | AI 비교 결과 |
 
@@ -74,6 +76,7 @@
 | `/admin/leads/:id` | `src/features/admin/pages/AdminLeadDetail.tsx` | 상담 요청 상세 |
 | `/admin/profile` | `src/features/admin/pages/AdminProfile.tsx` | 어드민 계정 설정 |
 | `/admin/credit` | `src/features/admin/pages/AdminCredit.tsx` | 크레딧 / 결제 관리 |
+| `/admin/preview` | `src/features/admin/pages/AdminPreview.tsx` | 학원 정보 미리보기 |
 
 ---
 
@@ -94,7 +97,10 @@
 | 파일 | 역할 |
 |------|------|
 | `src/store/onboardingStore.ts` | 온보딩 전역 상태 (Zustand) — AI 비교에도 사용 |
+| `src/store/learningTypeAnimStore.ts` | 학습 유형 저장/건너뛰기 시 카드 애니메이션 트리거 상태 |
 | `src/data/mockData.ts` | 학원 목록 / 커뮤니티 게시글 / 어드민 상담 데이터 |
+| `src/data/academies.json` | 실제 학원 데이터 (id, 이름, 위치, 과목, 주소 등) |
+| `src/data/learningTypes.ts` | 학습 유형 정의 (TypeKey, 이름, 이모지, 색상, 설명 등) |
 
 ---
 
@@ -104,3 +110,11 @@
 |------|------|
 | `src/features/onboarding/components/OnboardingLayout.tsx` | 온보딩 공통 래퍼 (진행 표시 등) |
 | `src/features/onboarding/components/StepCard.tsx` | 선택지 카드 컴포넌트 |
+
+---
+
+## 전역 컴포넌트
+
+| 파일 | 역할 |
+|------|------|
+| `src/components/LearningTypeAnimOverlay.tsx` | 학습 유형 저장/건너뛰기 시 결과 카드가 유저 아이콘으로 날아가는 전역 오버레이 애니메이션 |
