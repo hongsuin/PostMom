@@ -695,7 +695,7 @@ export default function Home() {
       </section></>)}
 
       {/* ── FOOTER ────────────────────────────────────────── */}
-      <footer className="border-t border-slate-200 bg-white py-14">
+      <footer className="hidden md:block border-t border-slate-200 bg-white py-14">
         <div className="mx-auto max-w-[1400px] px-8 xl:px-12">
           <div className="grid grid-cols-1 gap-10 md:grid-cols-[2fr_1fr_1fr_1fr]">
             {/* Brand */}
