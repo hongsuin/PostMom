@@ -67,7 +67,7 @@ export default function Login() {
 
       <div className="relative z-10 max-w-[480px] mx-auto px-6 pt-16 pb-10 min-h-screen flex flex-col justify-center">
         <div className="mb-10">
-          <h1 className="font-lora text-3xl font-semibold text-primary mb-2">PostMom</h1>
+          <img src="/앱로고-light.svg" alt="PostMom" className="h-8 w-auto mb-2" />
           <p className="text-slate-500 text-sm">우리 아이에게 맞는 학원을 더 쉽게 찾도록 도와드릴게요.</p>
         </div>
 

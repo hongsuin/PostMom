@@ -22,8 +22,8 @@ export default function Header({ title, showBack = false, rightElement }: Header
             <span className="font-semibold text-slate-900">{title}</span>
           )}
           {!title && !showBack && (
-            <Link to="/" className="font-lora text-xl font-medium tracking-tight text-primary">
-              PostMom
+            <Link to="/" aria-label="PostMom 홈">
+              <img src="/앱로고-light.svg" alt="PostMom" className="h-6 w-auto" />
             </Link>
           )}
         </div>

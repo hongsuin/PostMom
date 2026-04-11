@@ -30,8 +30,8 @@ export default function SiteHeader() {
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between px-8 py-3.5 xl:px-12">
           {/* Logo */}
-          <Link to="/" className="font-lora text-xl font-semibold tracking-tight text-slate-900">
-            PostMom
+          <Link to="/" aria-label="PostMom 홈">
+            <img src="/앱로고-light.svg" alt="PostMom" className="h-10 w-auto" />
           </Link>
 
           {/* Nav (desktop) */}
@@ -111,12 +111,8 @@ export default function SiteHeader() {
         }`}
       >
         <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-          <Link
-            to="/"
-            className="font-lora text-xl font-semibold tracking-tight text-slate-900"
-            onClick={() => setDrawerOpen(false)}
-          >
-            PostMom
+          <Link to="/" onClick={() => setDrawerOpen(false)} aria-label="PostMom 홈">
+            <img src="/앱로고-light.svg" alt="PostMom" className="h-6 w-auto" />
           </Link>
           <button
             onClick={() => setDrawerOpen(false)}

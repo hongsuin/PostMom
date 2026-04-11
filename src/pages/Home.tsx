@@ -184,8 +184,8 @@ export default function Home() {
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/20 backdrop-blur-md">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between px-8 py-4 xl:px-12">
           {/* Logo */}
-          <Link to="/" className="font-lora text-2xl font-semibold tracking-tight text-white">
-            PostMom
+          <Link to="/" aria-label="PostMom 홈">
+            <img src="/앱로고.svg" alt="PostMom" className="h-10 w-auto" />
           </Link>
 
           {/* Nav links (desktop) */}
@@ -250,12 +250,8 @@ export default function Home() {
         }`}
       >
         <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-          <Link
-            to="/"
-            className="font-lora text-xl font-semibold tracking-tight text-slate-900"
-            onClick={() => setDrawerOpen(false)}
-          >
-            PostMom
+          <Link to="/" onClick={() => setDrawerOpen(false)} aria-label="PostMom 홈">
+            <img src="/앱로고-light.svg" alt="PostMom" className="h-6 w-auto" />
           </Link>
           <button
             onClick={() => setDrawerOpen(false)}
@@ -700,8 +696,8 @@ export default function Home() {
           <div className="grid grid-cols-1 gap-10 md:grid-cols-[2fr_1fr_1fr_1fr]">
             {/* Brand */}
             <div>
-              <Link to="/" className="font-lora text-2xl font-semibold text-slate-900">
-                PostMom
+              <Link to="/" aria-label="PostMom 홈">
+                <img src="/앱로고-light.svg" alt="PostMom" className="h-7 w-auto" />
               </Link>
               <p className="mt-3 max-w-xs text-sm leading-relaxed text-slate-500">
                 학부모가 데이터로 학원을 고르는 시대. PostMom은 AI와 커뮤니티로 더 나은
