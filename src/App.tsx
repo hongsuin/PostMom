@@ -25,6 +25,7 @@ import ConsultComplete from './pages/ConsultComplete';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import MyPage from './pages/MyPage';
+import MyConsultations from './pages/MyConsultations';
 import AuthCallback from './pages/AuthCallback';
 import LearningTypeTest from './pages/LearningTypeTest';
 
@@ -87,6 +88,7 @@ export default function App() {
           <Route path="/consult/:id" element={<ConsultRequest />} />
           <Route path="/leveltest/:id" element={<LevelTestRequest />} />
           <Route path="/mypage" element={<MyPage />} />
+          <Route path="/mypage/consultations" element={<MyConsultations />} />
         </Route>
       </Routes>
       {/* Global overlay — persists across route transitions for learning type animation */}

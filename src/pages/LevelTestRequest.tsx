@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { academies } from '../data/mockData';
 import Header from '../layouts/Header';
+import { getSupabaseBrowserClient } from '../lib/supabase';
+import { useConsultationStore } from '../store/consultationStore';
 
 export default function LevelTestRequest() {
   const { id } = useParams();
@@ -10,6 +12,9 @@ export default function LevelTestRequest() {
 
   const [form, setForm] = useState({ name: '', phone: '', grade: '', preferDate: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
+
+  const { addConsultation } = useConsultationStore();
 
   const validate = () => {
     const e: Record<string, string> = {};
@@ -20,10 +25,36 @@ export default function LevelTestRequest() {
     return e;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const e = validate();
     if (Object.keys(e).length > 0) { setErrors(e); return; }
-    navigate('/consult/complete');
+    if (!academy) return;
+
+    setSubmitting(true);
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const { data: { session } } = await supabase.auth.getSession();
+
+      await addConsultation(
+        {
+          academyId: academy.id,
+          academyName: academy.name,
+          parentName: form.name,
+          phone: form.phone,
+          grade: form.grade,
+          message: form.preferDate ? `희망 날짜: ${form.preferDate}` : undefined,
+          requestType: '레벨테스트',
+        },
+        session?.user.id,
+      );
+
+      navigate('/consult/complete');
+    } catch (err) {
+      console.error('[LevelTestRequest] 저장 오류:', err);
+      navigate('/consult/complete');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (!academy) return <div className="p-4">학원을 찾을 수 없습니다.</div>;
@@ -89,10 +120,11 @@ export default function LevelTestRequest() {
         </div>
 
         <button
-          onClick={handleSubmit}
-          className="w-full bg-slate-900 text-white py-4 rounded-2xl font-semibold text-sm hover:bg-slate-800 transition-colors"
+          onClick={() => void handleSubmit()}
+          disabled={submitting}
+          className="w-full bg-slate-900 text-white py-4 rounded-2xl font-semibold text-sm hover:bg-slate-800 transition-colors disabled:opacity-60"
         >
-          레벨테스트 신청하기
+          {submitting ? '신청 중...' : '레벨테스트 신청하기'}
         </button>
       </div>
     </div>

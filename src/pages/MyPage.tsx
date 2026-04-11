@@ -8,6 +8,7 @@ import { LEARNING_TYPES, TYPE_KEY_LIST } from '../data/learningTypes';
 import type { TypeKey } from '../data/learningTypes';
 import { getUserType, USER_TYPE_META } from '../types/user';
 import UserTypeBadge from '../components/UserTypeBadge';
+import { useConsultationStore } from '../store/consultationStore';
 
 export default function MyPage() {
   const navigate = useNavigate();
@@ -32,6 +33,14 @@ export default function MyPage() {
     updateData({ learningType: value });
   };
 
+  const { myConsultations, fetchMyConsultations } = useConsultationStore();
+
+  useEffect(() => {
+    if (session?.user.id) {
+      void fetchMyConsultations(session.user.id);
+    }
+  }, [session, fetchMyConsultations]);
+
   const userType = getUserType(session);
   const userTypeMeta = USER_TYPE_META[userType];
 
@@ -44,10 +53,12 @@ export default function MyPage() {
   const currentLearningType = data.learningType;
   const currentTypeData = currentLearningType ? LEARNING_TYPES[currentLearningType] : null;
 
+  const consultCount = myConsultations.length;
+
   const menuItems = [
-    { icon: BookOpen, label: '상담 내역', badge: '2' },
-    { icon: MessageCircle, label: '내 게시글', badge: '' },
-    { icon: Bell, label: '알림 설정', badge: '' },
+    { icon: BookOpen, label: '상담 내역', badge: consultCount > 0 ? String(consultCount) : '', onClick: () => navigate('/mypage/consultations') },
+    { icon: MessageCircle, label: '내 게시글', badge: '', onClick: undefined },
+    { icon: Bell, label: '알림 설정', badge: '', onClick: undefined },
   ];
 
   return (
@@ -142,9 +153,10 @@ export default function MyPage() {
           {/* 메뉴 */}
           <div className="lg:col-span-2 space-y-4">
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-              {menuItems.map(({ icon: Icon, label, badge }) => (
+              {menuItems.map(({ icon: Icon, label, badge, onClick }) => (
                 <button
                   key={label}
+                  onClick={onClick}
                   className="w-full flex items-center justify-between px-6 py-4 border-b border-slate-50 last:border-0 hover:bg-primary/5 transition-colors"
                 >
                   <div className="flex items-center gap-3">
