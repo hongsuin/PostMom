@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 export default function AdminDashboard() {
   const newLeads = adminLeads.filter(l => l.status === '신규').length;
   const inProgressLeads = adminLeads.filter(l => l.status === '진행중').length;
-  const completedLeads = adminLeads.filter(l => l.status === '완료').length;
+
 
   const stats = [
     { label: '전체 리드', value: adminLeads.length, icon: Users, color: 'bg-primary/10 text-primary', border: 'border-primary/20' },

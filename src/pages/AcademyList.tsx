@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Star, MapPin, Clock, ChevronRight, SlidersHorizontal } from 'lucide-react';
 import { academies } from '../data/mockData';
@@ -19,7 +19,11 @@ export default function AcademyList() {
   const [activeSubject, setActiveSubject] = useState('전체');
   const [activeLocation, setActiveLocation] = useState('전체 지역');
   const [sortBy, setSortBy] = useState('평점 높은 순');
-  const { getReviews } = useReviewStore();
+  const { getReviews, fetchReviews } = useReviewStore();
+
+  useEffect(() => {
+    academies.forEach((a) => { void fetchReviews(a.id); });
+  }, [fetchReviews]);
 
   const filtered = academies.filter((a) => {
     const matchSearch =

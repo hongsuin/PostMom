@@ -7,7 +7,7 @@ import { useOnboardingStore } from '../store/onboardingStore';
 import { LEARNING_TYPES, TYPE_KEY_LIST } from '../data/learningTypes';
 import type { TypeKey } from '../data/learningTypes';
 import { getUserType, USER_TYPE_META } from '../types/user';
-import UserTypeBadge from '../components/UserTypeBadge';
+
 import { useConsultationStore } from '../store/consultationStore';
 
 export default function MyPage() {

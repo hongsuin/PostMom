@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { User } from 'lucide-react';
 import { getSupabaseBrowserClient } from '../lib/supabase';
 import type { Session } from '@supabase/supabase-js';
@@ -12,7 +12,6 @@ const NAV_LINKS = [
 
 export default function SiteHeader() {
   const { pathname } = useLocation();
-  const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
 
