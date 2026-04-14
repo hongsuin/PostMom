@@ -21,7 +21,7 @@ export default function AdminLayout() {
             PostMom <span className="text-primary text-sm font-medium ml-1 bg-primary/10 px-2 py-0.5 rounded-full">Admin</span>
           </Link>
 
-          {/* Nav links */}
+          {/* Nav links (desktop) */}
           <nav className="hidden items-center gap-1 lg:flex">
             {adminNav.map(({ icon: Icon, label, path }) => {
               const active = location.pathname === path || (path !== '/admin' && location.pathname.startsWith(path));
@@ -51,9 +51,16 @@ export default function AdminLayout() {
             <ChevronRight size={14} />
           </Link>
         </div>
+      </header>
 
-        {/* Mobile nav */}
-        <div className="flex border-t border-slate-100 lg:hidden">
+      {/* Content */}
+      <main className="pt-[57px] pb-[60px] lg:pb-0">
+        <Outlet />
+      </main>
+
+      {/* Bottom Nav (mobile only) */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white/95 backdrop-blur-md lg:hidden">
+        <div className="flex">
           {adminNav.map(({ icon: Icon, label, path }) => {
             const active = location.pathname === path || (path !== '/admin' && location.pathname.startsWith(path));
             return (
@@ -64,18 +71,13 @@ export default function AdminLayout() {
                   active ? 'text-primary' : 'text-slate-400'
                 }`}
               >
-                <Icon size={18} />
+                <Icon size={20} className={active ? 'text-primary' : 'text-slate-400'} />
                 {label}
               </Link>
             );
           })}
         </div>
-      </header>
-
-      {/* Content */}
-      <main className="pt-[57px] lg:pt-[57px]">
-        <Outlet />
-      </main>
+      </nav>
     </div>
   );
 }
