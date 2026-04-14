@@ -55,7 +55,7 @@ export default function OnboardingLayout({
               {step}/{TOTAL_STEPS}
             </p>
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/login')}
               className="text-xs text-slate-400 hover:text-slate-600 transition-colors"
             >
               건너뛰기 →

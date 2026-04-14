@@ -1,7 +1,11 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MessageCircle, Heart, Pencil, TrendingUp, Tag, ChevronRight } from 'lucide-react';
 import { communityPosts } from '../data/mockData';
+import type { CommunityPost } from '../data/mockData';
 import UserTypeBadge from '../components/UserTypeBadge';
+import UserProfileModal from '../components/UserProfileModal';
+import { useUserType } from '../hooks/useUserType';
 
 const POPULAR_TAGS = ['수학', '영어', '과학', '위례', '분당', '후기', '비교', '선행', '중학교'];
 
@@ -23,7 +27,26 @@ function formatDate(dateStr: string) {
 }
 
 export default function CommunityHome() {
+  const userType = useUserType();
+  const isAcademy = userType === 'academy';
+  const [selectedPost, setSelectedPost] = useState<CommunityPost | null>(null);
+
+  const openProfile = (post: CommunityPost, e: React.MouseEvent) => {
+    if (!isAcademy) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setSelectedPost(post);
+  };
+
   return (
+    <>
+    <UserProfileModal
+      author={selectedPost?.author ?? ''}
+      userType={selectedPost?.userType}
+      isOpen={!!selectedPost}
+      onClose={() => setSelectedPost(null)}
+      isAcademy={isAcademy}
+    />
     <div className="min-h-screen bg-slate-50">
       {/* Page hero */}
       <div className="border-b border-slate-200 bg-white">
@@ -89,13 +112,17 @@ export default function CommunityHome() {
 
                 {/* Footer */}
                 <div className="flex items-center justify-between border-t border-slate-100 pt-4">
-                  <div className="flex items-center gap-1.5 text-sm text-slate-500">
+                  <button
+                    type="button"
+                    onClick={(e) => openProfile(post, e)}
+                    className={`flex items-center gap-1.5 text-sm text-slate-500 ${isAcademy ? 'cursor-pointer hover:opacity-75 transition-opacity' : 'cursor-default'}`}
+                  >
                     <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
                       {post.author[0]}
                     </div>
                     <span className="font-medium text-slate-700">{post.author}</span>
                     <UserTypeBadge userType={post.userType} />
-                  </div>
+                  </button>
 
                   <div className="flex items-center gap-5 text-xs text-slate-400">
                     <span className="flex items-center gap-1.5 transition-colors group-hover:text-red-400">
@@ -197,5 +224,6 @@ export default function CommunityHome() {
         </div>
       </div>
     </div>
+    </>
   );
 }

@@ -8,6 +8,7 @@ export default function Login() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [oauthError, setOauthError] = useState('');
   const [isKakaoLoading, setIsKakaoLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const validate = () => {
     const nextErrors: Record<string, string> = {};
@@ -23,15 +24,27 @@ export default function Login() {
     return nextErrors;
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     const nextErrors = validate();
-
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
       return;
     }
 
-    navigate('/');
+    setIsLoading(true);
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const { error } = await supabase.auth.signInWithPassword({
+        email: form.email,
+        password: form.password,
+      });
+      if (error) throw error;
+      navigate('/');
+    } catch {
+      setErrors({ submit: '이메일 또는 비밀번호가 올바르지 않아요.' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleKakaoLogin = async () => {
@@ -101,11 +114,16 @@ export default function Login() {
           </div>
         </div>
 
+        {errors.submit && (
+          <p className="text-center text-xs text-red-500 mt-3">{errors.submit}</p>
+        )}
+
         <button
-          onClick={handleLogin}
-          className="w-full mt-6 bg-primary text-white py-4 rounded-2xl font-semibold text-sm hover:bg-primary/90 transition-all duration-200 active:scale-[0.99]"
+          onClick={() => void handleLogin()}
+          disabled={isLoading}
+          className="w-full mt-6 bg-primary text-white py-4 rounded-2xl font-semibold text-sm hover:bg-primary/90 transition-all duration-200 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          로그인
+          {isLoading ? '로그인 중...' : '로그인'}
         </button>
 
         <button

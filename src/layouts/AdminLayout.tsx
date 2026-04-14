@@ -4,7 +4,7 @@ import { LayoutDashboard, Users, CreditCard, User, ChevronRight } from 'lucide-r
 const adminNav = [
   { icon: LayoutDashboard, label: '대시보드', path: '/admin' },
   { icon: Users, label: '리드 관리', path: '/admin/leads' },
-  { icon: CreditCard, label: '크레딧', path: '/admin/credit' },
+  { icon: CreditCard, label: '비즈머니', path: '/admin/credit' },
   { icon: User, label: '프로필', path: '/admin/profile' },
 ];
 

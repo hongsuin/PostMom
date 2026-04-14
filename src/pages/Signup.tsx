@@ -57,7 +57,7 @@ export default function Signup() {
 
   // ── 가입 후 이동 경로 ────────────────────────────────────────────
   const getRedirectPath = (type: UserType) =>
-    type === 'academy' ? '/' : '/onboarding/1';
+    type === 'academy' ? '/login' : '/onboarding/1';
 
   // ── 이메일 가입 ─────────────────────────────────────────────────
   const handleSignup = async () => {

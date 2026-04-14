@@ -1,7 +1,11 @@
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Heart, MessageCircle, ChevronRight, ChevronLeft, Star, Send, Tag } from 'lucide-react';
 import { communityPosts, academies } from '../data/mockData';
 import UserTypeBadge from '../components/UserTypeBadge';
+import UserProfileModal from '../components/UserProfileModal';
+import { useUserType } from '../hooks/useUserType';
+import type { UserType } from '../types/user';
 
 const TAG_COLORS: Record<string, string> = {
   수학: 'bg-blue-50 text-blue-700',
@@ -33,6 +37,14 @@ const MOCK_COMMENTS = [
 export default function CommunityPost() {
   const { id } = useParams();
   const post = communityPosts.find((p) => p.id === id);
+  const userType = useUserType();
+  const isAcademy = userType === 'academy';
+  const [modalUser, setModalUser] = useState<{ author: string; userType?: UserType } | null>(null);
+
+  const openProfile = (author: string, uType?: UserType) => {
+    if (!isAcademy) return;
+    setModalUser({ author, userType: uType });
+  };
 
   if (!post) {
     return (
@@ -47,6 +59,14 @@ export default function CommunityPost() {
   );
 
   return (
+    <>
+    <UserProfileModal
+      author={modalUser?.author ?? ''}
+      userType={modalUser?.userType}
+      isOpen={!!modalUser}
+      onClose={() => setModalUser(null)}
+      isAcademy={isAcademy}
+    />
     <div className="min-h-screen bg-slate-50">
       {/* Sub-header */}
       <div className="border-b border-slate-200 bg-white">
@@ -88,16 +108,22 @@ export default function CommunityPost() {
 
               {/* Author + date */}
               <div className="mt-3 mb-6 flex items-center gap-3 border-b border-slate-100 pb-5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/15 text-sm font-bold text-primary">
-                  {post.author[0]}
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-slate-800">{post.author}</p>
-                    <UserTypeBadge userType={post.userType} />
+                <button
+                  type="button"
+                  onClick={() => openProfile(post.author, post.userType)}
+                  className={`flex items-center gap-3 ${isAcademy ? 'cursor-pointer hover:opacity-75 transition-opacity' : 'cursor-default'}`}
+                >
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/15 text-sm font-bold text-primary">
+                    {post.author[0]}
                   </div>
-                  <p className="text-xs text-slate-400">{post.date}</p>
-                </div>
+                  <div className="text-left">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-semibold text-slate-800">{post.author}</p>
+                      <UserTypeBadge userType={post.userType} />
+                    </div>
+                    <p className="text-xs text-slate-400">{post.date}</p>
+                  </div>
+                </button>
               </div>
 
               {/* Content */}
@@ -130,12 +156,22 @@ export default function CommunityPost() {
                     key={i}
                     className="flex gap-3 border-b border-slate-100 pb-4 last:border-0"
                   >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">
+                    <button
+                      type="button"
+                      onClick={() => openProfile(c.author)}
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600 ${isAcademy ? 'cursor-pointer hover:opacity-75 transition-opacity' : 'cursor-default'}`}
+                    >
                       {c.author[0]}
-                    </div>
+                    </button>
                     <div className="flex-1">
                       <div className="mb-1 flex items-center justify-between">
-                        <span className="text-sm font-semibold text-slate-800">{c.author}</span>
+                        <button
+                          type="button"
+                          onClick={() => openProfile(c.author)}
+                          className={`text-sm font-semibold text-slate-800 ${isAcademy ? 'cursor-pointer hover:text-primary transition-colors' : 'cursor-default'}`}
+                        >
+                          {c.author}
+                        </button>
                         <span className="text-xs text-slate-400">{c.date}</span>
                       </div>
                       <p className="text-sm leading-relaxed text-slate-600">{c.text}</p>
@@ -247,5 +283,6 @@ export default function CommunityPost() {
         </div>
       </div>
     </div>
+    </>
   );
 }
