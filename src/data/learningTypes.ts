@@ -1,0 +1,92 @@
+// ── 5가지 학습 유형 공유 데이터 ────────────────────────────────────────
+export const LEARNING_TYPES = {
+  competitive: {
+    key: 'competitive',
+    emoji: '🏆',
+    name: '경쟁 성취형',
+    desc: '점수와 순위로 동기부여 받는 타입이에요. 목표가 뚜렷하고 지는 걸 싫어하는 만큼 도전 의식이 강해요.',
+    strengths: ['명확한 목표 설정', '강한 승부욕', '결과 지향적'],
+    guide: [
+      '레벨반 구분이 명확하고 시험 대비 커리큘럼이 체계적인 학원',
+      '경시대회·수능 특강 등 도전적인 과정이 있는 학원',
+      '성취도 피드백을 주기적으로 제공하는 학원',
+    ],
+    caution: '지나친 경쟁 압박 환경은 번아웃을 유발할 수 있어요.',
+    color: 'from-yellow-400 to-orange-400',
+    bgLight: 'bg-yellow-50',
+    border: 'border-yellow-200',
+    text: 'text-yellow-700',
+  },
+  explorer: {
+    key: 'explorer',
+    emoji: '🔍',
+    name: '탐구 사고형',
+    desc: '암기보다 이해를 중시하고 "왜 그런지"를 알아야 직성이 풀리는 타입이에요. 질문이 많고 원리 파악 후 응용하는 것을 즐겨요.',
+    strengths: ['깊이 있는 이해력', '창의적 문제 해결', '높은 탐구 의욕'],
+    guide: [
+      '개념 설명 중심의 토론·발문식 수업을 하는 학원',
+      '선생님과 자유롭게 질문·소통이 가능한 학원',
+      '단순 암기보다 사고력·논리력을 키우는 학원',
+    ],
+    caution: '단순 반복 주입식 수업 환경에서는 흥미를 잃을 수 있어요.',
+    color: 'from-blue-400 to-cyan-400',
+    bgLight: 'bg-blue-50',
+    border: 'border-blue-200',
+    text: 'text-blue-700',
+  },
+  systematic: {
+    key: 'systematic',
+    emoji: '📋',
+    name: '체계 반복형',
+    desc: '규칙적인 루틴 속에서 꾸준히 반복하며 실력을 쌓는 타입이에요. 예측 가능한 환경을 선호하고 성실한 학습 태도를 갖고 있어요.',
+    strengths: ['꾸준한 학습 지속력', '높은 완성도', '안정적인 성장'],
+    guide: [
+      '커리큘럼이 체계적이고 진도 관리가 명확한 학원',
+      '숙제·피드백이 일정하게 제공되는 학원',
+      '장기 과정으로 학생을 꾸준히 관리하는 학원',
+    ],
+    caution: '갑작스러운 커리큘럼 변경이나 선생님 교체에 민감할 수 있어요.',
+    color: 'from-green-400 to-emerald-400',
+    bgLight: 'bg-green-50',
+    border: 'border-green-200',
+    text: 'text-green-700',
+  },
+  social: {
+    key: 'social',
+    emoji: '👥',
+    name: '사교 협동형',
+    desc: '친구들과 함께할 때 시너지가 극대화되는 타입이에요. 경쟁보다 협력을 즐기고, 학원 분위기와 선생님과의 관계에 큰 영향을 받아요.',
+    strengths: ['소통 능력', '협력 학습 효과', '긍정적인 에너지'],
+    guide: [
+      '소수 정예 그룹 수업으로 친밀감을 형성할 수 있는 학원',
+      '선생님이 친근하고 분위기가 밝은 학원',
+      '팀 프로젝트·그룹 활동이 포함된 학원',
+    ],
+    caution: '혼자 하는 자습 위주 학원이나 경쟁 분위기가 강한 곳은 위축될 수 있어요.',
+    color: 'from-purple-400 to-pink-400',
+    bgLight: 'bg-purple-50',
+    border: 'border-purple-200',
+    text: 'text-purple-700',
+  },
+  independent: {
+    key: 'independent',
+    emoji: '🎯',
+    name: '자기주도형',
+    desc: '스스로 계획을 세우고 자기 속도에 맞게 공부하는 타입이에요. 관심 분야를 깊이 파고들고 타인의 간섭을 불편해해요.',
+    strengths: ['높은 자기 관리력', '깊이 있는 집중력', '내적 동기 강함'],
+    guide: [
+      '진도를 자율적으로 조절할 수 있는 학원',
+      '1:1 또는 개인 맞춤 커리큘럼을 제공하는 학원',
+      '자습실과 개인 학습 공간이 마련된 학원',
+    ],
+    caution: '진도를 강제하거나 일괄 관리하는 학원 방식은 역효과를 낼 수 있어요.',
+    color: 'from-rose-400 to-red-400',
+    bgLight: 'bg-rose-50',
+    border: 'border-rose-200',
+    text: 'text-rose-700',
+  },
+} as const;
+
+export type TypeKey = keyof typeof LEARNING_TYPES;
+
+export const TYPE_KEY_LIST = Object.keys(LEARNING_TYPES) as TypeKey[];

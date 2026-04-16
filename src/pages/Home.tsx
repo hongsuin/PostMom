@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { User } from 'lucide-react';
+import { getSupabaseBrowserClient } from '../lib/supabase';
+import type { Session } from '@supabase/supabase-js';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -119,8 +121,23 @@ export default function Home() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [lowPerf, setLowPerf] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
   const { hash } = useLocation();
+  // const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const supabase = getSupabaseBrowserClient();
+    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => setSession(s));
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // const handleLogout = async () => {
+  //   const supabase = getSupabaseBrowserClient();
+  //   await supabase.auth.signOut();
+  //   navigate('/');
+  // };
 
   useEffect(() => {
     if (!hash) return;
@@ -167,8 +184,8 @@ export default function Home() {
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/20 backdrop-blur-md">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between px-8 py-4 xl:px-12">
           {/* Logo */}
-          <Link to="/" className="font-lora text-2xl font-semibold tracking-tight text-white">
-            PostMom
+          <Link to="/" aria-label="PostMom 홈">
+            <img src="/앱로고.svg" alt="PostMom" className="h-10 w-auto" />
           </Link>
 
           {/* Nav links (desktop) */}
@@ -186,24 +203,20 @@ export default function Home() {
 
           {/* Auth + CTA */}
           <div className="flex items-center gap-3">
-            <Link
-              to="/login"
-              className="hidden text-sm font-medium text-white/70 transition-colors hover:text-white lg:block"
-            >
-              로그인
-            </Link>
-            {/* <Link
-              to="/onboarding/1"
-              className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-slate-900 shadow-md transition-all hover:bg-slate-100 hover:scale-[1.03] active:scale-[0.97]"
-            >
-              무료로 시작하기
-            </Link> */}
+            {!session && (
+              <Link
+                to="/login"
+                className="hidden text-sm font-medium text-white/70 transition-colors hover:text-white lg:block"
+              >
+                Login
+              </Link>
+            )}
 
-            {/* Login icon (mobile) */}
+            {/* MyPage / Login icon */}
             <Link
-              to="/login"
-              className="flex items-center justify-center p-1 text-white lg:hidden"
-              aria-label="로그인"
+              to={session ? '/mypage' : '/login'}
+              className="flex items-center justify-center p-1 text-white transition-colors hover:text-white/70"
+              aria-label={session ? '마이페이지' : '로그인'}
             >
               <User size={22} />
             </Link>
@@ -237,12 +250,8 @@ export default function Home() {
         }`}
       >
         <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-          <Link
-            to="/"
-            className="font-lora text-xl font-semibold tracking-tight text-slate-900"
-            onClick={() => setDrawerOpen(false)}
-          >
-            PostMom
+          <Link to="/" onClick={() => setDrawerOpen(false)} aria-label="PostMom 홈">
+            <img src="/앱로고-light.svg" alt="PostMom" className="h-6 w-auto" />
           </Link>
           <button
             onClick={() => setDrawerOpen(false)}
@@ -270,13 +279,15 @@ export default function Home() {
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 border-t border-slate-100 px-4 py-5">
-          <Link
-            to="/login"
-            onClick={() => setDrawerOpen(false)}
-            className="block w-full rounded-lg border border-slate-200 py-2.5 text-center text-sm font-medium text-slate-600 hover:bg-slate-50"
-          >
-            로그인
-          </Link>
+          {!session && (
+            <Link
+              to="/login"
+              onClick={() => setDrawerOpen(false)}
+              className="block w-full rounded-lg border border-slate-200 py-2.5 text-center text-sm font-medium text-slate-600 hover:bg-slate-50"
+            >
+              로그인
+            </Link>
+          )}
         </div>
       </aside>
 
@@ -317,7 +328,7 @@ export default function Home() {
         />
 
         {/* Hero content */}
-        <div className="relative z-10 mx-auto flex min-h-screen max-w-[1400px] items-center px-8 pb-20 pt-28 xl:px-12">
+        <div className="relative z-10 mx-auto flex min-h-screen max-w-[1400px] items-start lg:items-center px-8 pb-20 pt-36 lg:pt-28 xl:px-12">
           <div className="grid w-full grid-cols-1 items-center gap-16 lg:grid-cols-[1fr_420px] xl:grid-cols-[1fr_480px]">
             {/* Left: headline + CTAs */}
             <div>
@@ -327,7 +338,7 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: EASE }}
               >
-                <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
+                <span className="h-1.5 w-1.5 rounded-full bg-green-400/60" />
                 <span className="text-xs font-medium text-white/80">
                   현재 350+ 학원 파트너와 함께합니다
                 </span>
@@ -335,29 +346,25 @@ export default function Home() {
 
               <motion.h1
                 id="hero-heading"
-                className="font-lora text-5xl font-semibold leading-[1.1] tracking-tight text-white xl:text-5xl 2xl:text-6xl"
+                className="font-lora text-3xl font-semibold leading-[1.1] tracking-tight text-white xl:text-3xl 2xl:text-4xl"
                 initial={{ opacity: 0, y: 24, filter: 'blur(4px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 transition={{ duration: 0.8, ease: EASE, delay: 0.1 }}
               >
-                우리 아이에게 맞는
-                <br />
-                학원 선택,
+                우리 아이에게 맞는 학원,
                 <br />
                 이제는{' '}
                 데이터로.
               </motion.h1>
 
               <motion.p
-                className="mt-6 max-w-xl text-lg leading-relaxed text-white/70"
+                className="mt-6 max-w-xl text-sm leading-relaxed text-white/70"
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: EASE, delay: 0.25 }}
               >
-                광고보다 실제 후기, 감보다 비교 데이터.
-                <br />
                 PostMom으로 지역·학년·과목·예산에
-                맞는 학원을 실제 데이터로 비교하고 <br/>상담까지 경험해보세요
+                맞는 학원을 <br/>실제 데이터로 비교하고 상담까지 경험해보세요
               </motion.p>
 
               <motion.div
@@ -367,21 +374,21 @@ export default function Home() {
                 transition={{ duration: 0.8, ease: EASE, delay: 0.38 }}
               >
                 <Link
-                  to="/onboarding/1"
-                  className="rounded-full bg-white px-8 py-4 text-base font-semibold text-slate-900 shadow-xl transition-all hover:scale-[1.03] hover:bg-slate-50 active:scale-[0.97]"
+                  to="/learning-test"
+                  className="rounded-full bg-green-400/20 backdrop-blur-md border border-green-300/40 px-6 py-3 text-base font-medium text-white shadow-xl transition-all hover:scale-[1.03] hover:bg-green-400/45 active:scale-[0.97]"
                 >
-                  POSTMOM 비교 무료로 시작 →
+                  POSTMOM 학습유형 분석하기 
                 </Link>
                 <Link
                   to="/academies"
-                  className="liquid-glass rounded-full px-8 py-4 text-base font-medium text-white transition-all hover:scale-[1.03] active:scale-[0.97]"
+                  className="liquid-glass rounded-full px-6 py-3 text-base font-medium text-white transition-all hover:scale-[1.03] active:scale-[0.97]"
                 >
                   우리 동네 학원 찾기
                 </Link>
               </motion.div>
 
               {/* Trust badges */}
-              <motion.div
+              {/* <motion.div
                 className="mt-8 flex flex-wrap items-center gap-3"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -397,34 +404,36 @@ export default function Home() {
                     </span>
                   )
                 )}
-              </motion.div>
+              </motion.div> */}
             </div>
 
             {/* Right: glass card */}
             <motion.div
-              className="liquid-glass hidden rounded-3xl p-7 text-white lg:block"
+              className="liquid-glass rounded-3xl p-5 text-white w-full lg:w-[320px] flex-shrink-0 ml-auto"
               initial={{ opacity: 0, y: 24, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.9, ease: EASE, delay: 0.3 }}
             >
-              <div className="mb-5 flex items-center justify-between">
-                <h3 className="font-lora text-lg font-medium">AI 추천 미리보기</h3>
-                <span className="rounded-full bg-green-800/20 px-3 py-1 text-xs font-medium text-white/400">
-                  분석 완료
-                </span>
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="font-lora text-base font-medium">내 카드</h3>
+                {session && (
+                  <span className="rounded-full bg-green-400/30 px-2.5 py-0.5 text-xs font-medium text-white/70">
+                    분석 완료
+                  </span>
+                )}
               </div>
 
-              <div className="space-y-3.5">
+              <div className={`space-y-2.5 transition-all duration-300 ${!session ? 'blur-sm select-none pointer-events-none' : ''}`}>
                 {[
                   ['지역', '위례'],
                   ['학년', '초등 4학년'],
                   ['과목', '영어'],
                   ['예산', '월 40만원 이하'],
-                  ['중요 기준', '밀착케어 / 후기 신뢰도'],
+                  ['중요 기준', '밀착케어'],
                 ].map(([label, val]) => (
                   <div
                     key={label}
-                    className="flex justify-between border-b border-white/12 pb-3 text-sm"
+                    className="flex justify-between border-b border-white/12 pb-2 text-xs"
                   >
                     <span className="text-white/60">{label}</span>
                     <span className="font-medium">{val}</span>
@@ -432,29 +441,36 @@ export default function Home() {
                 ))}
               </div>
 
-              <div className="mt-5 rounded-2xl bg-white/8 p-4 space-y-2.5">
-                <p className="text-xs font-semibold uppercase tracking-widest text-white/50">
+              {!session && (
+                <Link
+                  to="/login"
+                  className="mt-4 flex w-full items-center justify-center rounded-2xl bg-white/20 py-2.5 text-sm font-semibold text-white backdrop-blur-sm hover:bg-white/30 transition-colors"
+                >
+                  Login
+                </Link>
+              )}
+
+              <div className={`mt-4 rounded-2xl bg-white/8 p-3 space-y-2 transition-all duration-300 ${!session ? 'blur-sm select-none pointer-events-none' : ''}`}>
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-white/50">
                   추천 결과
                 </p>
-                {['위례 YBM 어학원 ★★★★★', '위례 파고다 주니어 ★★★★☆', '위례 정상어학원 ★★★★☆'].map(
-                  (academy) => (
-                    <div
-                      key={academy}
-                      className="flex items-center gap-2 rounded-xl bg-white/8 px-3 py-2 text-sm"
-                    >
-                      <span className="h-2 w-2 rounded-full bg-purple-400 flex-shrink-0" />
-                      {academy}
-                    </div>
-                  )
-                )}
+                {[
+                  { label: '심슨어학원 위례캠퍼스 ★★★★★', id: 'naver-심슨어학원위례캠퍼스' },
+                  { label: '아발론랭콘 위례캠퍼스 ★★★★☆', id: 'naver-아발론랭콘위례캠퍼스' },
+                  { label: '리드101영어학원 위례점 ★★★★☆', id: 'naver-리드101영어학원위례점' },
+                ].map(({ label, id }) => (
+                  <Link
+                    key={id}
+                    to={`/academies/${id}`}
+                    className="flex items-center gap-2 rounded-xl bg-white/8 px-3 py-1.5 text-xs hover:bg-white/15 transition-colors cursor-pointer"
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-green-400 flex-shrink-0" />
+                    {label}
+                  </Link>
+                ))}
               </div>
 
-              <Link
-                to="/onboarding/1"
-                className="mt-5 block w-full rounded-2xl bg-white/15 py-3 text-center text-sm font-semibold text-white transition-all hover:bg-white/22"
-              >
-                우리 아이 맞춤 분석 시작하기 →
-              </Link>
+
             </motion.div>
           </div>
         </div>
@@ -473,8 +489,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── STATS BAR ───────────────────────────────────── */}
-      <section className="border-b border-slate-100 bg-white py-12" aria-label="주요 통계">
+      {false && (<><section className="border-b border-slate-100 bg-white py-12" aria-label="주요 통계"> {/*여기 false -> true로 바꾸면 나옴*/ }
         <div className="mx-auto max-w-[1400px] px-8 xl:px-12">
           <dl className="grid grid-cols-2 gap-8 md:grid-cols-4">
             {STATS.map((stat) => (
@@ -639,11 +654,11 @@ export default function Home() {
         {/* Decorative blobs */}
         <div
           className="pointer-events-none absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full opacity-25 blur-3xl"
-          style={{ background: 'radial-gradient(circle, hsl(250 95% 65%) 0%, transparent 70%)' }}
+          style={{ background: 'radial-gradient(circle, hsl(130 79% 41%) 0%, transparent 70%)' }}
         />
         <div
           className="pointer-events-none absolute -bottom-32 -right-32 h-[400px] w-[400px] rounded-full opacity-20 blur-3xl"
-          style={{ background: 'radial-gradient(circle, hsl(250 95% 65%) 0%, transparent 70%)' }}
+          style={{ background: 'radial-gradient(circle, hsl(130 79% 41%) 0%, transparent 70%)' }}
         />
 
         <div className="relative mx-auto max-w-[800px] px-8 text-center xl:px-12">
@@ -660,7 +675,7 @@ export default function Home() {
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
-              to="/onboarding/1"
+              to="/learning-test"
               className="rounded-full bg-white px-10 py-4 text-base font-semibold text-slate-900 shadow-xl transition-all hover:scale-[1.03] hover:bg-slate-50 active:scale-[0.97]"
             >
               AI 비교 무료로 시작하기
@@ -673,16 +688,16 @@ export default function Home() {
             </Link>
           </div>
         </div>
-      </section>
+      </section></>)}
 
-      {/* ── FOOTER ──────────────────────────────────────── */}
-      <footer className="border-t border-slate-200 bg-white py-14">
+      {/* ── FOOTER ────────────────────────────────────────── */}
+      <footer className="hidden md:block border-t border-slate-200 bg-white py-14">
         <div className="mx-auto max-w-[1400px] px-8 xl:px-12">
           <div className="grid grid-cols-1 gap-10 md:grid-cols-[2fr_1fr_1fr_1fr]">
             {/* Brand */}
             <div>
-              <Link to="/" className="font-lora text-2xl font-semibold text-slate-900">
-                PostMom
+              <Link to="/" aria-label="PostMom 홈">
+                <img src="/앱로고-light.svg" alt="PostMom" className="h-7 w-auto" />
               </Link>
               <p className="mt-3 max-w-xs text-sm leading-relaxed text-slate-500">
                 학부모가 데이터로 학원을 고르는 시대. PostMom은 AI와 커뮤니티로 더 나은

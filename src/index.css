@@ -4,15 +4,15 @@
 :root {
   --font-lora: "Noto Sans KR", sans-serif;
   --font-inter: "Inter", sans-serif;
-  --color-brand-gray: hsl(240 4% 46%);
-  --color-primary: hsl(250 95% 65%);
+  --color-brand-gray: hsl(133, 9%, 70%);
+  --color-primary: hsl(130, 79%, 41%);
 }
 
 @theme {
   --font-lora: var(--font-lora);
   --font-inter: var(--font-inter);
   --color-brand-gray: var(--color-brand-gray);
-  --color-primary: hsl(250 95% 65%);
+  --color-primary: hsl(130 79% 41%);
 }
 
 .font-lora {
@@ -49,6 +49,7 @@
   padding: 1px;
   background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent, rgba(255, 255, 255, 0.3));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask-composite: exclude;
   pointer-events: none;
 }

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { academies } from '../data/mockData';
 import Header from '../layouts/Header';
+import { getSupabaseBrowserClient } from '../lib/supabase';
+import { useConsultationStore } from '../store/consultationStore';
 
 export default function ConsultRequest() {
   const { id } = useParams();
@@ -10,6 +12,9 @@ export default function ConsultRequest() {
 
   const [form, setForm] = useState({ name: '', phone: '', grade: '', message: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
+
+  const { addConsultation } = useConsultationStore();
 
   const validate = () => {
     const e: Record<string, string> = {};
@@ -19,10 +24,37 @@ export default function ConsultRequest() {
     return e;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const e = validate();
     if (Object.keys(e).length > 0) { setErrors(e); return; }
-    navigate('/consult/complete');
+    if (!academy) return;
+
+    setSubmitting(true);
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const { data: { session } } = await supabase.auth.getSession();
+
+      await addConsultation(
+        {
+          academyId: academy.id,
+          academyName: academy.name,
+          parentName: form.name,
+          phone: form.phone,
+          grade: form.grade,
+          message: form.message || undefined,
+          requestType: '상담',
+        },
+        session?.user.id,
+      );
+
+      navigate('/consult/complete');
+    } catch (err) {
+      console.error('[ConsultRequest] 저장 오류:', err);
+      // 저장 실패해도 완료 페이지로 이동
+      navigate('/consult/complete');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (!academy) return <div className="p-4">학원을 찾을 수 없습니다.</div>;
@@ -31,7 +63,7 @@ export default function ConsultRequest() {
     <div className="min-h-screen">
       <Header title="상담 신청" showBack />
 
-      <div className="px-5 pt-5 pb-8 space-y-4">
+      <div className="mx-auto max-w-[1400px] px-8 pt-5 pb-8 xl:px-12 space-y-4">
         {/* 학원 정보 */}
         <div className="bg-primary/10 rounded-2xl p-4">
           <p className="text-sm font-semibold text-primary">{academy.name}</p>
@@ -86,10 +118,11 @@ export default function ConsultRequest() {
         </div>
 
         <button
-          onClick={handleSubmit}
-          className="w-full bg-primary text-white py-4 rounded-2xl font-semibold text-sm hover:bg-primary/90 transition-colors"
+          onClick={() => void handleSubmit()}
+          disabled={submitting}
+          className="w-full bg-primary text-white py-4 rounded-2xl font-semibold text-sm hover:bg-primary/90 transition-colors disabled:opacity-60"
         >
-          상담 신청하기
+          {submitting ? '신청 중...' : '상담 신청하기'}
         </button>
       </div>
     </div>

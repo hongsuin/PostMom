@@ -1,65 +1,202 @@
-import { Link } from 'react-router-dom';
-import { User, ChevronRight, BookOpen, MessageCircle, LogOut, Bell } from 'lucide-react';
-import Header from '../layouts/Header';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { User, ChevronRight, BookOpen, MessageCircle, LogOut, Bell, Brain } from 'lucide-react';
+import { getSupabaseBrowserClient } from '../lib/supabase';
+import type { Session } from '@supabase/supabase-js';
+import { useOnboardingStore } from '../store/onboardingStore';
+import { LEARNING_TYPES, TYPE_KEY_LIST } from '../data/learningTypes';
+import type { TypeKey } from '../data/learningTypes';
+import { getUserType, USER_TYPE_META } from '../types/user';
+
+import { useConsultationStore } from '../store/consultationStore';
 
 export default function MyPage() {
+  const navigate = useNavigate();
+  const [session, setSession] = useState<Session | null>(null);
+  const { data, updateData } = useOnboardingStore();
+
+  useEffect(() => {
+    const supabase = getSupabaseBrowserClient();
+    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    const supabase = getSupabaseBrowserClient();
+    await supabase.auth.signOut();
+    navigate('/');
+  };
+
+  const handleLearningTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value as TypeKey | '';
+    updateData({ learningType: value });
+  };
+
+  const { myConsultations, fetchMyConsultations } = useConsultationStore();
+
+  useEffect(() => {
+    if (session?.user.id) {
+      void fetchMyConsultations(session.user.id);
+    }
+  }, [session, fetchMyConsultations]);
+
+  const userType = getUserType(session);
+  const userTypeMeta = USER_TYPE_META[userType];
+
+  const displayName =
+    session?.user?.user_metadata?.full_name ??
+    session?.user?.user_metadata?.name ??
+    '사용자';
+  const email = session?.user?.email ?? '';
+
+  const currentLearningType = data.learningType;
+  const currentTypeData = currentLearningType ? LEARNING_TYPES[currentLearningType] : null;
+
+  const consultCount = myConsultations.length;
+
   const menuItems = [
-    { icon: BookOpen, label: '상담 내역', badge: '2' },
-    { icon: MessageCircle, label: '내 게시글', badge: '' },
-    { icon: Bell, label: '알림 설정', badge: '' },
+    { icon: BookOpen, label: '상담 내역', badge: consultCount > 0 ? String(consultCount) : '', onClick: () => navigate('/mypage/consultations') },
+    { icon: MessageCircle, label: '내 게시글', badge: '', onClick: undefined },
+    { icon: Bell, label: '알림 설정', badge: '', onClick: undefined },
   ];
 
   return (
-    <div className="min-h-screen">
-      <Header title="마이페이지" />
+    <div className="min-h-screen bg-slate-50">
+      <div className="mx-auto max-w-[1400px] px-8 py-10 xl:px-12">
 
-      <div className="px-5 pt-5 pb-8 space-y-4">
-        {/* 프로필 카드 */}
-        <div className="bg-gradient-to-br from-primary to-primary/80 rounded-2xl p-5 text-white">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center shrink-0">
-              <User size={28} className="text-white" />
+        {/* 페이지 타이틀 */}
+        <div className="mb-8">
+          <p className="mb-1.5 text-sm font-semibold uppercase tracking-wider text-primary">
+            마이페이지
+          </p>
+          <h1 className="font-lora text-3xl font-semibold text-slate-900 xl:text-4xl">
+            내 계정
+          </h1>
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* 프로필 카드 */}
+          <div className="lg:col-span-1">
+            <div className="bg-gradient-to-br from-primary to-primary/80 rounded-2xl p-6 text-white">
+
+              {/* 유저 정보 */}
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+                  <User size={32} className="text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-lora font-semibold text-xl">{displayName}</p>
+                    {/* 유형 뱃지 (학부모/학원만 표시) */}
+                    {userType !== 'student' && (
+                      <span className="inline-flex items-center rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-medium text-white border border-white/30">
+                        {userTypeMeta.emoji} {userTypeMeta.label}
+                      </span>
+                    )}
+                  </div>
+                  {email && <p className="text-sm opacity-75 mt-0.5 truncate">{email}</p>}
+                </div>
+              </div>
+
+              {/* 학습 유형 섹션 — 학원/기업은 표시 안 함 */}
+              {userType !== 'academy' && (
+                <div className="mt-5 pt-5 border-t border-white/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Brain size={14} className="text-white/80" />
+                    <p className="text-xs font-semibold text-white/80 uppercase tracking-wider">
+                      학습 유형
+                    </p>
+                  </div>
+
+                  {currentTypeData && (
+                    <div className="flex items-center gap-2 mb-2.5">
+                      <span className="text-lg">{currentTypeData.emoji}</span>
+                      <span className="text-sm font-semibold text-white">
+                        {currentTypeData.name}
+                      </span>
+                    </div>
+                  )}
+
+                  <select
+                    value={currentLearningType}
+                    onChange={handleLearningTypeChange}
+                    className="w-full rounded-xl bg-white/15 border border-white/30 text-white text-sm px-3 py-2.5
+                      focus:outline-none focus:ring-2 focus:ring-white/40 cursor-pointer appearance-none"
+                    style={{ backgroundImage: 'none' }}
+                  >
+                    <option value="" className="text-slate-800 bg-white">
+                      {currentLearningType ? '유형 변경하기' : '아직 테스트하지 않았어요'}
+                    </option>
+                    {TYPE_KEY_LIST.map((key) => {
+                      const t = LEARNING_TYPES[key];
+                      return (
+                        <option key={key} value={key} className="text-slate-800 bg-white">
+                          {t.emoji} {t.name}
+                        </option>
+                      );
+                    })}
+                  </select>
+
+                  <Link
+                    to="/learning-test"
+                    className="mt-2.5 flex items-center justify-center gap-1 text-xs text-white/70 hover:text-white transition-colors"
+                  >
+                    <Brain size={11} />
+                    {currentLearningType ? '테스트 다시 하기 →' : '학습 유형 테스트하기 →'}
+                  </Link>
+                </div>
+              )}
             </div>
-            <div>
-              <p className="font-lora font-semibold text-lg">위례맘</p>
-              <p className="text-sm opacity-75 mt-0.5">postmom@email.com</p>
+          </div>
+
+          {/* 메뉴 */}
+          <div className="lg:col-span-2 space-y-4">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+              {menuItems.map(({ icon: Icon, label, badge, onClick }) => (
+                <button
+                  key={label}
+                  onClick={onClick}
+                  className="w-full flex items-center justify-between px-6 py-4 border-b border-slate-50 last:border-0 hover:bg-primary/5 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center">
+                      <Icon size={18} className="text-primary" />
+                    </div>
+                    <span className="text-sm font-medium text-slate-800">{label}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {badge && (
+                      <span className="bg-primary text-white text-xs px-2 py-0.5 rounded-full font-medium">
+                        {badge}
+                      </span>
+                    )}
+                    <ChevronRight size={16} className="text-slate-300" />
+                  </div>
+                </button>
+              ))}
             </div>
+
+            {/* 관리자 대시보드 — 학원/기업만 표시 */}
+            {userType === 'academy' && (
+              <Link
+                to="/admin"
+                className="block bg-slate-900 text-white px-6 py-4 rounded-2xl text-sm font-semibold text-center hover:bg-slate-800 transition-colors"
+              >
+                관리자 페이지로 이동 →
+              </Link>
+            )}
+
+            <button
+              onClick={() => void handleLogout()}
+              className="w-full flex items-center justify-center gap-2 text-slate-400 text-sm py-3 hover:text-slate-600 transition-colors"
+            >
+              <LogOut size={16} />
+              로그아웃
+            </button>
           </div>
         </div>
 
-        {/* 메뉴 */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-white/60 overflow-hidden">
-          {menuItems.map(({ icon: Icon, label, badge }) => (
-            <button
-              key={label}
-              className="w-full flex items-center justify-between px-4 py-4 border-b border-slate-50 last:border-0 hover:bg-primary/5 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-primary/10 rounded-xl flex items-center justify-center">
-                  <Icon size={16} className="text-primary" />
-                </div>
-                <span className="text-sm font-medium text-slate-800">{label}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                {badge && (
-                  <span className="bg-primary text-white text-xs px-2 py-0.5 rounded-full font-medium">{badge}</span>
-                )}
-                <ChevronRight size={16} className="text-slate-300" />
-              </div>
-            </button>
-          ))}
-        </div>
-
-        <Link
-          to="/admin"
-          className="block bg-slate-900 text-white px-4 py-4 rounded-2xl text-sm font-semibold text-center hover:bg-slate-800 transition-colors"
-        >
-          관리자 페이지로 이동 →
-        </Link>
-
-        <button className="w-full flex items-center justify-center gap-2 text-slate-400 text-sm py-3 hover:text-slate-600 transition-colors">
-          <LogOut size={16} />로그아웃
-        </button>
       </div>
     </div>
   );

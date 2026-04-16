@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { User } from 'lucide-react';
+import { getSupabaseBrowserClient } from '../lib/supabase';
+import type { Session } from '@supabase/supabase-js';
 
 const NAV_LINKS = [
   { label: '학원 찾기', to: '/academies' },
@@ -11,14 +13,24 @@ const NAV_LINKS = [
 export default function SiteHeader() {
   const { pathname } = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
+
+  useEffect(() => {
+    const supabase = getSupabaseBrowserClient();
+    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => setSession(s));
+    return () => subscription.unsubscribe();
+  }, []);
+
+ 
 
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between px-8 py-3.5 xl:px-12">
           {/* Logo */}
-          <Link to="/" className="font-lora text-xl font-semibold tracking-tight text-slate-900">
-            PostMom
+          <Link to="/" aria-label="PostMom 홈">
+            <img src="/앱로고-light.svg" alt="PostMom" className="h-10 w-auto" />
           </Link>
 
           {/* Nav (desktop) */}
@@ -44,24 +56,27 @@ export default function SiteHeader() {
 
           {/* Right */}
           <div className="flex items-center gap-3">
-            <Link
-              to="/login"
-              className="hidden text-sm font-medium text-slate-500 transition-colors hover:text-slate-900 lg:block"
-            >
-              로그인
-            </Link>
-            <Link
+            {!session && (
+              <Link
+                to="/login"
+                className="hidden text-sm font-medium text-slate-500 transition-colors hover:text-slate-900 lg:block"
+              >
+                login
+              </Link>
+            )}
+            {/* <Link
               to="/onboarding/1"
-              className="rounded-full bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:opacity-90 hover:scale-[1.03] active:scale-[0.97]"
+              className="rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary shadow-sm transition-all hover:opacity-90 hover:scale-[1.03] active:scale-[0.97]"
             >
-              AI 비교 시작
-            </Link>
+              P·M 추천 받기
+            </Link> */}
 
-            {/* Login icon (mobile) */}
+            {/* MyPage / Login icon — id used as animation anchor by LearningTypeAnimOverlay */}
             <Link
-              to="/login"
-              className="flex items-center justify-center p-1 text-slate-700 lg:hidden"
-              aria-label="로그인"
+              id="user-icon-anchor"
+              to={session ? '/mypage' : '/login'}
+              className="flex items-center justify-center p-1 text-slate-700 transition-colors hover:text-slate-900"
+              aria-label={session ? '마이페이지' : '로그인'}
             >
               <User size={22} />
             </Link>
@@ -95,12 +110,8 @@ export default function SiteHeader() {
         }`}
       >
         <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-          <Link
-            to="/"
-            className="font-lora text-xl font-semibold tracking-tight text-slate-900"
-            onClick={() => setDrawerOpen(false)}
-          >
-            PostMom
+          <Link to="/" onClick={() => setDrawerOpen(false)} aria-label="PostMom 홈">
+            <img src="/앱로고-light.svg" alt="PostMom" className="h-6 w-auto" />
           </Link>
           <button
             onClick={() => setDrawerOpen(false)}
@@ -138,13 +149,15 @@ export default function SiteHeader() {
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 border-t border-slate-100 px-4 py-5">
-          <Link
-            to="/login"
-            onClick={() => setDrawerOpen(false)}
-            className="block w-full rounded-lg border border-slate-200 py-2.5 text-center text-sm font-medium text-slate-600 hover:bg-slate-50"
-          >
-            로그인
-          </Link>
+          {!session && (
+            <Link
+              to="/login"
+              onClick={() => setDrawerOpen(false)}
+              className="block w-full rounded-lg border border-slate-200 py-2.5 text-center text-sm font-medium text-slate-600 hover:bg-slate-50"
+            >
+              login
+            </Link>
+          )}
         </div>
       </aside>
     </>

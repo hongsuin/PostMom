@@ -214,6 +214,15 @@ export default function AICompare() {
                     </div>
                   </div>
 
+                  {/* 우리 아이 정보 추가 */}
+                  <Link
+                    to="/onboarding/1"
+                    className="mb-2 flex w-full items-center justify-center gap-2 rounded-xl border border-primary py-3.5 text-sm font-semibold text-primary transition-all hover:bg-primary/5"
+                  >
+                    <Sparkles size={15} />
+                    우리 아이 정보 추가
+                  </Link>
+
                   {/* Compare CTA */}
                   <Link
                     to={canCompare ? '/compare/result' : '#'}

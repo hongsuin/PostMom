@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const TOTAL_STEPS = 5;
 
@@ -17,6 +18,8 @@ export default function OnboardingLayout({
   description,
   children,
 }: OnboardingLayoutProps) {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Background Video */}
@@ -42,14 +45,22 @@ export default function OnboardingLayout({
               <div
                 key={i}
                 className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
-                  i + 1 <= step ? 'bg-[hsl(250,95%,65%)]' : 'bg-slate-200'
+                  i + 1 <= step ? 'bg-primary' : 'bg-slate-200'
                 }`}
               />
             ))}
           </div>
-          <p className="text-xs text-slate-400">
-            {step}/{TOTAL_STEPS}
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-slate-400">
+              {step}/{TOTAL_STEPS}
+            </p>
+            <button
+              onClick={() => navigate('/login')}
+              className="text-xs text-slate-400 hover:text-slate-600 transition-colors"
+            >
+              건너뛰기 →
+            </button>
+          </div>
         </div>
 
         {/* Header */}

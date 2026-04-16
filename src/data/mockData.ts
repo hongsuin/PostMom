@@ -1,3 +1,5 @@
+import academiesJson from './academies.json';
+
 export interface Academy {
   id: string;
   name: string;
@@ -25,79 +27,117 @@ export interface Academy {
   additionalCosts: Array<{ item: string; cost: string }>;
   refundPolicy: string;
   reviewKeywords: string[];
-  reviews: Array<{ author: string; text: string; rating: number; keywords: string[] }>;
+  reviews: Array<{
+    author: string;
+    text: string;
+    rating: number;
+    keywords: string[];
+    userType?: 'student' | 'parent' | 'academy';
+  }>;
 }
+
+export type CommunityRegion = '위례' | '태평';
 
 export interface CommunityPost {
   id: string;
   title: string;
   content: string;
   author: string;
+  userType?: 'student' | 'parent' | 'academy';
   date: string;
+  createdAt?: string;
   likes: number;
   comments: number;
   tags: string[];
   mentionedAcademies: string[];
+  region: CommunityRegion;
+  link?: {
+    url: string;
+    title: string;
+  };
 }
 
 export interface Lead {
   id: string;
   academyName: string;
-  parentName: string; // masked
+  parentName: string;
   childGrade: string;
   subject: string;
   requestType: '상담' | '레벨테스트';
   status: '신규' | '진행중' | '완료';
   date: string;
-  phone: string; // masked
+  phone: string;
 }
-
-import academiesJson from './academies.json';
 
 export const academies: Academy[] = academiesJson as Academy[];
 
 export const communityPosts: CommunityPost[] = [
   {
     id: '1',
-    title: '매쓰피아 수학학원 1년 다닌 후기',
-    content: '안녕하세요! 저희 아이가 매쓰피아 수학학원을 1년 다녔는데 성적이 많이 올랐어요. 선생님들이 정말 꼼꼼하게 봐주시고, 특히 개념 설명이 탁월하더라고요. 처음에는 반에 학생 수가 많을까봐 걱정했는데 소수정예라 아이 개별 관리가 잘 됩니다.',
-    author: '위례맘123',
+    title: '위례 수학학원 한 달 다닌 후기',
+    content:
+      '아이랑 같이 상담받고 등록했는데 숙제 관리가 꽤 꼼꼼한 편이에요. 숙제가 많은 날은 힘들어했지만 적응하고 나니 개념 설명이 잘 들어온다고 하더라고요.',
+    author: '위례맘23',
+    userType: 'parent',
     date: '2026-03-10',
+    createdAt: '2026-03-10T09:00:00+09:00',
     likes: 24,
     comments: 8,
-    tags: ['수학', '위례', '후기'],
+    tags: ['수학', '초등', '후기'],
     mentionedAcademies: ['1'],
+    region: '위례',
+    link: {
+      url: 'https://blog.naver.com/example-wirye',
+      title: '학원 블로그',
+    },
   },
   {
     id: '2',
-    title: '영어나라 vs 다른 영어학원 비교해봤어요',
-    content: '영어나라 어학원이랑 근처 다른 학원 비교해봤는데요. 영어나라는 원어민 강사가 상주해서 실제 회화 연습이 정말 많이 돼요. 가격은 좀 있지만 그만한 값어치는 하는 것 같아요. 내신 관리도 잘 되고 있어서 만족합니다.',
-    author: '분당학부모',
+    title: '태평 영어학원 비교해보신 분 계실까요?',
+    content:
+      '상담을 두 군데 받아봤는데 커리큘럼과 숙제량 차이가 커서 고민 중이에요. 회화 중심인지 내신 중심인지 실제로 다녀본 분들의 의견이 궁금합니다.',
+    author: '태평학부모',
+    userType: 'parent',
     date: '2026-03-08',
+    createdAt: '2026-03-08T18:20:00+09:00',
     likes: 15,
     comments: 5,
-    tags: ['영어', '비교', '원어민'],
+    tags: ['영어', '비교', '상담'],
     mentionedAcademies: ['2'],
+    region: '태평',
   },
   {
     id: '3',
-    title: '중학교 입학 전 과학 선행 어디가 좋을까요?',
-    content: '이번에 아이가 중학교 들어가는데 과학 선행을 시키고 싶어서요. 사이언스랩이 실험 위주라고 들었는데 실제로 다니시는 분 계신가요? 중1 물리 과정 어떤지 궁금합니다.',
-    author: '새내기맘',
+    title: '중등 올라가기 전에 과학 선행 어디가 좋을까요?',
+    content:
+      '중학교 올라가기 전에 과학 선행을 조금 해두고 싶어요. 개념 설명이 쉬운 곳인지, 실험형 수업이 있는지 궁금해서 추천 부탁드립니다.',
+    author: '공부고민중',
+    userType: 'student',
     date: '2026-03-05',
+    createdAt: '2026-03-05T14:10:00+09:00',
     likes: 9,
     comments: 12,
-    tags: ['과학', '선행', '중학교'],
+    tags: ['과학', '선행', '중등'],
     mentionedAcademies: ['3'],
+    region: '위례',
   },
 ];
+
+export const myAcademy = {
+  name: '위례 수학학원',
+  subject: '수학',
+  owner: '김수학',
+  phone: '031-123-4567',
+  address: '경기 성남시 수정구 위례광장로 100',
+  email: 'admin@postmom.kr',
+};
 
 export const adminLeads: Lead[] = [
   {
     id: '1',
-    academyName: '매쓰피아 수학학원',
+    academyName: '위례 수학학원',
     parentName: '김*영',
-    childGrade: '중2',
+    childGrade: '중1',
     subject: '수학',
     requestType: '상담',
     status: '신규',
@@ -106,10 +146,10 @@ export const adminLeads: Lead[] = [
   },
   {
     id: '2',
-    academyName: '영어나라 어학원',
-    parentName: '이*수',
+    academyName: '위례 수학학원',
+    parentName: '이*민',
     childGrade: '초6',
-    subject: '영어',
+    subject: '수학',
     requestType: '레벨테스트',
     status: '진행중',
     date: '2026-03-14',
@@ -117,10 +157,10 @@ export const adminLeads: Lead[] = [
   },
   {
     id: '3',
-    academyName: '사이언스랩',
-    parentName: '박*민',
-    childGrade: '중1',
-    subject: '과학',
+    academyName: '위례 수학학원',
+    parentName: '박*아',
+    childGrade: '중2',
+    subject: '수학',
     requestType: '상담',
     status: '완료',
     date: '2026-03-12',

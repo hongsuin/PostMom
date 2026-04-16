@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import type { TypeKey } from '../data/learningTypes';
 
 /** Priority keys for AI engine - must match backend */
 export type PriorityKey =
@@ -33,6 +34,9 @@ export interface OnboardingData {
 
   // Optional
   childName?: string;
+
+  // Learning Type Test result
+  learningType: TypeKey | '';
 }
 
 export interface WeightedSignals {
@@ -61,6 +65,7 @@ const initialData: OnboardingData = {
   budgetRange: '',
   distance: '',
   trustFactor: '',
+  learningType: '',
 };
 
 const WEIGHTS = [0.5, 0.3, 0.2];
