@@ -19,6 +19,7 @@ import AICompare from './pages/AICompare';
 import AICompareResult from './pages/AICompareResult';
 import CommunityHome from './pages/CommunityHome';
 import CommunityPost from './pages/CommunityPost';
+import CommunityWrite from './pages/CommunityWrite';
 import ConsultRequest from './pages/ConsultRequest';
 import LevelTestRequest from './pages/LevelTestRequest';
 import ConsultComplete from './pages/ConsultComplete';
@@ -84,6 +85,7 @@ export default function App() {
           <Route path="/academies/:id" element={<AcademyDetail />} />
           <Route path="/compare" element={<AICompare />} />
           <Route path="/community" element={<CommunityHome />} />
+          <Route path="/community/write" element={<CommunityWrite />} />
           <Route path="/community/:id" element={<CommunityPost />} />
           <Route path="/consult/:id" element={<ConsultRequest />} />
           <Route path="/leveltest/:id" element={<LevelTestRequest />} />
