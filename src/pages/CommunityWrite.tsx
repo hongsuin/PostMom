@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ChevronLeft, ExternalLink, LoaderCircle, PencilLine } from 'lucide-react';
-import { useCommunityStore } from '../store/communityStore';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { ChevronLeft, ExternalLink, LoaderCircle } from 'lucide-react';
 import type { CommunityRegion } from '../data/mockData';
+import { getSupabaseBrowserClient } from '../lib/supabase';
+import { getCommunityBrowserId, useCommunityStore } from '../store/communityStore';
 
 const TEMPLATE_TEXT =
   '후기 찾아보다가 이 학원 블로그도 발견했어요. 커리큘럼이나 분위기 참고하실 분들께 도움이 될까 해서 공유합니다.';
@@ -19,8 +20,14 @@ function isValidUrl(value: string) {
 }
 
 export default function CommunityWrite() {
+  const { id } = useParams();
+  const isEditMode = !!id;
   const navigate = useNavigate();
   const addPost = useCommunityStore((state) => state.addPost);
+  const updatePost = useCommunityStore((state) => state.updatePost);
+  const fetchPostById = useCommunityStore((state) => state.fetchPostById);
+  const post = useCommunityStore((state) => (id ? state.getPostById(id) : null));
+
   const [form, setForm] = useState({
     region: '위례' as CommunityRegion,
     title: '',
@@ -30,6 +37,45 @@ export default function CommunityWrite() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const [canEdit, setCanEdit] = useState(!isEditMode);
+  const [loadingPost, setLoadingPost] = useState(isEditMode);
+
+  useEffect(() => {
+    if (!id) return;
+
+    const load = async () => {
+      setLoadingPost(true);
+      const loadedPost = post ?? (await fetchPostById(id));
+
+      const supabase = getSupabaseBrowserClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const browserId = getCommunityBrowserId();
+
+      const editable =
+        !!loadedPost &&
+        ((!!session?.user?.id && loadedPost.userId === session.user.id) ||
+          (!session?.user?.id &&
+            !!loadedPost.browserId &&
+            loadedPost.browserId === browserId));
+
+      setCanEdit(editable);
+
+      if (loadedPost) {
+        setForm({
+          region: loadedPost.region,
+          title: loadedPost.title,
+          content: loadedPost.content,
+          linkUrl: loadedPost.link?.url ?? '',
+        });
+      }
+
+      setLoadingPost(false);
+    };
+
+    void load();
+  }, [fetchPostById, id, post]);
 
   const linkLabel = useMemo(() => {
     if (!isValidUrl(form.linkUrl)) return '';
@@ -49,14 +95,9 @@ export default function CommunityWrite() {
     return nextErrors;
   };
 
-  const applyTemplate = () => {
-    setForm((current) => ({
-      ...current,
-      content: current.content.trim() ? current.content : TEMPLATE_TEXT,
-    }));
-  };
-
   const handleSubmit = async () => {
+    if (isEditMode && !canEdit) return;
+
     const nextErrors = validate();
     setErrors(nextErrors);
     setSubmitError('');
@@ -65,15 +106,26 @@ export default function CommunityWrite() {
 
     setIsSubmitting(true);
     try {
-      const saved = await addPost({
-        region: form.region,
-        title: form.title,
-        content: form.content,
-        linkUrl: form.linkUrl,
-      });
+      const saved =
+        isEditMode && id
+          ? await updatePost({
+              postId: id,
+              region: form.region,
+              title: form.title,
+              content: form.content,
+              linkUrl: form.linkUrl,
+            })
+          : await addPost({
+              region: form.region,
+              title: form.title,
+              content: form.content,
+              linkUrl: form.linkUrl,
+            });
+
       navigate(`/community/${saved.id}`);
     } catch (error) {
-      const message = error instanceof Error ? error.message : '게시글 저장 중 오류가 발생했습니다.';
+      const message =
+        error instanceof Error ? error.message : '게시글 저장 중 오류가 발생했습니다.';
       setSubmitError(message);
     } finally {
       setIsSubmitting(false);
@@ -95,11 +147,25 @@ export default function CommunityWrite() {
       </div>
 
       <div className="mx-auto max-w-4xl px-6 py-8">
+        {loadingPost && (
+          <div className="mb-4 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-500">
+            게시글 정보를 불러오는 중이에요.
+          </div>
+        )}
+
+        {isEditMode && !loadingPost && !canEdit && (
+          <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+            본인이 작성한 글만 수정할 수 있어요.
+          </div>
+        )}
+
         <div className="mb-6">
           <p className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-primary">
             Community Write
           </p>
-          <h1 className="text-3xl font-semibold text-slate-900">커뮤니티 글 작성</h1>
+          <h1 className="text-3xl font-semibold text-slate-900">
+            {isEditMode ? '커뮤니티 글 수정' : '커뮤니티 글 작성'}
+          </h1>
           <p className="mt-2 text-sm leading-6 text-slate-500">
             위례 또는 태평 지역 정보를 자유롭게 공유해 주세요. 로그인하지 않아도 글을 작성할 수 있어요.
           </p>
@@ -118,11 +184,12 @@ export default function CommunityWrite() {
                         key={region}
                         type="button"
                         onClick={() => setForm((current) => ({ ...current, region }))}
+                        disabled={isEditMode && !canEdit}
                         className={`rounded-2xl border px-4 py-4 text-left transition-all ${
                           selected
                             ? 'border-primary bg-primary/5 text-primary'
                             : 'border-slate-200 text-slate-600 hover:border-slate-300'
-                        }`}
+                        } disabled:cursor-not-allowed disabled:opacity-60`}
                       >
                         <p className="text-sm font-semibold">{region}</p>
                         <p className="mt-1 text-xs text-slate-400">이 지역 커뮤니티에 노출돼요.</p>
@@ -140,32 +207,24 @@ export default function CommunityWrite() {
                   onChange={(event) =>
                     setForm((current) => ({ ...current, title: event.target.value }))
                   }
+                  disabled={isEditMode && !canEdit}
                   placeholder="예: 태평 쪽 영어학원 정보 공유해요"
-                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-primary"
+                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-primary disabled:cursor-not-allowed disabled:bg-slate-50"
                 />
                 {errors.title && <p className="mt-2 text-xs text-red-500">{errors.title}</p>}
               </div>
 
               <div>
-                <div className="mb-2 flex items-center justify-between gap-3">
-                  <label className="block text-sm font-semibold text-slate-900">본문</label>
-                  <button
-                    type="button"
-                    onClick={applyTemplate}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-primary hover:text-primary"
-                  >
-                    <PencilLine size={13} />
-                    템플릿 넣기
-                  </button>
-                </div>
+                <label className="mb-2 block text-sm font-semibold text-slate-900">본문</label>
                 <textarea
                   value={form.content}
                   onChange={(event) =>
                     setForm((current) => ({ ...current, content: event.target.value }))
                   }
+                  disabled={isEditMode && !canEdit}
                   placeholder="후기, 분위기, 상담 경험 등을 자유롭게 적어 주세요."
                   rows={10}
-                  className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 text-sm leading-6 text-slate-900 outline-none transition focus:border-primary"
+                  className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 text-sm leading-6 text-slate-900 outline-none transition focus:border-primary disabled:cursor-not-allowed disabled:bg-slate-50"
                 />
                 {errors.content && <p className="mt-2 text-xs text-red-500">{errors.content}</p>}
               </div>
@@ -177,8 +236,9 @@ export default function CommunityWrite() {
                   onChange={(event) =>
                     setForm((current) => ({ ...current, linkUrl: event.target.value }))
                   }
+                  disabled={isEditMode && !canEdit}
                   placeholder="https://blog.naver.com/..."
-                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-primary"
+                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-primary disabled:cursor-not-allowed disabled:bg-slate-50"
                 />
                 {errors.linkUrl && <p className="mt-2 text-xs text-red-500">{errors.linkUrl}</p>}
                 {linkLabel && (
@@ -215,11 +275,11 @@ export default function CommunityWrite() {
             <button
               type="button"
               onClick={() => void handleSubmit()}
-              disabled={isSubmitting}
+              disabled={isSubmitting || (isEditMode && !canEdit)}
               className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-3.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSubmitting && <LoaderCircle size={16} className="animate-spin" />}
-              게시글 등록하기
+              {isEditMode ? '게시글 수정하기' : '게시글 등록하기'}
             </button>
           </aside>
         </div>

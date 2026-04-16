@@ -86,6 +86,7 @@ export default function App() {
           <Route path="/compare" element={<AICompare />} />
           <Route path="/community" element={<CommunityHome />} />
           <Route path="/community/write" element={<CommunityWrite />} />
+          <Route path="/community/:id/edit" element={<CommunityWrite />} />
           <Route path="/community/:id" element={<CommunityPost />} />
           <Route path="/consult/:id" element={<ConsultRequest />} />
           <Route path="/leveltest/:id" element={<LevelTestRequest />} />
