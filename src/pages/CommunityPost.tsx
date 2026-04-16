@@ -1,21 +1,27 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   ChevronLeft,
   ChevronRight,
   ExternalLink,
   Heart,
+  LoaderCircle,
   MessageCircle,
+  Pencil,
   Send,
   Star,
   Tag,
+  Trash2,
 } from 'lucide-react';
 import { academies } from '../data/mockData';
 import UserProfileModal from '../components/UserProfileModal';
 import UserTypeBadge from '../components/UserTypeBadge';
-import { useCommunityStore } from '../store/communityStore';
+import { getCommunityBrowserId, useCommunityStore } from '../store/communityStore';
 import { useUserType } from '../hooks/useUserType';
 import type { UserType } from '../types/user';
+import { getSupabaseBrowserClient } from '../lib/supabase';
+
+const EMPTY_COMMENTS: never[] = [];
 
 const TAG_COLORS: Record<string, string> = {
   수학: 'bg-blue-50 text-blue-700',
@@ -33,30 +39,60 @@ const REGION_STYLES: Record<string, string> = {
   태평: 'bg-orange-100 text-orange-700',
 };
 
-const MOCK_COMMENTS = [
-  {
-    author: '맘스토크',
-    text: '상담 분위기까지 같이 적어주셔서 도움이 많이 됐어요.',
-    date: '2시간 전',
-    likes: 3,
-  },
-  {
-    author: '태평학부모',
-    text: '링크 들어가 보니 커리큘럼 설명이 자세해서 참고하기 좋네요.',
-    date: '5시간 전',
-    likes: 1,
-  },
-];
+function formatCommentDate(dateStr: string) {
+  return new Date(dateStr).toLocaleString('ko-KR', {
+    month: 'numeric',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
 
 export default function CommunityPost() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const userType = useUserType();
   const isAcademy = userType === 'academy';
   const [modalUser, setModalUser] = useState<{ author: string; userType?: UserType } | null>(null);
   const [loading, setLoading] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const [commentError, setCommentError] = useState('');
+  const [submittingComment, setSubmittingComment] = useState(false);
+  const [actingPost, setActingPost] = useState(false);
+  const [actingCommentId, setActingCommentId] = useState<string | null>(null);
+  const [ownerUserId, setOwnerUserId] = useState<string | null>(null);
+  const [ownerBrowserId, setOwnerBrowserId] = useState<string>(getCommunityBrowserId());
+
   const fetchPosts = useCommunityStore((state) => state.fetchPosts);
   const fetchPostById = useCommunityStore((state) => state.fetchPostById);
-  const post = useCommunityStore((state) => (id ? state.getPostById(id) : null));
+  const fetchComments = useCommunityStore((state) => state.fetchComments);
+  const addComment = useCommunityStore((state) => state.addComment);
+  const deleteComment = useCommunityStore((state) => state.deleteComment);
+  const deletePost = useCommunityStore((state) => state.deletePost);
+  const toggleLike = useCommunityStore((state) => state.toggleLike);
+  const post = useCommunityStore((state) =>
+    id ? state.posts.find((item) => item.id === id) ?? null : null,
+  );
+  const comments = useCommunityStore((state) =>
+    id ? state.commentsByPost[id] ?? EMPTY_COMMENTS : EMPTY_COMMENTS,
+  );
+  const isPostLiked = useCommunityStore((state) => (id ? state.isPostLiked(id) : false));
+  const commentsLoading = useCommunityStore((state) =>
+    id ? state.commentsLoadingByPost[id] ?? false : false,
+  );
+
+  useEffect(() => {
+    const loadOwner = async () => {
+      const supabase = getSupabaseBrowserClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      setOwnerUserId(session?.user?.id ?? null);
+      setOwnerBrowserId(getCommunityBrowserId());
+    };
+
+    void loadOwner();
+  }, []);
 
   useEffect(() => {
     if (!id) return;
@@ -65,11 +101,12 @@ export default function CommunityPost() {
       setLoading(true);
       await fetchPosts();
       await fetchPostById(id);
+      await fetchComments(id);
       setLoading(false);
     };
 
     void load();
-  }, [fetchPostById, fetchPosts, id]);
+  }, [fetchComments, fetchPostById, fetchPosts, id]);
 
   const openProfile = (author: string, nextUserType?: UserType) => {
     if (!isAcademy) return;
@@ -80,6 +117,78 @@ export default function CommunityPost() {
     if (!post) return [];
     return academies.filter((academy) => post.mentionedAcademies.includes(academy.id));
   }, [post]);
+
+  const canManagePost =
+    !!post &&
+    ((!!ownerUserId && post.userId === ownerUserId) ||
+      (!ownerUserId && !!post.browserId && post.browserId === ownerBrowserId));
+
+  const canManageComment = (comment: (typeof comments)[number]) =>
+    (!!ownerUserId && comment.userId === ownerUserId) ||
+    (!ownerUserId && !!comment.browserId && comment.browserId === ownerBrowserId);
+
+  const handleLike = async () => {
+    if (!id) return;
+    try {
+      await toggleLike(id);
+    } catch (error) {
+      console.error('[CommunityPost] toggleLike error:', error);
+    }
+  };
+
+  const handleCommentSubmit = async () => {
+    if (!id || submittingComment) return;
+
+    const trimmed = commentText.trim();
+    if (!trimmed) {
+      setCommentError('댓글 내용을 입력해 주세요.');
+      return;
+    }
+
+    setSubmittingComment(true);
+    setCommentError('');
+    try {
+      await addComment(id, trimmed);
+      setCommentText('');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '댓글 등록 중 오류가 발생했습니다.';
+      setCommentError(message);
+    } finally {
+      setSubmittingComment(false);
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    if (!id || actingCommentId) return;
+
+    const confirmed = window.confirm('이 댓글을 삭제할까요?');
+    if (!confirmed) return;
+
+    setActingCommentId(commentId);
+    try {
+      await deleteComment(commentId, id);
+    } catch (error) {
+      console.error('[CommunityPost] deleteComment error:', error);
+    } finally {
+      setActingCommentId(null);
+    }
+  };
+
+  const handleDeletePost = async () => {
+    if (!id || actingPost) return;
+
+    const confirmed = window.confirm('이 게시글을 삭제할까요?');
+    if (!confirmed) return;
+
+    setActingPost(true);
+    try {
+      await deletePost(id);
+      navigate('/community');
+    } catch (error) {
+      console.error('[CommunityPost] deletePost error:', error);
+      setActingPost(false);
+    }
+  };
 
   if (!post && loading) {
     return (
@@ -144,9 +253,32 @@ export default function CommunityPost() {
                   ))}
                 </div>
 
-                <h1 className="text-2xl font-semibold leading-snug text-slate-900 xl:text-3xl">
-                  {post.title}
-                </h1>
+                <div className="flex items-start justify-between gap-4">
+                  <h1 className="text-2xl font-semibold leading-snug text-slate-900 xl:text-3xl">
+                    {post.title}
+                  </h1>
+
+                  {canManagePost && (
+                    <div className="flex shrink-0 items-center gap-2">
+                      <Link
+                        to={`/community/${post.id}/edit`}
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-600 transition hover:border-primary/30 hover:text-primary"
+                      >
+                        <Pencil size={14} />
+                        수정
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => void handleDeletePost()}
+                        disabled={actingPost}
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-red-200 px-3 py-2 text-sm text-red-500 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {actingPost ? <LoaderCircle size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                        삭제
+                      </button>
+                    </div>
+                  )}
+                </div>
 
                 <div className="mb-6 mt-3 flex items-center gap-3 border-b border-slate-100 pb-5">
                   <button
@@ -170,7 +302,7 @@ export default function CommunityPost() {
                 </div>
 
                 <div className="prose prose-slate max-w-none">
-                  <p className="text-base leading-relaxed whitespace-pre-wrap text-slate-700">
+                  <p className="whitespace-pre-wrap text-base leading-relaxed text-slate-700">
                     {post.content}
                   </p>
                 </div>
@@ -197,8 +329,16 @@ export default function CommunityPost() {
                 )}
 
                 <div className="mt-8 flex items-center gap-4 border-t border-slate-100 pt-5">
-                  <button className="flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-500 transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-500">
-                    <Heart size={15} />
+                  <button
+                    type="button"
+                    onClick={() => void handleLike()}
+                    className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-sm transition-all ${
+                      isPostLiked
+                        ? 'border-red-200 bg-red-50 text-red-500'
+                        : 'border-slate-200 text-slate-500 hover:border-red-200 hover:bg-red-50 hover:text-red-500'
+                    }`}
+                  >
+                    <Heart size={15} className={isPostLiked ? 'fill-red-500 text-red-500' : ''} />
                     좋아요 {post.likes}
                   </button>
                   <button className="flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-500 transition-all hover:border-primary/30 hover:bg-primary/5 hover:text-primary">
@@ -212,14 +352,24 @@ export default function CommunityPost() {
                 <h2 className="mb-5 text-base font-semibold text-slate-900">댓글 {post.comments}</h2>
 
                 <div className="mb-6 space-y-4">
-                  {MOCK_COMMENTS.map((comment, index) => (
+                  {commentsLoading && comments.length === 0 && (
+                    <div className="text-sm text-slate-400">댓글을 불러오는 중이에요.</div>
+                  )}
+
+                  {!commentsLoading && comments.length === 0 && (
+                    <div className="rounded-2xl border border-dashed border-slate-200 px-4 py-6 text-center text-sm text-slate-400">
+                      아직 댓글이 없어요. 첫 댓글을 남겨보세요.
+                    </div>
+                  )}
+
+                  {comments.map((comment) => (
                     <div
-                      key={index}
+                      key={comment.id}
                       className="flex gap-3 border-b border-slate-100 pb-4 last:border-0"
                     >
                       <button
                         type="button"
-                        onClick={() => openProfile(comment.author)}
+                        onClick={() => openProfile(comment.author, comment.userType)}
                         className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600 ${
                           isAcademy ? 'cursor-pointer transition-opacity hover:opacity-75' : 'cursor-default'
                         }`}
@@ -227,22 +377,41 @@ export default function CommunityPost() {
                         {comment.author[0]}
                       </button>
                       <div className="flex-1">
-                        <div className="mb-1 flex items-center justify-between">
-                          <button
-                            type="button"
-                            onClick={() => openProfile(comment.author)}
-                            className={`text-sm font-semibold text-slate-800 ${
-                              isAcademy ? 'cursor-pointer transition-colors hover:text-primary' : 'cursor-default'
-                            }`}
-                          >
-                            {comment.author}
-                          </button>
-                          <span className="text-xs text-slate-400">{comment.date}</span>
+                        <div className="mb-1 flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => openProfile(comment.author, comment.userType)}
+                              className={`text-sm font-semibold text-slate-800 ${
+                                isAcademy ? 'cursor-pointer transition-colors hover:text-primary' : 'cursor-default'
+                              }`}
+                            >
+                              {comment.author}
+                            </button>
+                            <UserTypeBadge userType={comment.userType} />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-slate-400">
+                              {formatCommentDate(comment.createdAt)}
+                            </span>
+                            {canManageComment(comment) && (
+                              <button
+                                type="button"
+                                onClick={() => void handleDeleteComment(comment.id)}
+                                disabled={actingCommentId === comment.id}
+                                className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-red-500 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                              >
+                                {actingCommentId === comment.id ? (
+                                  <LoaderCircle size={12} className="animate-spin" />
+                                ) : (
+                                  <Trash2 size={12} />
+                                )}
+                                삭제
+                              </button>
+                            )}
+                          </div>
                         </div>
-                        <p className="text-sm leading-relaxed text-slate-600">{comment.text}</p>
-                        <button className="mt-1.5 flex items-center gap-1 text-xs text-slate-400 transition-colors hover:text-red-400">
-                          <Heart size={11} /> {comment.likes}
-                        </button>
+                        <p className="text-sm leading-relaxed text-slate-600">{comment.content}</p>
                       </div>
                     </div>
                   ))}
@@ -254,14 +423,33 @@ export default function CommunityPost() {
                   </div>
                   <div className="flex flex-1 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 transition-all focus-within:border-primary focus-within:bg-white">
                     <input
-                      placeholder="댓글 기능은 곧 연결될 예정이에요."
+                      value={commentText}
+                      onChange={(event) => setCommentText(event.target.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter') {
+                          event.preventDefault();
+                          void handleCommentSubmit();
+                        }
+                      }}
+                      placeholder="댓글을 입력해 주세요."
                       className="flex-1 bg-transparent text-sm text-slate-800 placeholder-slate-400 focus:outline-none"
                     />
-                    <button className="shrink-0 rounded-lg bg-primary p-1.5 text-white transition-all hover:opacity-85">
-                      <Send size={13} />
+                    <button
+                      type="button"
+                      onClick={() => void handleCommentSubmit()}
+                      disabled={submittingComment}
+                      className="shrink-0 rounded-lg bg-primary p-1.5 text-white transition-all hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {submittingComment ? (
+                        <LoaderCircle size={13} className="animate-spin" />
+                      ) : (
+                        <Send size={13} />
+                      )}
                     </button>
                   </div>
                 </div>
+
+                {commentError && <p className="mt-3 text-sm text-red-500">{commentError}</p>}
               </div>
             </div>
 
