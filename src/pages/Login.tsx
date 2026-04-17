@@ -40,8 +40,13 @@ export default function Login() {
       });
       if (error) throw error;
       navigate('/');
-    } catch {
-      setErrors({ submit: '이메일 또는 비밀번호가 올바르지 않아요.' });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : '';
+      if (message.includes('Email not confirmed')) {
+        setErrors({ submit: '이메일 인증이 완료되지 않았어요. 가입 시 받은 이메일을 확인해주세요.' });
+      } else {
+        setErrors({ submit: '이메일 또는 비밀번호가 올바르지 않아요.' });
+      }
     } finally {
       setIsLoading(false);
     }
