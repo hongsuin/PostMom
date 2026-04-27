@@ -92,8 +92,15 @@ export default function Signup() {
 
       navigate(getRedirectPath(selectedType), { replace: true });
     } catch (err) {
-      console.error(err);
-      setErrors({ submit: '가입에 실패했어요. 다시 시도해주세요.' });
+      const code = (err as { code?: string })?.code;
+      console.error('[signup error]', err);
+      if (code === 'user_already_exists' || code === 'email_exists') {
+        setErrors({ submit: '이미 가입된 이메일이에요. 로그인해주세요.' });
+      } else if (code === 'over_email_send_rate_limit') {
+        setErrors({ submit: '이메일 발송 횟수를 초과했어요. 잠시 후 다시 시도해주세요.' });
+      } else {
+        setErrors({ submit: '가입에 실패했어요. 다시 시도해주세요.' });
+      }
     } finally {
       setIsLoading(false);
     }
