@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { academies } from '../data/mockData';
 import UserProfileModal from '../components/UserProfileModal';
+import ConfirmDeleteModal from '../components/ConfirmDeleteModal';
 import UserTypeBadge from '../components/UserTypeBadge';
 import { getCommunityBrowserId, useCommunityStore } from '../store/communityStore';
 import { useUserType } from '../hooks/useUserType';
@@ -233,48 +234,16 @@ export default function CommunityPost() {
         isAcademy={isAcademy}
       />
 
-      {pendingDelete && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          onClick={() => { if (!actingPost && !actingCommentId) setPendingDelete(null); }}
-        >
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
-          <div
-            className="relative w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <h2 className="text-base font-semibold text-slate-900">
-              {pendingDelete.type === 'post' ? '게시글 삭제' : '댓글 삭제'}
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-slate-500">
-              {pendingDelete.type === 'post'
-                ? '이 게시글을 삭제할까요? 삭제 후에는 되돌릴 수 없어요.'
-                : '이 댓글을 삭제할까요? 삭제 후에는 되돌릴 수 없어요.'}
-            </p>
-            <div className="mt-5 flex gap-2">
-              <button
-                type="button"
-                onClick={() => setPendingDelete(null)}
-                disabled={actingPost || !!actingCommentId}
-                className="flex-1 rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-slate-600 transition hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                취소
-              </button>
-              <button
-                type="button"
-                onClick={() => void confirmDelete()}
-                disabled={actingPost || !!actingCommentId}
-                className="flex-1 rounded-xl bg-red-500 py-2.5 text-sm font-semibold text-white transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {(pendingDelete.type === 'post' && actingPost) ||
-                (pendingDelete.type === 'comment' && actingCommentId === pendingDelete.commentId)
-                  ? '삭제 중...'
-                  : '삭제하기'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDeleteModal
+        isOpen={!!pendingDelete}
+        type={pendingDelete?.type ?? 'post'}
+        isLoading={
+          (pendingDelete?.type === 'post' && actingPost) ||
+          (pendingDelete?.type === 'comment' && actingCommentId === pendingDelete?.commentId)
+        }
+        onConfirm={() => void confirmDelete()}
+        onClose={() => setPendingDelete(null)}
+      />
 
       <div className="min-h-screen bg-slate-50">
         <div className="border-b border-slate-200 bg-white">
