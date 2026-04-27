@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getSupabaseBrowserClient } from '../lib/supabase';
 import type { UserType } from '../types/user';
@@ -7,6 +7,7 @@ export default function AuthCallback() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [message, setMessage] = useState('카카오 로그인 정보를 확인하고 있어요...');
+  const processed = useRef(false);
 
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
@@ -26,7 +27,22 @@ export default function AuthCallback() {
       return '/onboarding/1';
     };
 
-    // ── pendingUserType 처리 + 세션 확인 ────────────────────────
+    // ── pendingUserType 처리 + 내비게이션 (한 번만 실행) ────────
+    const handleSession = async (existingType: UserType | null) => {
+      if (processed.current) return;
+      processed.current = true;
+
+      const pendingType = localStorage.getItem('pendingUserType') as UserType | null;
+      if (pendingType) {
+        await supabase.auth.updateUser({ data: { userType: pendingType } });
+        localStorage.removeItem('pendingUserType');
+        navigate(getRedirectPath(pendingType), { replace: true });
+      } else {
+        navigate(getRedirectPath(existingType), { replace: true });
+      }
+    };
+
+    // ── 초기 세션 확인 ───────────────────────────────────────────
     const finishLogin = async () => {
       const { data, error } = await supabase.auth.getSession();
 
@@ -38,18 +54,8 @@ export default function AuthCallback() {
       }
 
       if (data.session) {
-        const pendingType = localStorage.getItem('pendingUserType') as UserType | null;
-
-        if (pendingType) {
-          // 카카오 가입 시 선택한 유형을 user_metadata에 저장
-          await supabase.auth.updateUser({ data: { userType: pendingType } });
-          localStorage.removeItem('pendingUserType');
-          navigate(getRedirectPath(pendingType), { replace: true });
-        } else {
-          // 일반 로그인 (유형 이미 저장됨) → 기존 유형으로 분기
-          const existingType = data.session.user?.user_metadata?.userType as UserType | null;
-          navigate(getRedirectPath(existingType), { replace: true });
-        }
+        const existingType = data.session.user?.user_metadata?.userType as UserType | null;
+        await handleSession(existingType);
         return;
       }
 
@@ -62,16 +68,8 @@ export default function AuthCallback() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
-        const pendingType = localStorage.getItem('pendingUserType') as UserType | null;
-
-        if (pendingType) {
-          await supabase.auth.updateUser({ data: { userType: pendingType } });
-          localStorage.removeItem('pendingUserType');
-          navigate(getRedirectPath(pendingType), { replace: true });
-        } else {
-          const existingType = session.user?.user_metadata?.userType as UserType | null;
-          navigate(getRedirectPath(existingType), { replace: true });
-        }
+        const existingType = session.user?.user_metadata?.userType as UserType | null;
+        await handleSession(existingType);
       }
     });
 
