@@ -39,6 +39,7 @@ export default function Signup() {
   });
   const [bizFile, setBizFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [notice, setNotice] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isKakaoLoading, setIsKakaoLoading] = useState(false);
   const [oauthError, setOauthError] = useState('');
@@ -85,7 +86,7 @@ export default function Signup() {
 
       // 이메일 인증이 필요한 경우 (session이 없음)
       if (!data.session) {
-        setErrors({ submit: '가입 확인 이메일을 보냈어요. 이메일을 확인한 후 로그인해주세요.' });
+        setNotice('가입 확인 이메일을 보냈어요. 이메일을 확인한 후 로그인해주세요.');
         return;
       }
 
@@ -204,7 +205,7 @@ export default function Signup() {
         <div className="flex items-center justify-between mb-8">
           <button
             type="button"
-            onClick={() => { setStep('type'); setErrors({}); setOauthError(''); }}
+            onClick={() => { setStep('type'); setErrors({}); setNotice(''); setOauthError(''); }}
             className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors"
           >
             <ChevronLeft size={16} />
@@ -349,6 +350,9 @@ export default function Signup() {
             </div>
           )}
 
+          {notice && (
+            <p className="text-center text-xs text-blue-600 rounded-xl bg-blue-50 border border-blue-100 px-4 py-3 leading-5">{notice}</p>
+          )}
           {errors.submit && (
             <p className="text-center text-xs text-red-500">{errors.submit}</p>
           )}
