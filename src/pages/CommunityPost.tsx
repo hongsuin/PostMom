@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { academies } from '../data/mockData';
 import UserProfileModal from '../components/UserProfileModal';
+import ConfirmDeleteModal from '../components/ConfirmDeleteModal';
 import UserTypeBadge from '../components/UserTypeBadge';
 import { getCommunityBrowserId, useCommunityStore } from '../store/communityStore';
 import { useUserType } from '../hooks/useUserType';
@@ -60,6 +61,10 @@ export default function CommunityPost() {
   const [submittingComment, setSubmittingComment] = useState(false);
   const [actingPost, setActingPost] = useState(false);
   const [actingCommentId, setActingCommentId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState('');
+  const [pendingDelete, setPendingDelete] = useState<
+    { type: 'post' } | { type: 'comment'; commentId: string } | null
+  >(null);
   const [ownerUserId, setOwnerUserId] = useState<string | null>(null);
   const [ownerBrowserId, setOwnerBrowserId] = useState<string>(getCommunityBrowserId());
 
@@ -161,14 +166,15 @@ export default function CommunityPost() {
   const handleDeleteComment = async (commentId: string) => {
     if (!id || actingCommentId) return;
 
-    const confirmed = window.confirm('이 댓글을 삭제할까요?');
-    if (!confirmed) return;
-
     setActingCommentId(commentId);
+    setActionError('');
     try {
       await deleteComment(commentId, id);
+      setPendingDelete(null);
     } catch (error) {
       console.error('[CommunityPost] deleteComment error:', error);
+      const message = error instanceof Error ? error.message : '댓글 삭제 중 오류가 발생했습니다.';
+      setActionError(message);
     } finally {
       setActingCommentId(null);
     }
@@ -177,17 +183,29 @@ export default function CommunityPost() {
   const handleDeletePost = async () => {
     if (!id || actingPost) return;
 
-    const confirmed = window.confirm('이 게시글을 삭제할까요?');
-    if (!confirmed) return;
-
     setActingPost(true);
+    setActionError('');
     try {
+      setPendingDelete(null);
       await deletePost(id);
       navigate('/community');
     } catch (error) {
       console.error('[CommunityPost] deletePost error:', error);
+      const message = error instanceof Error ? error.message : '게시글 삭제 중 오류가 발생했습니다.';
+      setActionError(message);
       setActingPost(false);
     }
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return;
+
+    if (pendingDelete.type === 'post') {
+      await handleDeletePost();
+      return;
+    }
+
+    await handleDeleteComment(pendingDelete.commentId);
   };
 
   if (!post && loading) {
@@ -214,6 +232,17 @@ export default function CommunityPost() {
         isOpen={!!modalUser}
         onClose={() => setModalUser(null)}
         isAcademy={isAcademy}
+      />
+
+      <ConfirmDeleteModal
+        isOpen={!!pendingDelete}
+        type={pendingDelete?.type ?? 'post'}
+        isLoading={
+          (pendingDelete?.type === 'post' && actingPost) ||
+          (pendingDelete?.type === 'comment' && actingCommentId === pendingDelete?.commentId)
+        }
+        onConfirm={() => void confirmDelete()}
+        onClose={() => setPendingDelete(null)}
       />
 
       <div className="min-h-screen bg-slate-50">
@@ -269,7 +298,7 @@ export default function CommunityPost() {
                       </Link>
                       <button
                         type="button"
-                        onClick={() => void handleDeletePost()}
+                        onClick={() => setPendingDelete({ type: 'post' })}
                         disabled={actingPost}
                         className="inline-flex items-center gap-1.5 rounded-xl border border-red-200 px-3 py-2 text-sm text-red-500 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
                       >
@@ -306,6 +335,12 @@ export default function CommunityPost() {
                     {post.content}
                   </p>
                 </div>
+
+                {actionError && (
+                  <p className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                    {actionError}
+                  </p>
+                )}
 
                 {post.link && (
                   <a
@@ -397,7 +432,9 @@ export default function CommunityPost() {
                             {canManageComment(comment) && (
                               <button
                                 type="button"
-                                onClick={() => void handleDeleteComment(comment.id)}
+                                onClick={() =>
+                                  setPendingDelete({ type: 'comment', commentId: comment.id })
+                                }
                                 disabled={actingCommentId === comment.id}
                                 className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-red-500 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
                               >

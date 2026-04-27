@@ -25,5 +25,6 @@ export function getSupabaseBrowserClient() {
 }
 
 export function getOAuthRedirectUrl(path = '/auth/callback') {
-  return new URL(path, window.location.origin).toString();
+  const base = import.meta.env.VITE_APP_URL ?? window.location.origin;
+  return new URL(path, base).toString();
 }

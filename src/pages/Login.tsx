@@ -38,10 +38,15 @@ export default function Login() {
         email: form.email,
         password: form.password,
       });
-      if (error) throw error;
+      if (error) {
+        if (error.code === 'email_not_confirmed') {
+          setErrors({ submit: '이메일 인증이 완료되지 않았어요. 가입 시 받은 이메일을 확인해주세요.' });
+        } else {
+          setErrors({ submit: '이메일 또는 비밀번호가 올바르지 않아요.' });
+        }
+        return;
+      }
       navigate('/');
-    } catch {
-      setErrors({ submit: '이메일 또는 비밀번호가 올바르지 않아요.' });
     } finally {
       setIsLoading(false);
     }

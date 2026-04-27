@@ -39,6 +39,7 @@ export default function Signup() {
   });
   const [bizFile, setBizFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [notice, setNotice] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isKakaoLoading, setIsKakaoLoading] = useState(false);
   const [oauthError, setOauthError] = useState('');
@@ -68,7 +69,7 @@ export default function Signup() {
     setIsLoading(true);
     try {
       const supabase = getSupabaseBrowserClient();
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: form.email,
         password: form.password,
         options: {
@@ -82,10 +83,24 @@ export default function Signup() {
         },
       });
       if (error) throw error;
+
+      // 이메일 인증이 필요한 경우 (session이 없음)
+      if (!data.session) {
+        setNotice('가입 확인 이메일을 보냈어요. 이메일을 확인한 후 로그인해주세요.');
+        return;
+      }
+
       navigate(getRedirectPath(selectedType), { replace: true });
     } catch (err) {
-      console.error(err);
-      setErrors({ submit: '가입에 실패했어요. 다시 시도해주세요.' });
+      const code = (err as { code?: string })?.code;
+      console.error('[signup error]', err);
+      if (code === 'user_already_exists' || code === 'email_exists') {
+        setErrors({ submit: '이미 가입된 이메일이에요. 로그인해주세요.' });
+      } else if (code === 'over_email_send_rate_limit') {
+        setErrors({ submit: '이메일 발송 횟수를 초과했어요. 잠시 후 다시 시도해주세요.' });
+      } else {
+        setErrors({ submit: '가입에 실패했어요. 다시 시도해주세요.' });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -197,7 +212,7 @@ export default function Signup() {
         <div className="flex items-center justify-between mb-8">
           <button
             type="button"
-            onClick={() => { setStep('type'); setErrors({}); setOauthError(''); }}
+            onClick={() => { setStep('type'); setErrors({}); setNotice(''); setOauthError(''); }}
             className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors"
           >
             <ChevronLeft size={16} />
@@ -342,6 +357,9 @@ export default function Signup() {
             </div>
           )}
 
+          {notice && (
+            <p className="text-center text-xs text-blue-600 rounded-xl bg-blue-50 border border-blue-100 px-4 py-3 leading-5">{notice}</p>
+          )}
           {errors.submit && (
             <p className="text-center text-xs text-red-500">{errors.submit}</p>
           )}
