@@ -22,6 +22,7 @@ export default function AuthCallback() {
     // ── 가입 후 이동 경로 분기 ──────────────────────────────────
     const getRedirectPath = (userType: UserType | null) => {
       if (userType === 'academy') return '/';
+      if (!userType) return '/signup'; // userType 없음 → 회원가입 먼저
       return '/onboarding/1';
     };
 
