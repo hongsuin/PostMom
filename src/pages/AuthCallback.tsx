@@ -61,7 +61,7 @@ export default function AuthCallback() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session) {
+      if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
         const pendingType = localStorage.getItem('pendingUserType') as UserType | null;
 
         if (pendingType) {

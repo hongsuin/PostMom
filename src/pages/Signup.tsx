@@ -68,7 +68,7 @@ export default function Signup() {
     setIsLoading(true);
     try {
       const supabase = getSupabaseBrowserClient();
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: form.email,
         password: form.password,
         options: {
@@ -82,6 +82,13 @@ export default function Signup() {
         },
       });
       if (error) throw error;
+
+      // 이메일 인증이 필요한 경우 (session이 없음)
+      if (!data.session) {
+        setErrors({ submit: '가입 확인 이메일을 보냈어요. 이메일을 확인한 후 로그인해주세요.' });
+        return;
+      }
+
       navigate(getRedirectPath(selectedType), { replace: true });
     } catch (err) {
       console.error(err);
