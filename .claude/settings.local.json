@@ -5,7 +5,17 @@
       "mcp__filesystem__list_directory",
       "Bash(npx tsc:*)",
       "Bash(not exist:*)",
-      "Bash(xargs grep:*)"
+      "Bash(xargs grep:*)",
+      "Read(//c/Users/user/Desktop/POSTMOM//**)",
+      "Read(//c/Users/user/Desktop/POSTMOM/**)",
+      "PowerShell(openfiles /query /fo csv 2>&1)",
+      "PowerShell($ErrorActionPreference = 'SilentlyContinue')",
+      "Bash(tasklist)",
+      "Bash(where handle64.exe)",
+      "Bash(where handle.exe)",
+      "PowerShell($empty = \"$env:TEMP\\\\empty_dir\"; New-Item -ItemType Directory -Force $empty | Out-Null; robocopy $empty \"C:\\\\Users\\\\user\\\\Desktop\\\\POSTMOM\\\\postmom-new\\\\.claude\\\\worktrees\\\\priceless-mendeleev-813efa\" /MIR /NFL /NDL /NJH /NJS; robocopy $empty \"C:\\\\Users\\\\user\\\\Desktop\\\\POSTMOM\\\\postmom-new\\\\.claude\\\\worktrees\\\\brave-brattain-15b487\" /MIR /NFL /NDL /NJH /NJS; Remove-Item $empty -Force)",
+      "PowerShell(cmd /c \"rmdir /s /q \"\"C:\\\\Users\\\\user\\\\Desktop\\\\POSTMOM\\\\postmom-new\\\\.claude\\\\worktrees\\\\priceless-mendeleev-813efa\"\" 2>&1\")",
+      "PowerShell(cmd /c \"rmdir /s /q \"\"C:\\\\Users\\\\user\\\\Desktop\\\\POSTMOM\\\\postmom-new\\\\.claude\\\\worktrees\\\\brave-brattain-15b487\"\" 2>&1\")"
     ]
   }
 }

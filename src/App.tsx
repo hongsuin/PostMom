@@ -29,6 +29,7 @@ import MyPage from './pages/MyPage';
 import MyConsultations from './pages/MyConsultations';
 import AuthCallback from './pages/AuthCallback';
 import LearningTypeTest from './pages/LearningTypeTest';
+import AiChat from './pages/AiChat';
 
 import OnboardingStep1 from './features/onboarding/pages/OnboardingStep1';
 import OnboardingStep2 from './features/onboarding/pages/OnboardingStep2';
@@ -63,6 +64,7 @@ export default function App() {
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/learning-test" element={<LearningTypeTest />} />
         <Route path="/consult/complete" element={<ConsultComplete />} />
+        <Route path="/ai-chat" element={<AiChat />} />
         <Route path="/compare/result" element={<AICompareResult />} />
 
         {/* Admin */}

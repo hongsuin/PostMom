@@ -10,6 +10,7 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 const NAV_LINKS = [
   { label: '학원 찾기', to: '/academies' },
   { label: 'AI 비교', to: '/compare' },
+  { label: '노무상담', to: '/ai-chat', isNew: true },
   { label: '커뮤니티', to: '/community' },
   { label: '이용 안내', to: '/#how' },
 ];
@@ -194,9 +195,12 @@ export default function Home() {
               <Link
                 key={link.label}
                 to={link.to}
-                className="text-sm font-medium text-white/70 transition-colors hover:text-white"
+                className="flex items-center gap-1 text-sm font-medium text-white/70 transition-colors hover:text-white"
               >
                 {link.label}
+                {link.isNew && (
+                  <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[9px] font-bold text-white">NEW</span>
+                )}
               </Link>
             ))}
           </nav>
@@ -271,9 +275,12 @@ export default function Home() {
               key={link.label}
               to={link.to}
               onClick={() => setDrawerOpen(false)}
-              className="flex items-center rounded-lg px-4 py-3 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+              className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
             >
               {link.label}
+              {link.isNew && (
+                <span className="rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] font-bold text-primary">NEW</span>
+              )}
             </Link>
           ))}
         </nav>
