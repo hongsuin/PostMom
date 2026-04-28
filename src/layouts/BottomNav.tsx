@@ -1,10 +1,11 @@
-import { Home, BookOpen, Zap, Users, User } from 'lucide-react';
+import { Home, BookOpen, Zap, MessageSquare, Users, User } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 const navItems = [
   { icon: Home, label: '홈', path: '/' },
   { icon: BookOpen, label: '학원', path: '/academies' },
   { icon: Zap, label: 'AI비교', path: '/compare' },
+  { icon: MessageSquare, label: '노무상담', path: '/ai-chat' },
   { icon: Users, label: '커뮤니티', path: '/community' },
   { icon: User, label: '마이', path: '/mypage' },
 ];
