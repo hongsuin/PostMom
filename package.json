@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"vite\" \"start-backend.bat\"",
+    "dev": "concurrently --names \"FRONT,NODE,RAG\" \"vite\" \"node server/index.js\" \"cd ..\\postmom-rag && venv\\Scripts\\uvicorn main:app --reload --port 8000\"",
     "dev:front": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",

@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, BookOpen, Scale, Users, User, Menu, Plus, Send, Paperclip, ArrowLeft } from 'lucide-react';
+import { Home, BookOpen, Scale, Users, User, Menu, Plus, Send, Paperclip, ArrowLeft, Trash2 } from 'lucide-react';
+import { getSupabaseBrowserClient } from '../lib/supabase';
+
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001';
 
 interface Message {
   id: string;
@@ -10,19 +13,18 @@ interface Message {
   time: string;
 }
 
+interface Session {
+  id: number;
+  title: string;
+  created_at: string;
+  updated_at: string;
+}
+
 const SUGGESTED = [
   '퇴직금은 어떻게 계산하나요?',
   '연차는 몇 개 줘야 하나요?',
   '근로계약서에 꼭 넣어야 할 항목은?',
   '4대보험 가입 기준이 어떻게 되나요?',
-];
-
-const HISTORY = [
-  { id: '1', title: '퇴직금 계산 방법', sub: '신입 선생님 퇴직금 관련...', group: '오늘' },
-  { id: '2', title: '연차 계산 기준', sub: '파트타임 연차 발생 여부...', group: '어제' },
-  { id: '3', title: '4대보험 가입 기준', sub: '주 3일 강사 4대보험...', group: '어제' },
-  { id: '4', title: '근로계약서 필수 항목', sub: '계약서 작성 시 포함할...', group: '지난 주' },
-  { id: '5', title: '출산휴가 급여 계산', sub: '출산 예정인 선생님 급여...', group: '지난 주' },
 ];
 
 const NAV_ITEMS = [
@@ -41,6 +43,29 @@ function formatSource(src: string) {
   return src.split(/[\\/]/).pop()?.replace(/^\[pdf\]/, '') ?? src;
 }
 
+function groupByDate(sessions: Session[]) {
+  const now = new Date();
+  const today = now.toDateString();
+  const yesterday = new Date(now.getTime() - 86400000).toDateString();
+
+  const groups: Record<string, Session[]> = { '오늘': [], '어제': [], '지난 주': [] };
+  sessions.forEach(s => {
+    const d = new Date(s.updated_at).toDateString();
+    if (d === today) groups['오늘'].push(s);
+    else if (d === yesterday) groups['어제'].push(s);
+    else groups['지난 주'].push(s);
+  });
+  return groups;
+}
+
+async function getAuthHeader(): Promise<{ Authorization: string } | null> {
+  const supabase = getSupabaseBrowserClient();
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  if (!token) return null;
+  return { Authorization: `Bearer ${token}` };
+}
+
 export default function AiChat() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -49,9 +74,26 @@ export default function AiChat() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(-1);
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [currentSessionId, setCurrentSessionId] = useState<number | null>(null);
+  const [userName, setUserName] = useState('');
   const progressTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // 로그인 유저 정보 + 세션 목록 로드
+  useEffect(() => {
+    async function init() {
+      const supabase = getSupabaseBrowserClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const name = user.user_metadata?.name || user.email?.split('@')[0] || '원장님';
+        setUserName(name);
+      }
+      await fetchSessions();
+    }
+    init();
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -76,6 +118,53 @@ export default function AiChat() {
     return () => { if (progressTimer.current) clearInterval(progressTimer.current); };
   }, [isLoading]);
 
+  async function fetchSessions() {
+    const headers = await getAuthHeader();
+    if (!headers) return;
+    try {
+      const res = await fetch(`${SERVER_URL}/api/sessions`, { headers });
+      if (res.ok) setSessions(await res.json());
+    } catch { /* 서버 꺼진 경우 무시 */ }
+  }
+
+  async function loadSession(session: Session) {
+    const headers = await getAuthHeader();
+    if (!headers) return;
+    try {
+      const res = await fetch(`${SERVER_URL}/api/sessions/${session.id}/messages`, { headers });
+      if (!res.ok) return;
+      const rows = await res.json();
+      const loaded: Message[] = rows.map((r: { id: number; role: string; content: string; sources: { source: string; page: number }[] | null; created_at: string }) => ({
+        id: String(r.id),
+        role: r.role as 'user' | 'bot',
+        content: r.content,
+        sources: r.sources ?? undefined,
+        time: new Date(r.created_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
+      }));
+      setMessages(loaded);
+      setCurrentSessionId(session.id);
+      setSidebarOpen(false);
+    } catch { /* 무시 */ }
+  }
+
+  async function deleteSession(e: React.MouseEvent, sessionId: number) {
+    e.stopPropagation();
+    const headers = await getAuthHeader();
+    if (!headers) return;
+    await fetch(`${SERVER_URL}/api/sessions/${sessionId}`, { method: 'DELETE', headers });
+    if (currentSessionId === sessionId) {
+      setMessages([]);
+      setCurrentSessionId(null);
+    }
+    setSessions(prev => prev.filter(s => s.id !== sessionId));
+  }
+
+  function handleNewChat() {
+    setMessages([]);
+    setCurrentSessionId(null);
+    setSidebarOpen(false);
+  }
+
   function handleTextareaChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     setInput(e.target.value);
     e.target.style.height = 'auto';
@@ -92,13 +181,17 @@ export default function AiChat() {
     setIsLoading(true);
 
     try {
-      const res = await fetch('http://localhost:8000/chat', {
+      const headers = await getAuthHeader();
+      if (!headers) throw new Error('로그인이 필요합니다.');
+
+      const res = await fetch(`${SERVER_URL}/api/chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question }),
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, sessionId: currentSessionId }),
       });
       if (!res.ok) throw new Error();
       const data = await res.json();
+
       setMessages(prev => [...prev, {
         id: (Date.now() + 1).toString(),
         role: 'bot',
@@ -106,11 +199,17 @@ export default function AiChat() {
         sources: data.sources,
         time: getTime(),
       }]);
+
+      // 새 세션이었으면 세션 ID 저장 + 목록 갱신
+      if (!currentSessionId) {
+        setCurrentSessionId(data.sessionId);
+        await fetchSessions();
+      }
     } catch {
       setMessages(prev => [...prev, {
         id: (Date.now() + 1).toString(),
         role: 'bot',
-        content: '연결 오류가 발생했습니다. RAG 서버 상태를 확인해주세요.',
+        content: '연결 오류가 발생했습니다. 서버 상태를 확인해주세요.',
         time: getTime(),
       }]);
     } finally {
@@ -126,6 +225,7 @@ export default function AiChat() {
   }
 
   const isEmpty = messages.length === 0;
+  const grouped = groupByDate(sessions);
 
   return (
     <div className="flex h-screen overflow-hidden bg-white font-lora">
@@ -159,7 +259,7 @@ export default function AiChat() {
 
         {/* New chat */}
         <button
-          onClick={() => { setMessages([]); setSidebarOpen(false); }}
+          onClick={handleNewChat}
           className="mx-3 mt-3 mb-1 px-4 py-2.5 rounded-[10px] flex items-center gap-2 text-[13px] font-semibold text-white border border-white/25 flex-shrink-0 transition-colors hover:bg-white/20"
           style={{ background: 'rgba(255,255,255,0.15)' }}
         >
@@ -169,26 +269,42 @@ export default function AiChat() {
 
         {/* History */}
         <div className="flex-1 overflow-y-auto px-2 pb-2">
-          {['오늘', '어제', '지난 주'].map(group => {
-            const items = HISTORY.filter(h => h.group === group);
-            if (!items.length) return null;
-            return (
-              <div key={group}>
-                <div className="px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-[0.8px]" style={{ color: '#D4EDE0' }}>
-                  {group}
-                </div>
-                {items.map(item => (
-                  <div
-                    key={item.id}
-                    className="px-3 py-2.5 rounded-lg cursor-pointer mb-0.5 hover:bg-black/15 transition-colors"
-                  >
-                    <div className="text-[13px] font-medium text-white truncate">{item.title}</div>
-                    <div className="text-[11px] truncate" style={{ color: '#D4EDE0' }}>{item.sub}</div>
+          {sessions.length === 0 ? (
+            <div className="px-3 pt-4 text-[12px]" style={{ color: '#D4EDE0' }}>
+              아직 상담 기록이 없어요.
+            </div>
+          ) : (
+            Object.entries(grouped).map(([group, items]) => {
+              if (!items.length) return null;
+              return (
+                <div key={group}>
+                  <div className="px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-[0.8px]" style={{ color: '#D4EDE0' }}>
+                    {group}
                   </div>
-                ))}
-              </div>
-            );
-          })}
+                  {items.map(item => (
+                    <div
+                      key={item.id}
+                      onClick={() => loadSession(item)}
+                      className={`group px-3 py-2.5 rounded-lg cursor-pointer mb-0.5 hover:bg-black/15 transition-colors flex items-center justify-between ${currentSessionId === item.id ? 'bg-black/20' : ''}`}
+                    >
+                      <div className="truncate flex-1">
+                        <div className="text-[13px] font-medium text-white truncate">{item.title}</div>
+                        <div className="text-[11px] truncate" style={{ color: '#D4EDE0' }}>
+                          {new Date(item.updated_at).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+                        </div>
+                      </div>
+                      <button
+                        onClick={(e) => deleteSession(e, item.id)}
+                        className="opacity-0 group-hover:opacity-100 ml-2 p-1 rounded hover:bg-black/20 transition-all flex-shrink-0"
+                      >
+                        <Trash2 size={13} className="text-white/70" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              );
+            })
+          )}
         </div>
 
         {/* User */}
@@ -198,8 +314,7 @@ export default function AiChat() {
               <User size={16} className="text-white" />
             </div>
             <div>
-              <div className="text-[13px] font-semibold text-white">김원장님</div>
-              <div className="text-[11px]" style={{ color: '#D4EDE0' }}>스탠다드 플랜</div>
+              <div className="text-[13px] font-semibold text-white">{userName || '원장님'}</div>
             </div>
           </div>
         </div>
@@ -224,8 +339,6 @@ export default function AiChat() {
             </button>
             <span className="text-[15px] font-semibold text-gray-900">노무 상담 AI</span>
           </div>
-          <div className="flex gap-2">
-          </div>
         </header>
 
         {/* Token progress bar */}
@@ -236,7 +349,7 @@ export default function AiChat() {
               style={{
                 width: `${progress}%`,
                 background: 'linear-gradient(90deg, #1AA75F, #34d399)',
-                transition: progress === 100 ? 'width 0.3s ease' : 'width 0.3s ease',
+                transition: 'width 0.3s ease',
                 opacity: progress === 100 ? 0 : 1,
               }}
             />
@@ -247,24 +360,17 @@ export default function AiChat() {
         <div className="flex-1 overflow-y-auto py-6">
           <div className="max-w-[720px] mx-auto px-5 flex flex-col gap-5">
             {isEmpty ? (
-              /* Welcome state */
               <div className="flex flex-col items-center gap-4 pt-8">
                 <img src="/웃음.png" alt="노무 AI" className="w-[88px] h-[88px] object-contain" />
                 <div className="text-center">
                   <div className="text-xl font-bold text-gray-900 leading-snug mb-1.5">
-                    원장님, 안녕하세요!
+                    {userName ? `${userName}님, 안녕하세요!` : '원장님, 안녕하세요!'}
                   </div>
                   <p className="text-[13px] text-gray-500 leading-relaxed max-w-[320px]">
                     학원 노무 관련 궁금증을 편하게 물어보세요.<br />
                     관련 법령과 문서를 바탕으로 안내해 드립니다.
                   </p>
                 </div>
-
-                {/* Token status pill */}
-                {/* <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[12px] text-slate-500">
-                  <span className="h-2 w-2 rounded-full bg-green-400" />
-                  <span>무료 토큰 <span className="font-semibold text-slate-700">충분</span>해요</span>
-                </div> */}
 
                 {/* Topic cards */}
                 <div className="grid grid-cols-2 gap-2 w-full max-w-[520px] mt-1">
