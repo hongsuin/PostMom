@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Home, BookOpen, Scale, Users, User, Menu, Plus, Send, Paperclip } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Home, BookOpen, Scale, Users, User, Menu, Plus, Send, Paperclip, ArrowLeft } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -43,16 +43,38 @@ function formatSource(src: string) {
 
 export default function AiChat() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [progress, setProgress] = useState(-1);
+  const progressTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
+
+  useEffect(() => {
+    if (isLoading) {
+      setProgress(0);
+      let current = 0;
+      progressTimer.current = setInterval(() => {
+        current += Math.random() * 8 * (1 - current / 90);
+        if (current >= 88) current = 88;
+        setProgress(Math.round(current));
+      }, 300);
+    } else {
+      if (progressTimer.current) clearInterval(progressTimer.current);
+      if (progress >= 0) {
+        setProgress(100);
+        setTimeout(() => setProgress(-1), 600);
+      }
+    }
+    return () => { if (progressTimer.current) clearInterval(progressTimer.current); };
+  }, [isLoading]);
 
   function handleTextareaChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     setInput(e.target.value);
@@ -118,17 +140,17 @@ export default function AiChat() {
       {/* ── SIDEBAR ── */}
       <aside
         className={`
-          flex flex-col flex-shrink-0 overflow-hidden z-50 w-[260px]
+          flex flex-col flex-shrink-0 overflow-hidden z-50 w-[280px] md:w-[500px]
           transition-transform duration-[250ms] ease-in-out
           fixed top-0 bottom-0 left-0
           md:static md:translate-x-0
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
-        style={{ background: '#1AA75F' }}
+        style={{ background: '#18ad60' }}
       >
         {/* Logo */}
         <div className="flex items-center gap-3 px-4 py-5 border-b border-white/15 flex-shrink-0">
-          <img src="/기본.png" alt="AI" className="w-8 h-8 object-contain flex-shrink-0" />
+          <img src="/기본얼굴.png" alt="AI" className="w-8 h-8 object-contain flex-shrink-0" />
           <div>
             <div className="text-[15px] font-bold text-white leading-tight">POSTMOM</div>
             <div className="text-[10px] leading-tight" style={{ color: '#D4EDE0' }}>노무 상담 AI</div>
@@ -194,11 +216,32 @@ export default function AiChat() {
             >
               <Menu size={18} />
             </button>
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center justify-center text-gray-500 hover:text-gray-800"
+            >
+              <ArrowLeft size={18} />
+            </button>
             <span className="text-[15px] font-semibold text-gray-900">노무 상담 AI</span>
           </div>
           <div className="flex gap-2">
           </div>
         </header>
+
+        {/* Token progress bar */}
+        <div className="h-[3px] w-full bg-gray-100 flex-shrink-0 overflow-hidden">
+          {progress >= 0 && (
+            <div
+              className="h-full"
+              style={{
+                width: `${progress}%`,
+                background: 'linear-gradient(90deg, #1AA75F, #34d399)',
+                transition: progress === 100 ? 'width 0.3s ease' : 'width 0.3s ease',
+                opacity: progress === 100 ? 0 : 1,
+              }}
+            />
+          )}
+        </div>
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto py-6">
@@ -218,10 +261,10 @@ export default function AiChat() {
                 </div>
 
                 {/* Token status pill */}
-                <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[12px] text-slate-500">
+                {/* <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[12px] text-slate-500">
                   <span className="h-2 w-2 rounded-full bg-green-400" />
                   <span>무료 토큰 <span className="font-semibold text-slate-700">충분</span>해요</span>
-                </div>
+                </div> */}
 
                 {/* Topic cards */}
                 <div className="grid grid-cols-2 gap-2 w-full max-w-[520px] mt-1">
@@ -244,7 +287,7 @@ export default function AiChat() {
 
                 {/* Example questions */}
                 <div className="w-full max-w-[520px] flex flex-col gap-2 mt-1">
-                  <div className="text-[11px] font-bold uppercase tracking-widest text-slate-400 px-1">이런 질문을 해보세요</div>
+                  <div className="text-[11px] font-bold uppercase tracking-widest text-slate-400 px-1">자주 묻는 질문</div>
                   {SUGGESTED.map(q => (
                     <button
                       key={q}
@@ -321,9 +364,9 @@ export default function AiChat() {
         </div>
 
         {/* Input */}
-        <div className="px-5 pb-5 pt-3 border-t border-gray-200 flex-shrink-0 bg-white">
+        <div className="px-5 pb-5 pt-3 flex-shrink-0 bg-white">
           <div
-            className="max-w-[720px] mx-auto flex items-end gap-2.5 px-4 py-3 rounded-[14px] border bg-gray-50 transition-all"
+            className="max-w-[720px] mx-auto flex items-center gap-2.5 px-4 py-3 rounded-[14px] border bg-gray-50 transition-all"
             style={{ borderColor: '#E5E7EB' }}
             onFocusCapture={e => { (e.currentTarget as HTMLDivElement).style.borderColor = '#1AA75F'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 0 0 3px rgba(26,167,95,0.1)'; }}
             onBlurCapture={e => { (e.currentTarget as HTMLDivElement).style.borderColor = '#E5E7EB'; (e.currentTarget as HTMLDivElement).style.boxShadow = 'none'; }}
