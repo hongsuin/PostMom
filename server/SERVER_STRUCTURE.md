@@ -42,6 +42,7 @@ postmom-new/
 | 변수 | 설명 |
 |------|------|
 | `PORT` | 서버 포트 (기본 3001) |
+| `CORS_ORIGIN` | 허용할 프론트 도메인 (기본 `http://localhost:5173`) |
 | `DATABASE_URL` | PostgreSQL 연결 문자열 |
 | `SUPABASE_URL` | Supabase 프로젝트 URL |
 | `SUPABASE_ANON_KEY` | Supabase anon 키 |

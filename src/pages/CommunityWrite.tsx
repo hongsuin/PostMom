@@ -167,7 +167,7 @@ export default function CommunityWrite() {
             {isEditMode ? '커뮤니티 글 수정' : '커뮤니티 글 작성'}
           </h1>
           <p className="mt-2 text-sm leading-6 text-slate-500">
-            위례 또는 태평 지역 정보를 자유롭게 공유해 주세요. 로그인하지 않아도 글을 작성할 수 있어요.
+            위례 또는 태평 지역 정보를 자유롭게 공유해 주세요. 글 작성과 수정은 로그인 후 이용할 수 있어요.
           </p>
         </div>
 

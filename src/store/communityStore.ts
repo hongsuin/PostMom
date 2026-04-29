@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { communityPosts as mockCommunityPosts } from '../data/mockData';
 import type { CommunityPost, CommunityRegion } from '../data/mockData';
 import { getSupabaseBrowserClient } from '../lib/supabase';
+import { communityRequest } from '../lib/communityApi';
 import { getUserType } from '../types/user';
 
 const COMMUNITY_BROWSER_ID_KEY = 'communityBrowserId';
@@ -19,15 +20,6 @@ interface CommunityUpdateInput {
   title: string;
   content: string;
   linkUrl?: string;
-}
-
-interface CommunityLikeRow {
-  id: string;
-  post_id: string;
-}
-
-interface CommunityCountRow {
-  post_id: string;
 }
 
 interface CommunityPostRow {
@@ -175,79 +167,6 @@ function updatePostCounts(
   return posts.map((post) => (post.id === postId ? updater(post) : post));
 }
 
-async function fetchCurrentLikeRows(postIds: string[]) {
-  if (postIds.length === 0) return [] as CommunityLikeRow[];
-
-  const supabase = getSupabaseBrowserClient();
-  const browserId = getBrowserId();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  let query = supabase.from('community_post_likes').select('id, post_id').in('post_id', postIds);
-
-  if (session?.user?.id) {
-    query = query.eq('user_id', session.user.id);
-  } else {
-    query = query.eq('browser_id', browserId);
-  }
-
-  const { data, error } = await query;
-  if (error) {
-    console.error('[communityStore] fetchCurrentLikeRows error:', error.message);
-    return [] as CommunityLikeRow[];
-  }
-
-  return (data ?? []) as CommunityLikeRow[];
-}
-
-function buildCountMap(rows: CommunityCountRow[]) {
-  return rows.reduce<Record<string, number>>((acc, row) => {
-    acc[row.post_id] = (acc[row.post_id] ?? 0) + 1;
-    return acc;
-  }, {});
-}
-
-async function fetchEngagementCounts(postIds: string[]) {
-  if (postIds.length === 0) {
-    return {
-      likeCounts: {} as Record<string, number>,
-      commentCounts: {} as Record<string, number>,
-    };
-  }
-
-  const supabase = getSupabaseBrowserClient();
-  const [{ data: likeData, error: likeError }, { data: commentData, error: commentError }] =
-    await Promise.all([
-      supabase.from('community_post_likes').select('post_id').in('post_id', postIds),
-      supabase.from('community_post_comments').select('post_id').in('post_id', postIds),
-    ]);
-
-  if (likeError) {
-    console.error('[communityStore] fetchEngagementCounts likes error:', likeError.message);
-  }
-
-  if (commentError) {
-    console.error('[communityStore] fetchEngagementCounts comments error:', commentError.message);
-  }
-
-  return {
-    likeCounts: buildCountMap((likeData ?? []) as CommunityCountRow[]),
-    commentCounts: buildCountMap((commentData ?? []) as CommunityCountRow[]),
-  };
-}
-
-function applyEngagementCounts(
-  posts: CommunityPost[],
-  counts: { likeCounts: Record<string, number>; commentCounts: Record<string, number> },
-) {
-  return posts.map((post) => ({
-    ...post,
-    likes: counts.likeCounts[post.id] ?? 0,
-    comments: counts.commentCounts[post.id] ?? 0,
-  }));
-}
-
 export const useCommunityStore = create<CommunityStore>((set, get) => ({
   posts: sortPosts(mockCommunityPosts),
   commentsByPost: {},
@@ -260,62 +179,41 @@ export const useCommunityStore = create<CommunityStore>((set, get) => ({
     if (get().loading) return;
 
     set({ loading: true });
-    const supabase = getSupabaseBrowserClient();
-    const { data, error } = await supabase
-      .from('community_posts')
-      .select('*')
-      .order('created_at', { ascending: false });
+    try {
+      const [postsData, likeData] = await Promise.all([
+        communityRequest<CommunityPostRow[]>('/api/community/posts'),
+        communityRequest<{ post_id: string }[]>('/api/community/likes/me', { auth: true }).catch(() => []),
+      ]);
 
-    if (error) {
-      console.error('[communityStore] fetchPosts error:', error.message);
+      const posts = resolvePosts(postsData.map(mapRowToPost));
+      set({
+        posts,
+        likedPostIds: likeData.map((row) => row.post_id),
+        loading: false,
+        hydrated: true,
+      });
+    } catch (error) {
+      console.error('[communityStore] fetchPosts error:', error);
       set({ loading: false, hydrated: true, posts: [] });
-      return;
     }
-
-    const mapped = ((data ?? []) as CommunityPostRow[]).map(mapRowToPost);
-    const basePosts = resolvePosts(mapped);
-    const counts = await fetchEngagementCounts(basePosts.map((post) => post.id));
-    const posts = applyEngagementCounts(basePosts, counts);
-    const likeRows = await fetchCurrentLikeRows(posts.map((post) => post.id));
-
-    set({
-      posts,
-      likedPostIds: likeRows.map((row) => row.post_id),
-      loading: false,
-      hydrated: true,
-    });
   },
 
   fetchPostById: async (id) => {
     const existing = get().getPostById(id);
     if (existing) return existing;
 
-    const supabase = getSupabaseBrowserClient();
-    const { data, error } = await supabase
-      .from('community_posts')
-      .select('*')
-      .eq('id', id)
-      .maybeSingle();
-
-    if (error) {
-      console.error('[communityStore] fetchPostById error:', error.message);
+    try {
+      const post = await communityRequest<CommunityPostRow>(`/api/community/posts/${id}`);
+      const mapped = mapRowToPost(post);
+      set((state) => ({
+        posts: resolvePosts([mapped, ...state.posts.filter((item) => item.id !== mapped.id)]),
+        hydrated: true,
+      }));
+      return mapped;
+    } catch (error) {
+      console.error('[communityStore] fetchPostById error:', error);
       return null;
     }
-
-    if (!data) return null;
-
-    const post = mapRowToPost(data as CommunityPostRow);
-    const counts = await fetchEngagementCounts([post.id]);
-    const countedPost = applyEngagementCounts([post], counts)[0];
-    const likeRows = await fetchCurrentLikeRows([post.id]);
-
-    set((state) => ({
-      posts: resolvePosts([countedPost, ...state.posts.filter((item) => item.id !== post.id)]),
-      likedPostIds: Array.from(new Set([...state.likedPostIds, ...likeRows.map((row) => row.post_id)])),
-      hydrated: true,
-    }));
-
-    return countedPost;
   },
 
   fetchComments: async (postId) => {
@@ -325,31 +223,23 @@ export const useCommunityStore = create<CommunityStore>((set, get) => ({
       commentsLoadingByPost: { ...state.commentsLoadingByPost, [postId]: true },
     }));
 
-    const supabase = getSupabaseBrowserClient();
-    const { data, error } = await supabase
-      .from('community_post_comments')
-      .select('*')
-      .eq('post_id', postId)
-      .order('created_at', { ascending: true });
-
-    if (error) {
-      console.error('[communityStore] fetchComments error:', error.message);
+    try {
+      const data = await communityRequest<CommunityCommentRow[]>(`/api/community/posts/${postId}/comments`);
+      const comments = data.map(mapRowToComment);
+      set((state) => ({
+        commentsByPost: { ...state.commentsByPost, [postId]: comments },
+        commentsLoadingByPost: { ...state.commentsLoadingByPost, [postId]: false },
+        posts: updatePostCounts(state.posts, postId, (post) => ({
+          ...post,
+          comments: comments.length,
+        })),
+      }));
+    } catch (error) {
+      console.error('[communityStore] fetchComments error:', error);
       set((state) => ({
         commentsLoadingByPost: { ...state.commentsLoadingByPost, [postId]: false },
       }));
-      return;
     }
-
-    const comments = ((data ?? []) as CommunityCommentRow[]).map(mapRowToComment);
-
-    set((state) => ({
-      commentsByPost: { ...state.commentsByPost, [postId]: comments },
-      commentsLoadingByPost: { ...state.commentsLoadingByPost, [postId]: false },
-      posts: updatePostCounts(state.posts, postId, (post) => ({
-        ...post,
-        comments: comments.length,
-      })),
-    }));
   },
 
   addPost: async (input) => {
@@ -365,35 +255,19 @@ export const useCommunityStore = create<CommunityStore>((set, get) => ({
       '익명';
 
     const userType = session ? getUserType(session) : null;
-    const trimmedLink = input.linkUrl?.trim() ?? '';
-    const linkUrl = trimmedLink || null;
-    const linkTitle = linkUrl ? getHostnameLabel(linkUrl) : null;
-
-    const { data, error } = await supabase
-      .from('community_posts')
-      .insert({
-        user_id: session?.user?.id ?? null,
-        browser_id: session?.user?.id ? null : getBrowserId(),
-        author,
-        user_type: userType,
+    const trimmedLink = input.linkUrl?.trim();
+    const savedRow = await communityRequest<CommunityPostRow>('/api/community/posts', {
+      method: 'POST',
+      auth: true,
+      body: {
         region: input.region,
         title: input.title.trim(),
         content: input.content.trim(),
-        tags: ['정보공유'],
-        mentioned_academies: [],
-        link_url: linkUrl,
-        link_title: linkTitle,
-      })
-      .select('*');
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    const savedRow = ((data ?? []) as CommunityPostRow[])[0];
-    if (!savedRow) {
-      throw new Error('게시글 저장 결과를 확인할 수 없습니다.');
-    }
+        linkUrl: trimmedLink || undefined,
+        author,
+        userType: userType ?? undefined,
+      },
+    });
 
     const saved = mapRowToPost(savedRow);
     set((state) => ({
@@ -404,35 +278,19 @@ export const useCommunityStore = create<CommunityStore>((set, get) => ({
   },
 
   updatePost: async (input) => {
-    const supabase = getSupabaseBrowserClient();
-    const trimmedLink = input.linkUrl?.trim() ?? '';
-    const linkUrl = trimmedLink || null;
-    const linkTitle = linkUrl ? getHostnameLabel(linkUrl) : null;
-
-    const { data, error } = await supabase
-      .from('community_posts')
-      .update({
+    const trimmedLink = input.linkUrl?.trim();
+    const updatedRow = await communityRequest<CommunityPostRow>(`/api/community/posts/${input.postId}`, {
+      method: 'PATCH',
+      auth: true,
+      body: {
         region: input.region,
         title: input.title.trim(),
         content: input.content.trim(),
-        link_url: linkUrl,
-        link_title: linkTitle,
-      })
-      .eq('id', input.postId)
-      .select('*');
+        linkUrl: trimmedLink || undefined,
+      },
+    });
 
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    const updatedRow = ((data ?? []) as CommunityPostRow[])[0];
-    if (!updatedRow) {
-      throw new Error('수정할 게시글을 찾지 못했어요. 새로고침 후 다시 시도해 주세요.');
-    }
-
-    const updated = mapRowToPost(updatedRow);
-    const counts = await fetchEngagementCounts([updated.id]);
-    const countedPost = applyEngagementCounts([updated], counts)[0];
+    const countedPost = mapRowToPost(updatedRow);
 
     set((state) => ({
       posts: resolvePosts([countedPost, ...state.posts.filter((item) => item.id !== countedPost.id)]),
@@ -442,11 +300,10 @@ export const useCommunityStore = create<CommunityStore>((set, get) => ({
   },
 
   deletePost: async (postId) => {
-    const supabase = getSupabaseBrowserClient();
-    const { error } = await supabase.from('community_posts').delete().eq('id', postId);
-    if (error) {
-      throw new Error(error.message);
-    }
+    await communityRequest<{ ok: true }>(`/api/community/posts/${postId}`, {
+      method: 'DELETE',
+      auth: true,
+    });
 
     set((state) => {
       const nextComments = { ...state.commentsByPost };
@@ -465,7 +322,6 @@ export const useCommunityStore = create<CommunityStore>((set, get) => ({
     if (!trimmed) return;
 
     const supabase = getSupabaseBrowserClient();
-    const browserId = getBrowserId();
     const {
       data: { session },
     } = await supabase.auth.getSession();
@@ -478,24 +334,17 @@ export const useCommunityStore = create<CommunityStore>((set, get) => ({
 
     const userType = session ? getUserType(session) : null;
 
-    const { data, error } = await supabase
-      .from('community_post_comments')
-      .insert({
-        post_id: postId,
-        user_id: session?.user?.id ?? null,
-        browser_id: session?.user?.id ? null : browserId,
-        author,
-        user_type: userType,
+    const row = await communityRequest<CommunityCommentRow>(`/api/community/posts/${postId}/comments`, {
+      method: 'POST',
+      auth: true,
+      body: {
         content: trimmed,
-      })
-      .select('*')
-      .single();
+        author,
+        userType: userType ?? undefined,
+      },
+    });
 
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    const savedComment = mapRowToComment(data as CommunityCommentRow);
+    const savedComment = mapRowToComment(row);
 
     set((state) => ({
       commentsByPost: {
@@ -510,11 +359,10 @@ export const useCommunityStore = create<CommunityStore>((set, get) => ({
   },
 
   deleteComment: async (commentId, postId) => {
-    const supabase = getSupabaseBrowserClient();
-    const { error } = await supabase.from('community_post_comments').delete().eq('id', commentId);
-    if (error) {
-      throw new Error(error.message);
-    }
+    await communityRequest<{ ok: true }>(`/api/community/comments/${commentId}`, {
+      method: 'DELETE',
+      auth: true,
+    });
 
     set((state) => {
       const remainingComments = (state.commentsByPost[postId] ?? []).filter(
@@ -535,27 +383,13 @@ export const useCommunityStore = create<CommunityStore>((set, get) => ({
   },
 
   toggleLike: async (postId) => {
-    const supabase = getSupabaseBrowserClient();
-    const browserId = getBrowserId();
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const isLiked = get().likedPostIds.includes(postId);
 
-    let query = supabase.from('community_post_likes').select('id, post_id').eq('post_id', postId);
-    if (session?.user?.id) {
-      query = query.eq('user_id', session.user.id);
-    } else {
-      query = query.eq('browser_id', browserId);
-    }
-
-    const { data: existingRows, error: existingError } = await query.maybeSingle();
-    if (existingError) {
-      throw new Error(existingError.message);
-    }
-
-    if (existingRows) {
-      const { error } = await supabase.from('community_post_likes').delete().eq('id', existingRows.id);
-      if (error) throw new Error(error.message);
+    if (isLiked) {
+      await communityRequest<{ ok: true }>(`/api/community/posts/${postId}/likes`, {
+        method: 'DELETE',
+        auth: true,
+      });
 
       set((state) => ({
         likedPostIds: state.likedPostIds.filter((likedId) => likedId !== postId),
@@ -567,12 +401,10 @@ export const useCommunityStore = create<CommunityStore>((set, get) => ({
       return;
     }
 
-    const { error } = await supabase.from('community_post_likes').insert({
-      post_id: postId,
-      user_id: session?.user?.id ?? null,
-      browser_id: session?.user?.id ? null : browserId,
+    await communityRequest<{ ok: true }>(`/api/community/posts/${postId}/likes`, {
+      method: 'POST',
+      auth: true,
     });
-    if (error) throw new Error(error.message);
 
     set((state) => ({
       likedPostIds: Array.from(new Set([...state.likedPostIds, postId])),
