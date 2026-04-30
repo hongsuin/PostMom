@@ -1,0 +1,8 @@
+[2m오후 6:44:08[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [2m[console.error] [22mTypeError: Failed to fetch
+    at http://localhost:5174/node_modules/.vite/deps/@supabase_supabase-js.js?v=3bdcd175:12614:22
+    at _handleRequest (http://localhost:5174/node_modules/.vite/deps/@supabase_supabase-js.js?v=3bdcd175:12870:18)
+    at _request (http://localhost:5174/node_modules/.vite/deps/@supabase_supabase-js.js?v=3bdcd175:12857:21)
+    at http://localhost:5174/node_modules/.vite/deps/@supabase_supabase-js.js?v=3bdcd175:17512:18
+    at SupabaseAuthClient._useSession (http://localhost:5174/node_modules/.vite/deps/@supabase_supabase-js.js?v=3bdcd175:17355:17)
+    at async SupabaseAuthClient._getUser (http://localhost:5174/node_modules/.vite/deps/@supabase_supabase-js.js?v=3bdcd175:17504:11)
+    at async http://localhost:5174/node_modules/.vite/deps/@supabase_supabase-js.js?v=3bdcd175:17492:11

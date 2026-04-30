@@ -233,3 +233,35 @@ Port 5173 is in use, trying another one...
 [2m오후 5:59:07[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AiChat.tsx, /src/index.css[22m
 [2m오후 5:59:20[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AiChat.tsx, /src/index.css[22m
 [2m오후 5:59:26[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AiChat.tsx, /src/index.css[22m
+[2m오후 6:02:01[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AiChat.tsx, /src/index.css[22m
+[2m오후 6:05:09[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AiChat.tsx, /src/index.css[22m
+[2m오후 6:05:16[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AiChat.tsx, /src/index.css[22m
+[2m오후 6:05:26[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AiChat.tsx, /src/index.css[22m
+[2m오후 6:05:35[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AiChat.tsx, /src/index.css[22m
+[2m오후 6:08:49[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AiChat.tsx, /src/index.css[22m
+[2m오후 6:09:13[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AiChat.tsx, /src/index.css[22m
+[2m오후 6:10:07[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AiChat.tsx, /src/index.css[22m
+[2m오후 6:10:15[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AiChat.tsx, /src/index.css[22m
+[2m오후 6:12:35[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AiChat.tsx, /src/index.css[22m
+[2m오후 6:14:06[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AiChat.tsx, /src/index.css[22m
+[2m오후 6:14:15[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AiChat.tsx, /src/index.css[22m
+[2m오후 6:14:21[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AiChat.tsx, /src/index.css[22m
+[2m오후 6:14:28[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AiChat.tsx, /src/index.css[22m
+[2m오후 6:27:04[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2m.claude/worktrees/heuristic-cohen-70d33f/index.html[22m
+[2m오후 6:27:04[22m [36m[1m[vite][22m[39m changed tsconfig file detected: C:/Users/user/Desktop/POSTMOM/postmom-new/.claude/worktrees/heuristic-cohen-70d33f/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
+[2m오후 6:35:11[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m오후 6:35:16[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m오후 6:39:42[22m [36m[1m[vite][22m[39m changed tsconfig file detected: C:/Users/user/Desktop/POSTMOM/postmom-new/.claude/worktrees/heuristic-cohen-70d33f/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
+[2m오후 6:39:42[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2m.claude/worktrees/heuristic-cohen-70d33f/index.html[22m
+[2m오후 6:44:08[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32m✨ new dependencies optimized: [33mreact-markdown[32m[39m
+[2m오후 6:44:08[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32m✨ optimized dependencies changed. reloading[39m
+[2m오후 6:47:25[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AiChat.tsx, /src/index.css[22m
+[2m오후 6:48:22[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AiChat.tsx, /src/index.css[22m
+[2m오후 6:49:57[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AiChatV2.tsx, /src/index.css[22m
+[2m오후 6:50:11[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m오후 6:53:09[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AiChat.tsx, /src/index.css[22m
+[2m오후 6:53:17[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AiChat.tsx, /src/index.css[22m
+[2m오후 6:53:28[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m오후 6:53:28[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m오후 6:53:28[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m오후 6:53:28[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css[22m
