@@ -187,7 +187,7 @@ export default function AiChat() {
       const res = await fetch(`${SERVER_URL}/api/chat`, {
         method: 'POST',
         headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question, sessionId: currentSessionId }),
+        body: JSON.stringify(currentSessionId ? { question, sessionId: currentSessionId } : { question }),
       });
       if (!res.ok) throw new Error();
       const data = await res.json();

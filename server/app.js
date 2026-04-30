@@ -26,7 +26,7 @@ const prisma = new PrismaClient();
 const RAG_URL = process.env.RAG_URL || 'http://localhost:8000';
 const supabase = getSupabaseClient();
 
-const corsOrigin = process.env.CORS_ORIGIN || /^http:\/\/localhost(:\d+)?$/;
+const corsOrigin = process.env.CORS_ORIGIN || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
 const apiLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 120,
