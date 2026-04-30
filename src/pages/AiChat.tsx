@@ -89,7 +89,7 @@ export default function AiChat() {
   const [progress, setProgress] = useState(-1);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<number | null>(null);
-  const [userName, setUserName] = useState('');
+  const [userName, setUserName] = useState<string | null>(null);
   const progressTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const phaseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -101,8 +101,10 @@ export default function AiChat() {
       const supabase = getSupabaseBrowserClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const name = user.user_metadata?.name || user.email?.split('@')[0] || '원장님';
+        const name = user.user_metadata?.name || user.email?.split('@')[0] || '';
         setUserName(name);
+      } else {
+        setUserName('');
       }
       await fetchSessions();
     }
@@ -110,6 +112,7 @@ export default function AiChat() {
   }, []);
 
   useEffect(() => {
+    if (messages.length === 0) return;
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
@@ -331,7 +334,7 @@ export default function AiChat() {
               <User size={16} className="text-white" />
             </div>
             <div>
-              <div className="text-[13px] font-semibold text-white">{userName || '원장님'}</div>
+              <div className="text-[13px] font-semibold text-white">{userName === null ? '' : userName || '원장님'}</div>
             </div>
           </div>
         </div>
@@ -380,7 +383,7 @@ export default function AiChat() {
               <div className="flex flex-col items-center gap-4 pt-8">
                 <img src="/웃음.png" alt="노무 AI" className="w-[88px] h-[88px] object-contain" />
                 <div className="text-center">
-                  <div className="text-xl font-bold text-gray-900 leading-snug mb-1.5">
+                  <div className="text-xl font-bold text-gray-900 leading-snug mb-1.5" style={{ visibility: userName === null ? 'hidden' : 'visible' }}>
                     {userName ? `${userName}님, 안녕하세요!` : '원장님, 안녕하세요!'}
                   </div>
                   <p className="text-[13px] text-gray-500 leading-relaxed max-w-[320px]">
