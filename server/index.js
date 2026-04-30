@@ -90,11 +90,19 @@ app.post('/api/chat', authMiddleware, async (req, res) => {
       data: { sessionId: session.id, role: 'user', content: question },
     });
 
+    // 직전 대화 히스토리 조회 (최근 6개)
+    const recentMessages = await prisma.chatMessage.findMany({
+      where: { sessionId: session.id },
+      orderBy: { createdAt: 'desc' },
+      take: 6,
+    });
+    const history = recentMessages.reverse().map(m => ({ role: m.role, content: m.content }));
+
     // RAG 서버 호출
     const ragRes = await fetch(`${RAG_URL}/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({ question, history }),
     });
     if (!ragRes.ok) throw new Error('RAG 서버 오류');
     const ragData = await ragRes.json();

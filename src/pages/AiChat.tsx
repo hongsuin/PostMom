@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, BookOpen, Scale, Users, User, Menu, Plus, Send, Paperclip, ArrowLeft, Trash2 } from 'lucide-react';
 import { getSupabaseBrowserClient } from '../lib/supabase';
+import ReactMarkdown from 'react-markdown';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001';
 
@@ -22,9 +23,9 @@ interface Session {
 
 const SUGGESTED = [
   '퇴직금은 어떻게 계산하나요?',
-  '연차는 몇 개 줘야 하나요?',
-  '근로계약서에 꼭 넣어야 할 항목은?',
-  '4대보험 가입 기준이 어떻게 되나요?',
+  '실업급여 수급 자격이 어떻게 되나요?',
+  '기간제 계약 최대 기간이 얼마나 되나요?',
+  '최저임금 기준으로 임금을 계산하는 방법은?',
 ];
 
 const NAV_ITEMS = [
@@ -73,11 +74,13 @@ export default function AiChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingPhase, setLoadingPhase] = useState<'searching' | 'generating'>('searching');
   const [progress, setProgress] = useState(-1);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<number | null>(null);
   const [userName, setUserName] = useState('');
   const progressTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const phaseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -179,6 +182,8 @@ export default function AiChat() {
     setInput('');
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
     setIsLoading(true);
+    setLoadingPhase('searching');
+    phaseTimer.current = setTimeout(() => setLoadingPhase('generating'), 1500);
 
     try {
       const headers = await getAuthHeader();
@@ -213,6 +218,7 @@ export default function AiChat() {
         time: getTime(),
       }]);
     } finally {
+      if (phaseTimer.current) clearTimeout(phaseTimer.current);
       setIsLoading(false);
     }
   }
@@ -332,7 +338,7 @@ export default function AiChat() {
               <Menu size={18} />
             </button>
             <button
-              onClick={() => navigate(-1)}
+              onClick={() => messages.length > 0 ? handleNewChat() : navigate(-1)}
               className="flex items-center justify-center text-gray-500 hover:text-gray-800"
             >
               <ArrowLeft size={18} />
@@ -342,7 +348,7 @@ export default function AiChat() {
         </header>
 
         {/* Token progress bar */}
-        <div className="h-[3px] w-full bg-gray-100 flex-shrink-0 overflow-hidden">
+        {/* <div className="h-[3px] w-full bg-gray-100 flex-shrink-0 overflow-hidden">
           {progress >= 0 && (
             <div
               className="h-full"
@@ -354,7 +360,7 @@ export default function AiChat() {
               }}
             />
           )}
-        </div>
+        </div> */}
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto py-6">
@@ -375,10 +381,10 @@ export default function AiChat() {
                 {/* Topic cards */}
                 <div className="grid grid-cols-2 gap-2 w-full max-w-[520px] mt-1">
                   {[
-                    { title: '퇴직금', desc: '지급 기준, 계산 방법' },
-                    { title: '근로계약서', desc: '작성 항목, 주의사항' },
-                    { title: '4대보험', desc: '가입 기준, 유형별 적용' },
-                    { title: '최저임금·수당', desc: '2025년 기준, 연장수당' },
+                    { title: '퇴직급여제도', desc: '퇴직금 계산, 지급 기준' },
+                    { title: '기간제및단시간근로자', desc: '계약 기간, 비례 처우' },
+                    { title: '실업급여', desc: '수급 자격, 급여 계산' },
+                    { title: '임금', desc: '최저임금, 체불, 수당' },
                   ].map(({ title, desc }) => (
                     <button
                       key={title}
@@ -426,7 +432,17 @@ export default function AiChat() {
                           : { background: '#F0F9F3', borderColor: '#C0EDD5' }
                       }
                     >
-                      {msg.content}
+                      <ReactMarkdown
+                        components={{
+                          p: ({ children }) => <p className="mb-1 last:mb-0">{children}</p>,
+                          strong: ({ children }) => <strong className="font-bold">{children}</strong>,
+                          ul: ({ children }) => <ul className="list-disc pl-4 mb-1">{children}</ul>,
+                          ol: ({ children }) => <ol className="list-decimal pl-4 mb-1">{children}</ol>,
+                          li: ({ children }) => <li className="mb-0.5">{children}</li>,
+                        }}
+                      >
+                        {msg.content}
+                      </ReactMarkdown>
                     </div>
                     {msg.sources && msg.sources.length > 0 && (
                       <div className="flex flex-wrap gap-1.5 px-1">
@@ -452,7 +468,7 @@ export default function AiChat() {
               <div className="flex gap-3">
                 <img src="/검색.png" alt="AI" className="w-[34px] h-[34px] object-contain flex-shrink-0" />
                 <div
-                  className="px-4 py-3 rounded-2xl rounded-tl-sm border flex gap-1 items-center"
+                  className="px-4 py-3 rounded-2xl rounded-tl-sm border flex items-center gap-2"
                   style={{ background: '#F0F9F3', borderColor: '#C0EDD5' }}
                 >
                   {[0, 1, 2].map(i => (
@@ -462,6 +478,9 @@ export default function AiChat() {
                       style={{ animation: `bounce 1.4s ${i * 0.2}s infinite` }}
                     />
                   ))}
+                  <span className="text-[12px] text-gray-500 ml-1">
+                    {loadingPhase === 'searching' ? '관련 법령문서를 검색중입니다...' : '답변을 생성중입니다...'}
+                  </span>
                 </div>
               </div>
             )}
