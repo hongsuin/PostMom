@@ -36,6 +36,17 @@ const NAV_ITEMS = [
   { icon: User, label: '마이', path: '/mypage' },
 ];
 
+const PDF_SVGS = [
+  '/PDF.svg', '/PDF-1.svg', '/PDF-2.svg', '/PDF-3.svg',
+  '/PDF-4.svg', '/PDF-5.svg', '/PDF-6.svg', '/PDF-7.svg',
+];
+
+function PdfIcon({ src }: { src: string }) {
+  return (
+    <img src={src} alt="PDF" style={{ flexShrink: 0, width: 64, height: 78, objectFit: 'contain' }} />
+  );
+}
+
 function getTime() {
   return new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
 }
@@ -378,6 +389,15 @@ export default function AiChat() {
                   </p>
                 </div>
 
+                {/* PDF Document Marquee */}
+                <div className="w-full overflow-hidden rounded-1xl py-4" style={{ background: '#ffffff' }}>
+                  <div className="overflow-hidden">
+                    <div className="flex gap-4" style={{ width: 'max-content', animation: 'marquee-right 20s linear infinite' }}>
+                      {[...PDF_SVGS, ...PDF_SVGS].map((src, i) => <PdfIcon key={`b${i}`} src={src} />)}
+                    </div>
+                  </div>
+                </div>
+
                 {/* Topic cards */}
                 <div className="grid grid-cols-2 gap-2 w-full max-w-[520px] mt-1">
                   {[
@@ -549,6 +569,14 @@ export default function AiChat() {
         @keyframes bounce {
           0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
           30% { transform: translateY(-5px); opacity: 1; }
+        }
+        @keyframes marquee-left {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
+        }
+        @keyframes marquee-right {
+          from { transform: translateX(-50%); }
+          to { transform: translateX(0); }
         }
       `}</style>
     </div>
