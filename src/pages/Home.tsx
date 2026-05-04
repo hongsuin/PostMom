@@ -180,7 +180,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="w-full font-inter bg-white">
+    <div className="w-full font-inter bg-white h-full overflow-y-auto">
       {/* ── NAVIGATION ─────────────────────────────────── */}
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/20 backdrop-blur-md">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between px-8 py-4 xl:px-12">
