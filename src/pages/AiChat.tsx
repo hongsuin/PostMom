@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, BookOpen, Scale, Users, User, Menu, Plus, Send, Paperclip, ArrowLeft, Trash2 } from 'lucide-react';
+import { Home, BookOpen, Scale, Users, User, Menu, Plus, Send, ArrowLeft, Trash2 } from 'lucide-react';
 import { getSupabaseBrowserClient } from '../lib/supabase';
 import ReactMarkdown from 'react-markdown';
 
@@ -260,7 +260,7 @@ export default function AiChat() {
       {/* ── SIDEBAR ── */}
       <aside
         className={`
-          flex flex-col flex-shrink-0 overflow-hidden z-50 w-[280px] md:w-[500px]
+          flex flex-col flex-shrink-0 overflow-hidden z-50 w-[280px] md:w-[380px]
           transition-transform duration-[250ms] ease-in-out
           fixed top-0 bottom-0 left-0
           md:static md:translate-x-0
@@ -288,7 +288,7 @@ export default function AiChat() {
         </button>
 
         {/* History */}
-        <div className="flex-1 overflow-y-auto px-2 pb-2">
+        <div className="flex-1 overflow-y-auto px-2 pb-2 sidebar-scroll">
           {sessions.length === 0 ? (
             <div className="px-3 pt-4 text-[12px]" style={{ color: '#D4EDE0' }}>
               아직 상담 기록이 없어요.
@@ -377,7 +377,7 @@ export default function AiChat() {
         </div> */}
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto py-6">
+        <div className="flex-1 overflow-y-auto py-6 chat-scroll">
           <div className="max-w-[720px] mx-auto px-5 flex flex-col gap-5">
             {isEmpty ? (
               <div className="flex flex-col items-center gap-4 pt-8">
@@ -531,9 +531,6 @@ export default function AiChat() {
               style={{ fontFamily: 'inherit', maxHeight: '120px' }}
             />
             <div className="flex gap-2 items-center flex-shrink-0">
-              <button className="w-8 h-8 rounded-lg border border-gray-200 bg-white flex items-center justify-center text-gray-400 hover:bg-gray-50">
-                <Paperclip size={14} />
-              </button>
               <button
                 onClick={() => sendMessage(input)}
                 disabled={!input.trim() || isLoading}
@@ -580,6 +577,16 @@ export default function AiChat() {
         @keyframes marquee-right {
           from { transform: translateX(-50%); }
           to { transform: translateX(0); }
+        }
+
+        /* 스크롤바 숨김 */
+        .sidebar-scroll,
+        .chat-scroll {
+          scrollbar-width: none;
+        }
+        .sidebar-scroll::-webkit-scrollbar,
+        .chat-scroll::-webkit-scrollbar {
+          display: none;
         }
       `}</style>
     </div>

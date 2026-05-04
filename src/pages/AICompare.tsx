@@ -1,7 +1,8 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Zap, Sparkles, Star, MapPin, Check, X } from 'lucide-react';
 import { academies } from '../data/mockData';
 import { useState } from 'react';
+import { useCompareStore } from '../store/compareStore';
 
 const SUBJECT_COLORS: Record<string, string> = {
   수학: 'bg-blue-50 text-blue-700',
@@ -10,7 +11,16 @@ const SUBJECT_COLORS: Record<string, string> = {
 };
 
 export default function AICompare() {
+  const navigate = useNavigate();
+  const setCompare = useCompareStore((s) => s.setSelected);
   const [selected, setSelected] = useState<string[]>([]);
+
+  function handleCompare() {
+    if (selected.length < 2) return;
+    const selectedAcademies = academies.filter((a) => selected.includes(a.id));
+    setCompare(selected, selectedAcademies);
+    navigate('/compare/result');
+  }
 
   const toggle = (id: string) => {
     setSelected((prev) =>
@@ -224,8 +234,9 @@ export default function AICompare() {
                   </Link>
 
                   {/* Compare CTA */}
-                  <Link
-                    to={canCompare ? '/compare/result' : '#'}
+                  <button
+                    onClick={handleCompare}
+                    disabled={!canCompare}
                     className={`flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all ${
                       canCompare
                         ? 'bg-primary text-white shadow-md shadow-primary/30 hover:opacity-90 hover:scale-[1.02]'
@@ -234,7 +245,7 @@ export default function AICompare() {
                   >
                     <Zap size={15} />
                     AI 비교 분석 시작
-                  </Link>
+                  </button>
 
                   {!canCompare && (
                     <p className="mt-2.5 text-center text-xs text-slate-400">
@@ -262,8 +273,9 @@ export default function AICompare() {
       {/* Mobile sticky CTA */}
       {selected.length > 0 && (
         <div className="fixed bottom-0 left-0 right-0 border-t border-slate-200 bg-white p-4 lg:hidden">
-          <Link
-            to={canCompare ? '/compare/result' : '#'}
+          <button
+            onClick={handleCompare}
+            disabled={!canCompare}
             className={`flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold ${
               canCompare
                 ? 'bg-primary text-white'
@@ -272,7 +284,7 @@ export default function AICompare() {
           >
             <Zap size={15} />
             AI 비교 시작 ({selected.length}/3)
-          </Link>
+          </button>
         </div>
       )}
     </div>

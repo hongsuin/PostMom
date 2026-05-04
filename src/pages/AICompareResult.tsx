@@ -1,6 +1,11 @@
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Star, CheckCircle, ArrowLeft, TrendingUp, LayoutGrid } from 'lucide-react';
 import { useOnboardingStore } from '../store/onboardingStore';
+import { useCompareStore } from '../store/compareStore';
+import { getSupabaseBrowserClient } from '../lib/supabase';
+
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001';
 
 interface AcademyResult {
   id: string;
@@ -14,57 +19,78 @@ interface AcademyResult {
   distanceFit: number;
 }
 
-const mockResults: AcademyResult[] = [
-  {
-    id: 'naver-심슨어학원위례캠퍼스',
-    name: '심슨어학원 위례캠퍼스',
-    rating: 4.8,
-    matchScore: 92,
-    reasons: ['통학 거리 12분으로 조건 충족', '숙제 관리 강점 → 학습 습관 개선에 적합', '예산 범위 내 (월 30만원)', '문제해결력 향상 프로그램 보유'],
-    curriculumFit: 95, teachingQuality: 90, priceFit: 88, distanceFit: 92
-  },
-  {
-    id: 'naver-아발론랭콘위례캠퍼스',
-    name: '아발론랭콘 위례캠퍼스',
-    rating: 4.6,
-    matchScore: 85,
-    reasons: ['통학 거리 18분으로 가까운 편', '개별 맞춤 커리큘럼 제공', '예산 범위 내 (월 28만원)', '학습 목표 달성률 높음'],
-    curriculumFit: 88, teachingQuality: 85, priceFit: 90, distanceFit: 78
-  },
-  {
-    id: 'naver-리드101영어학원위례점',
-    name: '리드101영어학원 위례점',
-    rating: 4.7,
-    matchScore: 78,
-    reasons: ['통학 거리 25분으로 약간 먼 편', '실력 향상 프로그램 우수', '예산 범위 내 (월 32만원)', '소규모 클래스 운영'],
-    curriculumFit: 82, teachingQuality: 88, priceFit: 85, distanceFit: 65
-  }
-];
-
 const GRADE_LABELS: Record<string, string> = { elementary: '초등학생', middle: '중학생', high: '고등학생' };
 const LEVEL_LABELS: Record<string, string> = { beginner: '기초', average: '보통', advanced: '상급' };
 
+async function getAuthHeader(): Promise<{ Authorization: string } | null> {
+  const supabase = getSupabaseBrowserClient();
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  if (!token) return null;
+  return { Authorization: `Bearer ${token}` };
+}
+
 export default function AICompareResult() {
   const navigate = useNavigate();
-  const { data } = useOnboardingStore();
+  const { data: onboarding } = useOnboardingStore();
+  const { selectedAcademies } = useCompareStore();
+
+  const [results, setResults] = useState<AcademyResult[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const summaryParts: string[] = [];
-  if (data.childGrade) summaryParts.push(GRADE_LABELS[data.childGrade] || data.childGrade);
-  if (data.englishLevel) summaryParts.push(`${LEVEL_LABELS[data.englishLevel] || data.englishLevel} 수준`);
-  if (data.budgetRange) summaryParts.push('예산 조건 반영');
-  if (data.distance) summaryParts.push('거리 조건 반영');
+  if (onboarding.childGrade) summaryParts.push(GRADE_LABELS[onboarding.childGrade] || onboarding.childGrade);
+  if (onboarding.englishLevel) summaryParts.push(`${LEVEL_LABELS[onboarding.englishLevel] || onboarding.englishLevel} 수준`);
+  if (onboarding.budgetRange) summaryParts.push('예산 조건 반영');
+  if (onboarding.distance) summaryParts.push('거리 조건 반영');
   const summaryText = summaryParts.length > 0
-    ? summaryParts.join(' / ') + ' 기반으로 1,136개 학부모 리뷰를 분석했습니다.'
-    : '1,136개 학부모 리뷰를 분석했습니다.';
+    ? summaryParts.join(' / ') + ' 기반으로 학원을 분석했습니다.'
+    : '선택하신 학원을 AI가 분석했습니다.';
+
+  useEffect(() => {
+    if (selectedAcademies.length < 2) {
+      navigate('/compare');
+      return;
+    }
+    fetchCompare();
+  }, []);
+
+  async function fetchCompare() {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const headers = await getAuthHeader();
+      if (!headers) {
+        setError('로그인이 필요합니다.');
+        return;
+      }
+      const res = await fetch(`${SERVER_URL}/api/compare`, {
+        method: 'POST',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          academies: selectedAcademies,
+          userProfile: onboarding,
+        }),
+      });
+      if (!res.ok) throw new Error('서버 오류가 발생했습니다.');
+      const data: AcademyResult[] = await res.json();
+      setResults(data);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'AI 분석 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      <video autoPlay loop muted playsInline className="absolute inset-0 h-full w-full object-cover">
+    <div className="compare-scroll h-screen overflow-y-auto relative" style={{ scrollbarWidth: 'none' }}>
+      <video autoPlay loop muted playsInline className="fixed inset-0 h-full w-full object-cover -z-10">
         <source src="/correctvideo.mp4" type="video/mp4" />
       </video>
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-50/90 to-white/90" />
+      <div className="fixed inset-0 bg-gradient-to-b from-slate-50/90 to-white/90 -z-10" />
 
-      <div className="relative z-10 max-w-[480px] mx-auto min-h-screen">
+      <div className="relative z-10 max-w-[480px] mx-auto">
         {/* Header */}
         <header className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-primary/20 z-40 px-5 h-14 flex items-center gap-3">
           <button
@@ -86,7 +112,7 @@ export default function AICompareResult() {
             <p className="text-sm leading-relaxed opacity-90">
               {summaryText}
               <br />
-              우선순위에 맞춰 3개 학원을 비교하여 가장 적합한 옵션을 추천해 드립니다.
+              우선순위에 맞춰 {selectedAcademies.length}개 학원을 비교하여 가장 적합한 옵션을 추천해 드립니다.
             </p>
           </div>
 
@@ -99,8 +125,32 @@ export default function AICompareResult() {
             학원 비교 화면으로 돌아가기
           </button>
 
+          {/* 로딩 */}
+          {isLoading && (
+            <div className="flex flex-col items-center gap-4 py-16">
+              <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+              <div className="text-center">
+                <p className="text-sm font-semibold text-slate-700">AI가 학원을 분석하고 있습니다</p>
+                <p className="text-xs text-slate-400 mt-1">잠시만 기다려주세요...</p>
+              </div>
+            </div>
+          )}
+
+          {/* 에러 */}
+          {!isLoading && error && (
+            <div className="bg-red-50 border border-red-200 rounded-2xl p-5 text-center">
+              <p className="text-sm text-red-600 mb-3">{error}</p>
+              <button
+                onClick={fetchCompare}
+                className="text-sm font-semibold text-primary underline"
+              >
+                다시 시도하기
+              </button>
+            </div>
+          )}
+
           {/* 학원 카드들 */}
-          {mockResults.map((academy, idx) => (
+          {!isLoading && !error && results.map((academy, idx) => (
             <div
               key={academy.id}
               className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 shadow-sm border border-white/60"
@@ -171,25 +221,31 @@ export default function AICompareResult() {
               </Link>
             </div>
           ))}
+
           {/* 하단 네비게이션 버튼 */}
-          <div className="grid grid-cols-2 gap-3 pt-2 pb-4">
-            <button
-              onClick={() => navigate('/compare')}
-              className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white py-3.5 text-sm font-semibold text-slate-700 hover:border-primary hover:text-primary transition-colors"
-            >
-              <ArrowLeft size={15} />
-              다시 선택하기
-            </button>
-            <Link
-              to="/academies"
-              className="flex items-center justify-center gap-2 rounded-2xl bg-slate-900 py-3.5 text-sm font-semibold text-white hover:bg-slate-800 transition-colors"
-            >
-              <LayoutGrid size={15} />
-              학원 전체보기
-            </Link>
-          </div>
+          {!isLoading && (
+            <div className="grid grid-cols-2 gap-3 pt-2 pb-4">
+              <button
+                onClick={() => navigate('/compare')}
+                className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white py-3.5 text-sm font-semibold text-slate-700 hover:border-primary hover:text-primary transition-colors"
+              >
+                <ArrowLeft size={15} />
+                다시 선택하기
+              </button>
+              <Link
+                to="/academies"
+                className="flex items-center justify-center gap-2 rounded-2xl bg-slate-900 py-3.5 text-sm font-semibold text-white hover:bg-slate-800 transition-colors"
+              >
+                <LayoutGrid size={15} />
+                학원 전체보기
+              </Link>
+            </div>
+          )}
         </div>
       </div>
+      <style>{`
+        .compare-scroll::-webkit-scrollbar { display: none; }
+      `}</style>
     </div>
   );
 }
