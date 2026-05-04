@@ -17,7 +17,9 @@
       "PowerShell(cmd /c \"rmdir /s /q \"\"C:\\\\Users\\\\user\\\\Desktop\\\\POSTMOM\\\\postmom-new\\\\.claude\\\\worktrees\\\\priceless-mendeleev-813efa\"\" 2>&1\")",
       "PowerShell(cmd /c \"rmdir /s /q \"\"C:\\\\Users\\\\user\\\\Desktop\\\\POSTMOM\\\\postmom-new\\\\.claude\\\\worktrees\\\\brave-brattain-15b487\"\" 2>&1\")",
       "Bash(dir /b c:\\\\Users\\\\user\\\\Desktop\\\\POSTMOM\\\\postmom-new\\\\.env*)",
-      "Bash(Remove-Item \"c:\\\\Users\\\\user\\\\Desktop\\\\POSTMOM\\\\postmom-new\\\\src\\\\pages\\\\CardSetup.tsx\")"
+      "Bash(Remove-Item \"c:\\\\Users\\\\user\\\\Desktop\\\\POSTMOM\\\\postmom-new\\\\src\\\\pages\\\\CardSetup.tsx\")",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\user\\\\Desktop\\\\POSTMOM\\\\postmom-new\" -Directory)",
+      "Bash(Select-Object Name)"
     ]
   }
 }

@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, ChevronRight, BookOpen, MessageCircle, LogOut, Bell, Brain, ChevronDown } from 'lucide-react';
 import { getSupabaseBrowserClient } from '../lib/supabase';
+import { syncUserProfile } from '../lib/syncUserProfile';
 import type { Session } from '@supabase/supabase-js';
 import { useOnboardingStore } from '../store/onboardingStore';
 import { LEARNING_TYPES, TYPE_KEY_LIST } from '../data/learningTypes';
@@ -45,6 +46,7 @@ export default function MyPage() {
     const supabase = getSupabaseBrowserClient();
     await supabase.auth.updateUser({ data: { learning_type: value || null } });
     updateData({ learningType: value });
+    await syncUserProfile({ ...data, learningType: value });
   };
 
   const { myConsultations, fetchMyConsultations } = useConsultationStore();

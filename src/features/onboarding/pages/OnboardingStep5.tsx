@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Heart, CheckCircle2 } from 'lucide-react';
 import { useOnboardingStore } from '../../../store/onboardingStore';
 import { getSupabaseBrowserClient } from '../../../lib/supabase';
+import { syncUserProfile } from '../../../lib/syncUserProfile';
 import OnboardingLayout from '../components/OnboardingLayout';
 import StepCard from '../components/StepCard';
 
@@ -102,6 +103,7 @@ export default function OnboardingStep5() {
           },
         },
       });
+      await syncUserProfile(data);
       setShowPopup(true);
     } catch {
       // 저장 실패해도 팝업은 표시
