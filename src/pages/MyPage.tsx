@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, ChevronRight, BookOpen, MessageCircle, LogOut, Bell, Brain, ChevronDown } from 'lucide-react';
+import { ChevronRight, BookOpen, MessageCircle, LogOut, Bell, Brain, ChevronDown } from 'lucide-react';
 import { getSupabaseBrowserClient } from '../lib/supabase';
 import { syncUserProfile } from '../lib/syncUserProfile';
 import type { Session } from '@supabase/supabase-js';
@@ -98,8 +98,8 @@ export default function MyPage() {
 
               {/* 유저 정보 */}
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center shrink-0">
-                  <User size={32} className="text-white" />
+                <div className="w-16 h-16 rounded-full overflow-hidden shrink-0 bg-white/20">
+                  <img src="/기본얼굴.png" alt="프로필" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
