@@ -445,7 +445,7 @@ export default function Home() {
               >
                 <Link
                   to="/learning-test"
-                  className="rounded-full bg-green-400/20 backdrop-blur-md border border-green-300/40 px-6 py-3 text-base font-medium text-white shadow-xl transition-all hover:scale-[1.03] hover:bg-green-400/45 active:scale-[0.97]"
+                  className="liquid-glass rounded-full px-6 py-3 text-base font-medium text-white transition-all hover:scale-[1.03] active:scale-[0.97]"
                 >
                   POSTMOM 학습유형 분석하기 
                 </Link>

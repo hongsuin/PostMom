@@ -21,14 +21,16 @@ export default function AuthCallback() {
     let isMounted = true;
 
     // ── 가입 후 이동 경로 분기 ──────────────────────────────────
-    const getRedirectPath = (userType: UserType | null) => {
+    // hasOnboarding: user_metadata.onboarding에 데이터가 있으면 기존 유저 → 홈으로
+    const getRedirectPath = (userType: UserType | null, hasOnboarding: boolean) => {
       if (userType === 'academy') return '/';
       if (!userType) return '/signup'; // userType 없음 → 회원가입 먼저
-      return '/onboarding/1';
+      if (hasOnboarding) return '/';  // 온보딩 완료된 기존 유저 → 홈
+      return '/onboarding/1';          // 신규 유저 → 온보딩
     };
 
     // ── pendingUserType 처리 + 내비게이션 (한 번만 실행) ────────
-    const handleSession = async (existingType: UserType | null) => {
+    const handleSession = async (existingType: UserType | null, hasOnboarding: boolean) => {
       if (processed.current) return;
       processed.current = true;
 
@@ -36,9 +38,10 @@ export default function AuthCallback() {
       if (pendingType) {
         await supabase.auth.updateUser({ data: { userType: pendingType } });
         localStorage.removeItem('pendingUserType');
-        navigate(getRedirectPath(pendingType), { replace: true });
+        // 신규 가입이므로 hasOnboarding=false → /onboarding/1 로 이동
+        navigate(getRedirectPath(pendingType, false), { replace: true });
       } else {
-        navigate(getRedirectPath(existingType), { replace: true });
+        navigate(getRedirectPath(existingType, hasOnboarding), { replace: true });
       }
     };
 
@@ -55,7 +58,8 @@ export default function AuthCallback() {
 
       if (data.session) {
         const existingType = data.session.user?.user_metadata?.userType as UserType | null;
-        await handleSession(existingType);
+        const hasOnboarding = !!data.session.user?.user_metadata?.onboarding;
+        await handleSession(existingType, hasOnboarding);
         return;
       }
 
@@ -69,7 +73,8 @@ export default function AuthCallback() {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
         const existingType = session.user?.user_metadata?.userType as UserType | null;
-        await handleSession(existingType);
+        const hasOnboarding = !!session.user?.user_metadata?.onboarding;
+        await handleSession(existingType, hasOnboarding);
       }
     });
 
