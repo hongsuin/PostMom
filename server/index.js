@@ -172,6 +172,14 @@ app.post('/api/compare', authMiddleware, async (req, res) => {
     userProfile.difficulties?.length ? `어려움: ${userProfile.difficulties.join(', ')}` : null,
   ].filter(Boolean).join('\n') : '정보 없음';
 
+  const learningTypeSummary = userProfile?.learningTypeName ? `
+학습 유형: ${userProfile.learningTypeName}
+유형 설명: ${userProfile.learningTypeDesc || ''}
+핵심 강점: ${userProfile.learningTypeStrengths?.join(', ') || ''}
+이 유형에 맞는 학원 기준:
+${userProfile.learningTypeGuide?.map((g, i) => `  ${i + 1}. ${g}`).join('\n') || ''}
+피해야 할 환경: ${userProfile.learningTypeCaution || ''}`.trim() : null;
+
   const academySummaries = academies.map((a, i) => `
 [학원 ${i + 1}]
 ID: ${a.id}
@@ -190,26 +198,31 @@ ID: ${a.id}
 평점: ${a.rating || '정보 없음'}
 `.trim()).join('\n\n');
 
-  const prompt = `당신은 학원 추천 전문가입니다. 아래 학부모/학생 프로필과 학원 정보를 바탕으로 각 학원을 분석하고 적합도를 평가해주세요.
+  const prompt = `당신은 학원 추천 전문가입니다. 아래 아이의 학습 유형과 프로필을 바탕으로 각 학원을 분석하고 적합도를 평가해주세요.
 
-## 학부모/학생 프로필
+${learningTypeSummary ? `## 아이의 학습 유형 (가장 중요한 분석 기준)
+${learningTypeSummary}
+
+` : ''}## 추가 프로필 정보
 ${userSummary}
 
 ## 비교할 학원 목록
 ${academySummaries}
 
 ## 요청사항
-각 학원에 대해 다음 JSON 배열을 반환해주세요. 반드시 적합도 점수(matchScore) 기준 내림차순으로 정렬하세요.
-정보가 부족한 항목은 학원 이름, 위치, 가격, 반 크기 등 가용 정보를 바탕으로 합리적으로 추론해주세요.
+- 학습 유형의 특성과 선호 환경을 최우선 기준으로 각 학원의 적합도를 평가하세요.
+- 추천 이유는 학습 유형과 연결하여 구체적으로 작성하세요 (예: "탐구 사고형에게 맞는 개념 중심 수업 방식").
+- 반드시 적합도(matchScore) 기준 내림차순으로 정렬하세요.
+- 정보가 부족하면 학원명·위치·가격·반 크기 등으로 합리적으로 추론하세요.
 
 반드시 아래 JSON 형식만 반환하세요 (설명 없이):
 [
   {
     "id": "학원 ID (위 목록의 ID 그대로)",
     "name": "학원 이름",
-    "rating": 숫자 (실제 평점이 없으면 4.0~4.9 사이 추정),
-    "matchScore": 0~100 정수 (프로필 적합도),
-    "reasons": ["추천 이유 1", "추천 이유 2", "추천 이유 3", "추천 이유 4"],
+    "rating": 숫자 (실제 평점 없으면 4.0~4.9 추정),
+    "matchScore": 0~100 정수 (학습 유형 기준 적합도),
+    "reasons": ["학습 유형과 연결한 추천 이유 1", "이유 2", "이유 3", "이유 4"],
     "curriculumFit": 0~100 정수,
     "teachingQuality": 0~100 정수,
     "priceFit": 0~100 정수,

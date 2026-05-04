@@ -1,8 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Zap, Sparkles, Star, MapPin, Check, X } from 'lucide-react';
+import { Zap, Sparkles, Star, MapPin, Check, X, CheckCircle } from 'lucide-react';
 import { academies } from '../data/mockData';
 import { useState } from 'react';
 import { useCompareStore } from '../store/compareStore';
+import { useOnboardingStore } from '../store/onboardingStore';
+import { LEARNING_TYPES } from '../data/learningTypes';
 
 const SUBJECT_COLORS: Record<string, string> = {
   수학: 'bg-blue-50 text-blue-700',
@@ -13,7 +15,11 @@ const SUBJECT_COLORS: Record<string, string> = {
 export default function AICompare() {
   const navigate = useNavigate();
   const setCompare = useCompareStore((s) => s.setSelected);
+  const { data: onboarding } = useOnboardingStore();
   const [selected, setSelected] = useState<string[]>([]);
+
+  const learningType = onboarding.learningType;
+  const typeData = learningType ? LEARNING_TYPES[learningType] : null;
 
   function handleCompare() {
     if (selected.length < 2) return;
@@ -225,13 +231,28 @@ export default function AICompare() {
                   </div>
 
                   {/* 우리 아이 정보 추가 */}
-                  <Link
-                    to="/onboarding/1"
-                    className="mb-2 flex w-full items-center justify-center gap-2 rounded-xl border border-primary py-3.5 text-sm font-semibold text-primary transition-all hover:bg-primary/5"
-                  >
-                    <Sparkles size={15} />
-                    우리 아이 정보 추가
-                  </Link>
+                  {typeData ? (
+                    <div className="mb-2 flex w-full flex-col gap-1.5">
+                      <div className="flex items-center gap-2 rounded-xl bg-primary/5 border border-primary/20 px-4 py-3">
+                        <CheckCircle size={15} className="text-primary shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-semibold text-primary">학습 유형 분석 완료</p>
+                          <p className="text-xs text-slate-500 truncate"> {typeData.name}</p>
+                        </div>
+                        <Link to="/learning-test" className="text-[11px] text-slate-400 hover:text-primary transition-colors shrink-0">
+                          재검사
+                        </Link>
+                      </div>
+                    </div>
+                  ) : (
+                    <Link
+                      to="/onboarding/1"
+                      className="mb-2 flex w-full items-center justify-center gap-2 rounded-xl border border-primary py-3.5 text-sm font-semibold text-primary transition-all hover:bg-primary/5"
+                    >
+                      <Sparkles size={15} />
+                      우리 아이 정보 추가
+                    </Link>
+                  )}
 
                   {/* Compare CTA */}
                   <button

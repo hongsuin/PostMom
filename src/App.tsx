@@ -1,11 +1,27 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { getSupabaseBrowserClient } from './lib/supabase';
+import { useOnboardingStore } from './store/onboardingStore';
+import type { TypeKey } from './data/learningTypes';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
+  return null;
+}
+
+function LearningTypeLoader() {
+  const { updateData } = useOnboardingStore();
+  useEffect(() => {
+    const supabase = getSupabaseBrowserClient();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const lt = session?.user?.user_metadata?.learning_type as TypeKey | undefined;
+      updateData({ learningType: lt ?? '' });
+    });
+    return () => subscription.unsubscribe();
+  }, []);
   return null;
 }
 import LearningTypeAnimOverlay from './components/LearningTypeAnimOverlay';
@@ -49,6 +65,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <LearningTypeLoader />
       <Routes>
         {/* Onboarding - no bottom nav */}
         <Route path="/onboarding/1" element={<OnboardingStep1 />} />
