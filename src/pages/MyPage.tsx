@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, ChevronRight, BookOpen, MessageCircle, LogOut, Bell, Brain } from 'lucide-react';
+import { ChevronRight, BookOpen, MessageCircle, LogOut, Bell, Brain, ChevronDown } from 'lucide-react';
 import { getSupabaseBrowserClient } from '../lib/supabase';
+import { syncUserProfile } from '../lib/syncUserProfile';
 import type { Session } from '@supabase/supabase-js';
 import { useOnboardingStore } from '../store/onboardingStore';
 import { LEARNING_TYPES, TYPE_KEY_LIST } from '../data/learningTypes';
@@ -13,6 +14,8 @@ import { useConsultationStore } from '../store/consultationStore';
 export default function MyPage() {
   const navigate = useNavigate();
   const [session, setSession] = useState<Session | null>(null);
+  const [typeDropOpen, setTypeDropOpen] = useState(false);
+  const typeDropRef = useRef<HTMLDivElement>(null);
   const { data, updateData } = useOnboardingStore();
 
   useEffect(() => {
@@ -22,15 +25,28 @@ export default function MyPage() {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (typeDropRef.current && !typeDropRef.current.contains(e.target as Node)) {
+        setTypeDropOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const handleLogout = async () => {
     const supabase = getSupabaseBrowserClient();
     await supabase.auth.signOut();
     navigate('/');
   };
 
-  const handleLearningTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleLearningTypeChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value as TypeKey | '';
+    const supabase = getSupabaseBrowserClient();
+    await supabase.auth.updateUser({ data: { learning_type: value || null } });
     updateData({ learningType: value });
+    await syncUserProfile({ ...data, learningType: value });
   };
 
   const { myConsultations, fetchMyConsultations } = useConsultationStore();
@@ -82,8 +98,8 @@ export default function MyPage() {
 
               {/* 유저 정보 */}
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center shrink-0">
-                  <User size={32} className="text-white" />
+                <div className="w-16 h-16 rounded-full overflow-hidden shrink-0 bg-white/20">
+                  <img src="/기본얼굴.png" alt="프로필" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -109,42 +125,63 @@ export default function MyPage() {
                     </p>
                   </div>
 
-                  {currentTypeData && (
-                    <div className="flex items-center gap-2 mb-2.5">
-                      <span className="text-lg">{currentTypeData.emoji}</span>
-                      <span className="text-sm font-semibold text-white">
-                        {currentTypeData.name}
-                      </span>
+                  {currentTypeData ? (
+                    <>
+                      {/* 커스텀 pill 드롭다운 */}
+                      <div ref={typeDropRef} className="relative mb-2.5">
+                        <button
+                          onClick={() => setTypeDropOpen(o => !o)}
+                          className="w-full flex items-center justify-between px-4 py-2.5 rounded-2xl bg-white/20 hover:bg-white/30 transition-colors"
+                        >
+                          <span className="text-sm font-semibold text-white">{currentTypeData.name}</span>
+                          <ChevronDown size={14} className={`text-white/70 transition-transform ${typeDropOpen ? 'rotate-180' : ''}`} />
+                        </button>
+
+                        {typeDropOpen && (
+                          <div className="absolute left-0 right-0 top-full mt-1.5 rounded-2xl bg-white shadow-lg border border-slate-100 overflow-hidden z-50">
+                            {TYPE_KEY_LIST.map((key) => {
+                              const t = LEARNING_TYPES[key];
+                              return (
+                                <button
+                                  key={key}
+                                  onClick={async () => {
+                                    await handleLearningTypeChange({ target: { value: key } } as React.ChangeEvent<HTMLSelectElement>);
+                                    setTypeDropOpen(false);
+                                  }}
+                                  className={`w-full text-left px-4 py-2.5 text-sm transition-colors hover:bg-primary/5 ${
+                                    key === currentLearningType ? 'font-semibold text-primary bg-primary/5' : 'text-slate-700'
+                                  }`}
+                                >
+                                  {t.name}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+
+                      <Link
+                        to="/learning-test"
+                        className="flex items-center justify-center gap-1 text-xs text-white/70 hover:text-white transition-colors"
+                      >
+                        <Brain size={11} />
+                        테스트 다시 하기 →
+                      </Link>
+                    </>
+                  ) : (
+                    <div className="bg-white/10 rounded-xl p-3.5 text-center">
+                      <p className="text-xs text-white/60 mb-2.5">
+                        아직 학습 유형 테스트를 받지 않았어요
+                      </p>
+                      <Link
+                        to="/learning-test"
+                        className="inline-flex items-center gap-1.5 bg-white text-primary text-xs font-semibold px-4 py-2 rounded-lg hover:bg-white/90 transition-colors"
+                      >
+                        <Brain size={12} />
+                        테스트 받으러 가기
+                      </Link>
                     </div>
                   )}
-
-                  <select
-                    value={currentLearningType}
-                    onChange={handleLearningTypeChange}
-                    className="w-full rounded-xl bg-white/15 border border-white/30 text-white text-sm px-3 py-2.5
-                      focus:outline-none focus:ring-2 focus:ring-white/40 cursor-pointer appearance-none"
-                    style={{ backgroundImage: 'none' }}
-                  >
-                    <option value="" className="text-slate-800 bg-white">
-                      {currentLearningType ? '유형 변경하기' : '아직 테스트하지 않았어요'}
-                    </option>
-                    {TYPE_KEY_LIST.map((key) => {
-                      const t = LEARNING_TYPES[key];
-                      return (
-                        <option key={key} value={key} className="text-slate-800 bg-white">
-                          {t.emoji} {t.name}
-                        </option>
-                      );
-                    })}
-                  </select>
-
-                  <Link
-                    to="/learning-test"
-                    className="mt-2.5 flex items-center justify-center gap-1 text-xs text-white/70 hover:text-white transition-colors"
-                  >
-                    <Brain size={11} />
-                    {currentLearningType ? '테스트 다시 하기 →' : '학습 유형 테스트하기 →'}
-                  </Link>
                 </div>
               )}
             </div>

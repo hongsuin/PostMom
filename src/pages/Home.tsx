@@ -7,9 +7,55 @@ import type { Session } from '@supabase/supabase-js';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
+interface SavedRec {
+  id: string;
+  name: string;
+  rating: number;
+  matchScore: number;
+}
+
+interface OnboardingMeta {
+  childGrade?: string;
+  englishLevel?: string;
+  budgetRange?: string;
+  distance?: string;
+  trustFactor?: string;
+}
+
+const GRADE_LABEL: Record<string, string> = {
+  elementary: '초등학생',
+  middle: '중학생',
+  high: '고등학생',
+};
+const LEVEL_LABEL: Record<string, string> = {
+  beginner: '기초',
+  average: '보통',
+  advanced: '심화',
+};
+const BUDGET_LABEL: Record<string, string> = {
+  under_200: '월 20만원 미만',
+  '200_300': '월 20~30만원',
+  '300_400': '월 30~40만원',
+  '400_500': '월 40~50만원',
+  over_500: '월 50만원 이상',
+};
+const DISTANCE_LABEL: Record<string, string> = {
+  walking: '도보 5분',
+  '10min': '10분 이내',
+  '20min': '20분 이내',
+  no_limit: '상관없음',
+};
+const TRUST_LABEL: Record<string, string> = {
+  child_enjoys: '아이가 좋아해요',
+  see_improvement: '실력 향상',
+  teacher_communication: '선생님 소통',
+  proven_results: '검증된 실적',
+};
+
 const NAV_LINKS = [
   { label: '학원 찾기', to: '/academies' },
   { label: 'AI 비교', to: '/compare' },
+  { label: '노무상담', to: '/ai-chat', isNew: true },
   { label: '커뮤니티', to: '/community' },
   { label: '이용 안내', to: '/#how' },
 ];
@@ -122,16 +168,34 @@ export default function Home() {
   const [reducedMotion, setReducedMotion] = useState(false);
   const [lowPerf, setLowPerf] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
+  const [savedRecs, setSavedRecs] = useState<SavedRec[]>([]);
+  const [onboardingMeta, setOnboardingMeta] = useState<OnboardingMeta | null>(null);
   const { hash } = useLocation();
   // const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
-    supabase.auth.getSession().then(({ data }) => setSession(data.session));
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => setSession(s));
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      const meta = data.session?.user?.user_metadata?.onboarding as OnboardingMeta | undefined;
+      if (meta) setOnboardingMeta(meta);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+      setSession(s);
+      const meta = s?.user?.user_metadata?.onboarding as OnboardingMeta | undefined;
+      if (meta) setOnboardingMeta(meta);
+    });
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('lastRecommendation');
+      if (raw) setSavedRecs(JSON.parse(raw).results ?? []);
+    } catch {}
+  }, []);
+
 
   // const handleLogout = async () => {
   //   const supabase = getSupabaseBrowserClient();
@@ -179,7 +243,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="w-full font-inter bg-white">
+    <div className="w-full font-inter bg-white h-full overflow-y-auto">
       {/* ── NAVIGATION ─────────────────────────────────── */}
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/20 backdrop-blur-md">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between px-8 py-4 xl:px-12">
@@ -194,9 +258,12 @@ export default function Home() {
               <Link
                 key={link.label}
                 to={link.to}
-                className="text-sm font-medium text-white/70 transition-colors hover:text-white"
+                className="flex items-center gap-1 text-sm font-medium text-white/70 transition-colors hover:text-white"
               >
                 {link.label}
+                {link.isNew && (
+                  <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[9px] font-bold text-white">NEW</span>
+                )}
               </Link>
             ))}
           </nav>
@@ -271,9 +338,12 @@ export default function Home() {
               key={link.label}
               to={link.to}
               onClick={() => setDrawerOpen(false)}
-              className="flex items-center rounded-lg px-4 py-3 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+              className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
             >
               {link.label}
+              {link.isNew && (
+                <span className="rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] font-bold text-primary">NEW</span>
+              )}
             </Link>
           ))}
         </nav>
@@ -375,7 +445,7 @@ export default function Home() {
               >
                 <Link
                   to="/learning-test"
-                  className="rounded-full bg-green-400/20 backdrop-blur-md border border-green-300/40 px-6 py-3 text-base font-medium text-white shadow-xl transition-all hover:scale-[1.03] hover:bg-green-400/45 active:scale-[0.97]"
+                  className="liquid-glass rounded-full px-6 py-3 text-base font-medium text-white transition-all hover:scale-[1.03] active:scale-[0.97]"
                 >
                   POSTMOM 학습유형 분석하기 
                 </Link>
@@ -416,58 +486,91 @@ export default function Home() {
             >
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="font-lora text-base font-medium">내 카드</h3>
-                {session && (
-                  <span className="rounded-full bg-green-400/30 px-2.5 py-0.5 text-xs font-medium text-white/70">
-                    분석 완료
+                {session && onboardingMeta && (
+                  <Link
+                    to="/onboarding/1"
+                    className="text-[11px] text-white/50 hover:text-white/80 transition-colors"
+                  >
+                    수정
+                  </Link>
+                )}
+                {session && !onboardingMeta && (
+                  <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs text-white/50">
+                    미설정
                   </span>
                 )}
               </div>
 
               <div className={`space-y-2.5 transition-all duration-300 ${!session ? 'blur-sm select-none pointer-events-none' : ''}`}>
-                {[
-                  ['지역', '위례'],
-                  ['학년', '초등 4학년'],
-                  ['과목', '영어'],
-                  ['예산', '월 40만원 이하'],
-                  ['중요 기준', '밀착케어'],
-                ].map(([label, val]) => (
-                  <div
-                    key={label}
-                    className="flex justify-between border-b border-white/12 pb-2 text-xs"
-                  >
-                    <span className="text-white/60">{label}</span>
-                    <span className="font-medium">{val}</span>
-                  </div>
-                ))}
+                {onboardingMeta ? (
+                  ([
+                    ['학년', GRADE_LABEL[onboardingMeta.childGrade ?? ''] ?? '-'],
+                    ['영어 실력', LEVEL_LABEL[onboardingMeta.englishLevel ?? ''] ?? '-'],
+                    ['예산', BUDGET_LABEL[onboardingMeta.budgetRange ?? ''] ?? '-'],
+                    ['거리', DISTANCE_LABEL[onboardingMeta.distance ?? ''] ?? '-'],
+                    ['신뢰 기준', TRUST_LABEL[onboardingMeta.trustFactor ?? ''] ?? '-'],
+                  ] as [string, string][]).map(([label, val]) => (
+                    <div key={label} className="flex justify-between border-b border-white/12 pb-2 text-xs">
+                      <span className="text-white/60">{label}</span>
+                      <span className="font-medium">{val}</span>
+                    </div>
+                  ))
+                ) : (
+                  ([
+                    ['학년', '-'],
+                    ['영어 실력', '-'],
+                    ['예산', '-'],
+                    ['거리', '-'],
+                    ['신뢰 기준', '-'],
+                  ] as [string, string][]).map(([label, val]) => (
+                    <div key={label} className="flex justify-between border-b border-white/12 pb-2 text-xs">
+                      <span className="text-white/60">{label}</span>
+                      <span className="font-medium text-white/30">{val}</span>
+                    </div>
+                  ))
+                )}
               </div>
 
-              {!session && (
+              {!session ? (
                 <Link
                   to="/login"
                   className="mt-4 flex w-full items-center justify-center rounded-2xl bg-white/20 py-2.5 text-sm font-semibold text-white backdrop-blur-sm hover:bg-white/30 transition-colors"
                 >
                   Login
                 </Link>
-              )}
+              ) : !onboardingMeta ? (
+                <Link
+                  to="/onboarding/1"
+                  className="mt-4 flex w-full items-center justify-center rounded-2xl bg-white/20 py-2.5 text-sm font-semibold text-white backdrop-blur-sm hover:bg-white/30 transition-colors"
+                >
+                  내 아이 정보 입력하기 →
+                </Link>
+              ) : null}
 
               <div className={`mt-4 rounded-2xl bg-white/8 p-3 space-y-2 transition-all duration-300 ${!session ? 'blur-sm select-none pointer-events-none' : ''}`}>
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-white/50">
-                  추천 결과
+                  지난 추천 결과
                 </p>
-                {[
-                  { label: '심슨어학원 위례캠퍼스 ★★★★★', id: 'naver-심슨어학원위례캠퍼스' },
-                  { label: '아발론랭콘 위례캠퍼스 ★★★★☆', id: 'naver-아발론랭콘위례캠퍼스' },
-                  { label: '리드101영어학원 위례점 ★★★★☆', id: 'naver-리드101영어학원위례점' },
-                ].map(({ label, id }) => (
+                {savedRecs.length > 0 ? (
+                  savedRecs.slice(0, 3).map((rec) => (
+                    <Link
+                      key={rec.id}
+                      to={`/academies/${rec.id}`}
+                      className="flex items-center gap-2 rounded-xl bg-white/8 px-3 py-1.5 text-xs hover:bg-white/15 transition-colors cursor-pointer"
+                    >
+                      <span className="h-1.5 w-1.5 rounded-full bg-green-400 flex-shrink-0" />
+                      <span className="truncate flex-1">{rec.name}</span>
+                      <span className="text-green-400 font-semibold shrink-0">{rec.matchScore}%</span>
+                    </Link>
+                  ))
+                ) : (
                   <Link
-                    key={id}
-                    to={`/academies/${id}`}
-                    className="flex items-center gap-2 rounded-xl bg-white/8 px-3 py-1.5 text-xs hover:bg-white/15 transition-colors cursor-pointer"
+                    to="/academies"
+                    className="flex items-center justify-center gap-1.5 rounded-xl bg-white/15 px-3 py-2.5 text-xs font-medium text-white/80 hover:bg-white/25 transition-colors"
                   >
-                    <span className="h-1.5 w-1.5 rounded-full bg-green-400 flex-shrink-0" />
-                    {label}
+                    학원 찾기 탭으로 이동 →
                   </Link>
-                ))}
+                )}
               </div>
 
 

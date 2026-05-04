@@ -8,12 +8,16 @@ import {
   Pencil,
   Tag,
   TrendingUp,
+  Users,
 } from 'lucide-react';
+import type { Session } from '@supabase/supabase-js';
 import type { CommunityPost } from '../data/mockData';
 import UserProfileModal from '../components/UserProfileModal';
 import UserTypeBadge from '../components/UserTypeBadge';
 import { useCommunityStore } from '../store/communityStore';
 import { useUserType } from '../hooks/useUserType';
+import { getSupabaseBrowserClient } from '../lib/supabase';
+import { syncUserProfile } from '../lib/syncUserProfile';
 
 const POPULAR_TAGS = ['수학', '영어', '과학', '후기', '비교', '상담', '중등'];
 
@@ -41,13 +45,50 @@ export default function CommunityHome() {
   const userType = useUserType();
   const isAcademy = userType === 'academy';
   const [selectedPost, setSelectedPost] = useState<CommunityPost | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const posts = useCommunityStore((state) => state.posts);
   const loading = useCommunityStore((state) => state.loading);
+  const similarPostIds = useCommunityStore((state) => state.similarPostIds);
   const fetchPosts = useCommunityStore((state) => state.fetchPosts);
+  const fetchSimilarPostIds = useCommunityStore((state) => state.fetchSimilarPostIds);
+
+  useEffect(() => {
+    const supabase = getSupabaseBrowserClient();
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      // 기존 유저 포함 - 세션 로드 시점에 user_profiles를 자동으로 sync
+      if (data.session?.user?.id) {
+        void syncUserProfile();
+      }
+    });
+  }, []);
 
   useEffect(() => {
     void fetchPosts();
   }, [fetchPosts]);
+
+  useEffect(() => {
+    if (!session?.user?.id || posts.length === 0) return;
+
+    const meta = session.user.user_metadata ?? {};
+    const ob = (meta.onboarding ?? {}) as Record<string, string>;
+    if (!ob.childGrade) return;
+
+    void fetchSimilarPostIds(
+      {
+        child_grade: ob.childGrade || undefined,
+        english_level: ob.englishLevel || undefined,
+        class_type: ob.classType || undefined,
+        teaching_style: ob.teachingStyle || undefined,
+        budget_range: ob.budgetRange || undefined,
+        distance: ob.distance || undefined,
+        learning_type: (meta.learning_type as string) || undefined,
+      },
+      session.user.id,
+    );
+  }, [session, posts, fetchSimilarPostIds]);
+
+  const similarPosts = posts.filter((p) => similarPostIds.includes(p.id));
 
   const openProfile = (post: CommunityPost, e: React.MouseEvent) => {
     if (!isAcademy) return;
@@ -61,6 +102,84 @@ export default function CommunityHome() {
     e.stopPropagation();
     window.open(url, '_blank', 'noopener,noreferrer');
   };
+
+  const renderPostCard = (post: CommunityPost) => (
+    <Link
+      key={post.id}
+      to={`/community/${post.id}`}
+      className="group block rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
+    >
+      <div className="mb-3 flex items-center justify-between gap-4">
+        <div className="flex flex-wrap gap-1.5">
+          <span
+            className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+              REGION_STYLES[post.region] ?? 'bg-slate-100 text-slate-700'
+            }`}
+          >
+            {post.region}
+          </span>
+          {post.tags.map((tag) => (
+            <span
+              key={tag}
+              className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                TAG_COLORS[tag] ?? 'bg-slate-100 text-slate-600'
+              }`}
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+        <span className="shrink-0 text-xs text-slate-400">{formatDate(post.date)}</span>
+      </div>
+
+      <h3 className="mb-2 text-base font-semibold text-slate-900 transition-colors group-hover:text-primary">
+        {post.title}
+      </h3>
+
+      <p className="mb-4 line-clamp-2 text-sm leading-relaxed text-slate-500">{post.content}</p>
+
+      <div className="flex items-center justify-between gap-4 border-t border-slate-100 pt-4">
+        <button
+          type="button"
+          onClick={(event) => openProfile(post, event)}
+          className={`flex items-center gap-1.5 text-sm text-slate-500 ${
+            isAcademy ? 'cursor-pointer transition-opacity hover:opacity-75' : 'cursor-default'
+          }`}
+        >
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+            {post.author[0]}
+          </div>
+          <span className="font-medium text-slate-700">{post.author}</span>
+          <UserTypeBadge userType={post.userType} />
+        </button>
+
+        <div className="flex items-center gap-4 text-xs text-slate-400">
+          {post.link && (
+            <button
+              type="button"
+              onClick={(event) => openExternalLink(post.link!.url, event)}
+              className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 font-medium text-slate-500 transition hover:border-primary/30 hover:text-primary"
+            >
+              <ExternalLink size={12} />
+              블로그 보기
+            </button>
+          )}
+          <span className="flex items-center gap-1.5 transition-colors group-hover:text-red-400">
+            <Heart size={13} />
+            {post.likes}
+          </span>
+          <span className="flex items-center gap-1.5 transition-colors group-hover:text-primary">
+            <MessageCircle size={13} />
+            {post.comments}
+          </span>
+          <span className="flex items-center gap-1 font-medium text-slate-500 transition-colors group-hover:text-primary">
+            읽기
+            <ChevronRight size={13} />
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
 
   return (
     <>
@@ -101,95 +220,40 @@ export default function CommunityHome() {
 
         <div className="mx-auto max-w-[1400px] px-8 py-8 xl:px-12">
           <div className="flex gap-8">
-            <div className="min-w-0 flex-1 space-y-4">
-              {posts.map((post) => (
-                <Link
-                  key={post.id}
-                  to={`/community/${post.id}`}
-                  className="group block rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
-                >
-                  <div className="mb-3 flex items-center justify-between gap-4">
-                    <div className="flex flex-wrap gap-1.5">
-                      <span
-                        className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                          REGION_STYLES[post.region] ?? 'bg-slate-100 text-slate-700'
-                        }`}
-                      >
-                        {post.region}
-                      </span>
-                      {post.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                            TAG_COLORS[tag] ?? 'bg-slate-100 text-slate-600'
-                          }`}
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                    <span className="shrink-0 text-xs text-slate-400">{formatDate(post.date)}</span>
+            <div className="min-w-0 flex-1">
+              {/* 나와 비슷한 학부모 글 섹션 */}
+              {similarPosts.length > 0 && (
+                <div className="mb-8">
+                  <div className="mb-3 flex items-center gap-2">
+                    <Users size={15} className="text-primary" />
+                    <p className="text-sm font-semibold text-slate-800">나와 비슷한 조건의 학부모 글</p>
+                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                      카드 2개+ 일치
+                    </span>
                   </div>
-
-                  <h3 className="mb-2 text-base font-semibold text-slate-900 transition-colors group-hover:text-primary">
-                    {post.title}
-                  </h3>
-
-                  <p className="mb-4 line-clamp-2 text-sm leading-relaxed text-slate-500">
-                    {post.content}
+                  <div className="space-y-3">
+                    {similarPosts.map((post) => renderPostCard(post))}
+                  </div>
+                  <div className="mt-6 border-t border-slate-200" />
+                  <p className="mt-4 mb-4 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    전체 글
                   </p>
-
-                  <div className="flex items-center justify-between gap-4 border-t border-slate-100 pt-4">
-                    <button
-                      type="button"
-                      onClick={(event) => openProfile(post, event)}
-                      className={`flex items-center gap-1.5 text-sm text-slate-500 ${
-                        isAcademy ? 'cursor-pointer transition-opacity hover:opacity-75' : 'cursor-default'
-                      }`}
-                    >
-                      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                        {post.author[0]}
-                      </div>
-                      <span className="font-medium text-slate-700">{post.author}</span>
-                      <UserTypeBadge userType={post.userType} />
-                    </button>
-
-                    <div className="flex items-center gap-4 text-xs text-slate-400">
-                      {post.link && (
-                        <button
-                          type="button"
-                          onClick={(event) => openExternalLink(post.link!.url, event)}
-                          className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 font-medium text-slate-500 transition hover:border-primary/30 hover:text-primary"
-                        >
-                          <ExternalLink size={12} />
-                          블로그 보기
-                        </button>
-                      )}
-                      <span className="flex items-center gap-1.5 transition-colors group-hover:text-red-400">
-                        <Heart size={13} />
-                        {post.likes}
-                      </span>
-                      <span className="flex items-center gap-1.5 transition-colors group-hover:text-primary">
-                        <MessageCircle size={13} />
-                        {post.comments}
-                      </span>
-                      <span className="flex items-center gap-1 font-medium text-slate-500 transition-colors group-hover:text-primary">
-                        읽기
-                        <ChevronRight size={13} />
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-
-              {!loading && posts.length === 0 && (
-                <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center text-sm text-slate-400">
-                  아직 등록된 글이 없어요. 첫 글을 남겨보세요.
                 </div>
               )}
 
-              <div className="rounded-2xl border border-dashed border-slate-300 py-4 text-center text-sm font-medium text-slate-400">
-                {loading ? '게시글을 불러오는 중이에요.' : '최신 글이 모두 표시되고 있어요.'}
+              {/* 전체 글 목록 */}
+              <div className="space-y-4">
+                {posts.map((post) => renderPostCard(post))}
+
+                {!loading && posts.length === 0 && (
+                  <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center text-sm text-slate-400">
+                    아직 등록된 글이 없어요. 첫 글을 남겨보세요.
+                  </div>
+                )}
+
+                <div className="rounded-2xl border border-dashed border-slate-300 py-4 text-center text-sm font-medium text-slate-400">
+                  {loading ? '게시글을 불러오는 중이에요.' : '최신 글이 모두 표시되고 있어요.'}
+                </div>
               </div>
             </div>
 

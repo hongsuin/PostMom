@@ -1,5 +1,7 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getSupabaseBrowserClient } from '../../../lib/supabase';
+import { useOnboardingStore } from '../../../store/onboardingStore';
 
 const TOTAL_STEPS = 5;
 
@@ -19,25 +21,41 @@ export default function OnboardingLayout({
   children,
 }: OnboardingLayoutProps) {
   const navigate = useNavigate();
+  const { reset } = useOnboardingStore();
+  const [checked, setChecked] = useState(false);
+
+  useEffect(() => {
+    const supabase = getSupabaseBrowserClient();
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) {
+        navigate('/login', { replace: true });
+        return;
+      }
+      if (step === 1) reset();
+      setChecked(true);
+    });
+  }, []);
+
+  if (!checked) return null;
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="h-full overflow-y-auto">
       {/* Background Video */}
       <video
         autoPlay
         loop
         muted
         playsInline
-        className="absolute inset-0 h-full w-full object-cover"
+        className="fixed inset-0 h-full w-full object-cover -z-10"
       >
         <source src="/correctvideo.mp4" type="video/mp4" />
       </video>
 
       {/* Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-50/90 to-white/90" />
+      <div className="fixed inset-0 bg-gradient-to-b from-slate-50/90 to-white/90 -z-10" />
 
       {/* Content */}
-      <div className="relative z-10 max-w-lg mx-auto px-5 pt-10 pb-24 overflow-y-auto min-h-screen">
+      <div className="max-w-lg mx-auto px-5 pt-10 pb-24 min-h-screen">
         {/* Progress */}
         <div className="mb-10">
           <div className="flex gap-1.5 mb-2">

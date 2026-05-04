@@ -7,6 +7,7 @@ import type { Session } from '@supabase/supabase-js';
 const NAV_LINKS = [
   { label: '학원 찾기', to: '/academies' },
   { label: 'AI 비교', to: '/compare' },
+  { label: '노무상담', to: '/ai-chat', isNew: true },
   { label: '커뮤니티', to: '/community' },
 ];
 
@@ -41,13 +42,16 @@ export default function SiteHeader() {
                 <Link
                   key={link.to}
                   to={link.to}
-                  className={`text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-1 text-sm font-medium transition-colors ${
                     active ? 'text-primary' : 'text-slate-500 hover:text-slate-900'
                   }`}
                 >
                   {link.label}
+                  {link.isNew && (
+                    <span className="rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] font-bold text-primary">NEW</span>
+                  )}
                   {active && (
-                    <span className="ml-1 inline-block h-1 w-1 rounded-full bg-primary align-middle" />
+                    <span className="ml-0.5 inline-block h-1 w-1 rounded-full bg-primary align-middle" />
                   )}
                 </Link>
               );
@@ -140,6 +144,9 @@ export default function SiteHeader() {
                 }`}
               >
                 {link.label}
+                {link.isNew && (
+                  <span className="rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] font-bold text-primary">NEW</span>
+                )}
                 {active && (
                   <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
                 )}

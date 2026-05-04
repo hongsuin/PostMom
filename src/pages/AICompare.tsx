@@ -1,7 +1,10 @@
-import { Link } from 'react-router-dom';
-import { Zap, Sparkles, Star, MapPin, Check, X } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Zap, Sparkles, Star, MapPin, Check, X, CheckCircle } from 'lucide-react';
 import { academies } from '../data/mockData';
 import { useState } from 'react';
+import { useCompareStore } from '../store/compareStore';
+import { useOnboardingStore } from '../store/onboardingStore';
+import { LEARNING_TYPES } from '../data/learningTypes';
 
 const SUBJECT_COLORS: Record<string, string> = {
   수학: 'bg-blue-50 text-blue-700',
@@ -10,7 +13,20 @@ const SUBJECT_COLORS: Record<string, string> = {
 };
 
 export default function AICompare() {
+  const navigate = useNavigate();
+  const setCompare = useCompareStore((s) => s.setSelected);
+  const { data: onboarding } = useOnboardingStore();
   const [selected, setSelected] = useState<string[]>([]);
+
+  const learningType = onboarding.learningType;
+  const typeData = learningType ? LEARNING_TYPES[learningType] : null;
+
+  function handleCompare() {
+    if (selected.length < 2) return;
+    const selectedAcademies = academies.filter((a) => selected.includes(a.id));
+    setCompare(selected, selectedAcademies);
+    navigate('/compare/result');
+  }
 
   const toggle = (id: string) => {
     setSelected((prev) =>
@@ -215,17 +231,33 @@ export default function AICompare() {
                   </div>
 
                   {/* 우리 아이 정보 추가 */}
-                  <Link
-                    to="/onboarding/1"
-                    className="mb-2 flex w-full items-center justify-center gap-2 rounded-xl border border-primary py-3.5 text-sm font-semibold text-primary transition-all hover:bg-primary/5"
-                  >
-                    <Sparkles size={15} />
-                    우리 아이 정보 추가
-                  </Link>
+                  {typeData ? (
+                    <div className="mb-2 flex w-full flex-col gap-1.5">
+                      <div className="flex items-center gap-2 rounded-xl bg-primary/5 border border-primary/20 px-4 py-3">
+                        <CheckCircle size={15} className="text-primary shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-semibold text-primary">학습 유형 분석 완료</p>
+                          <p className="text-xs text-slate-500 truncate"> {typeData.name}</p>
+                        </div>
+                        <Link to="/learning-test" className="text-[11px] text-slate-400 hover:text-primary transition-colors shrink-0">
+                          재검사
+                        </Link>
+                      </div>
+                    </div>
+                  ) : (
+                    <Link
+                      to="/onboarding/1"
+                      className="mb-2 flex w-full items-center justify-center gap-2 rounded-xl border border-primary py-3.5 text-sm font-semibold text-primary transition-all hover:bg-primary/5"
+                    >
+                      <Sparkles size={15} />
+                      우리 아이 정보 추가
+                    </Link>
+                  )}
 
                   {/* Compare CTA */}
-                  <Link
-                    to={canCompare ? '/compare/result' : '#'}
+                  <button
+                    onClick={handleCompare}
+                    disabled={!canCompare}
                     className={`flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all ${
                       canCompare
                         ? 'bg-primary text-white shadow-md shadow-primary/30 hover:opacity-90 hover:scale-[1.02]'
@@ -234,7 +266,7 @@ export default function AICompare() {
                   >
                     <Zap size={15} />
                     AI 비교 분석 시작
-                  </Link>
+                  </button>
 
                   {!canCompare && (
                     <p className="mt-2.5 text-center text-xs text-slate-400">
@@ -242,17 +274,6 @@ export default function AICompare() {
                     </p>
                   )}
                 </div>
-              </div>
-
-              {/* Tip */}
-              <div className="mt-4 rounded-xl bg-slate-100 p-4 text-xs text-slate-500 leading-relaxed">
-                <p className="mb-1 font-semibold text-slate-700">💡 비교 분석 제공 항목</p>
-                <ul className="space-y-1">
-                  <li>· 강점 및 약점 요약</li>
-                  <li>· 학부모 후기 감성 분석</li>
-                  <li>· 우리 아이 적합도 점수</li>
-                  <li>· 최종 추천 이유</li>
-                </ul>
               </div>
             </div>
           </aside>
@@ -262,8 +283,9 @@ export default function AICompare() {
       {/* Mobile sticky CTA */}
       {selected.length > 0 && (
         <div className="fixed bottom-0 left-0 right-0 border-t border-slate-200 bg-white p-4 lg:hidden">
-          <Link
-            to={canCompare ? '/compare/result' : '#'}
+          <button
+            onClick={handleCompare}
+            disabled={!canCompare}
             className={`flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold ${
               canCompare
                 ? 'bg-primary text-white'
@@ -272,7 +294,7 @@ export default function AICompare() {
           >
             <Zap size={15} />
             AI 비교 시작 ({selected.length}/3)
-          </Link>
+          </button>
         </div>
       )}
     </div>
