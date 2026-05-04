@@ -254,17 +254,6 @@ export default function AICompare() {
                   )}
                 </div>
               </div>
-
-              {/* Tip */}
-              <div className="mt-4 rounded-xl bg-slate-100 p-4 text-xs text-slate-500 leading-relaxed">
-                <p className="mb-1 font-semibold text-slate-700">💡 비교 분석 제공 항목</p>
-                <ul className="space-y-1">
-                  <li>· 강점 및 약점 요약</li>
-                  <li>· 학부모 후기 감성 분석</li>
-                  <li>· 우리 아이 적합도 점수</li>
-                  <li>· 최종 추천 이유</li>
-                </ul>
-              </div>
             </div>
           </aside>
         </div>
