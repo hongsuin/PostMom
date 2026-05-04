@@ -109,42 +109,55 @@ export default function MyPage() {
                     </p>
                   </div>
 
-                  {currentTypeData && (
-                    <div className="flex items-center gap-2 mb-2.5">
-                      <span className="text-lg">{currentTypeData.emoji}</span>
-                      <span className="text-sm font-semibold text-white">
-                        {currentTypeData.name}
-                      </span>
+                  {currentTypeData ? (
+                    <>
+                      <div className="flex items-center gap-2 mb-2.5">
+                        <span className="text-lg">{currentTypeData.emoji}</span>
+                        <span className="text-sm font-semibold text-white">
+                          {currentTypeData.name}
+                        </span>
+                      </div>
+
+                      <select
+                        value={currentLearningType}
+                        onChange={handleLearningTypeChange}
+                        className="w-full rounded-xl bg-white/15 border border-white/30 text-white text-sm px-3 py-2.5
+                          focus:outline-none focus:ring-2 focus:ring-white/40 cursor-pointer appearance-none"
+                        style={{ backgroundImage: 'none' }}
+                      >
+                        <option value="" className="text-slate-800 bg-white">유형 변경하기</option>
+                        {TYPE_KEY_LIST.map((key) => {
+                          const t = LEARNING_TYPES[key];
+                          return (
+                            <option key={key} value={key} className="text-slate-800 bg-white">
+                              {t.emoji} {t.name}
+                            </option>
+                          );
+                        })}
+                      </select>
+
+                      <Link
+                        to="/learning-test"
+                        className="mt-2.5 flex items-center justify-center gap-1 text-xs text-white/70 hover:text-white transition-colors"
+                      >
+                        <Brain size={11} />
+                        테스트 다시 하기 →
+                      </Link>
+                    </>
+                  ) : (
+                    <div className="bg-white/10 rounded-xl p-3.5 text-center">
+                      <p className="text-xs text-white/60 mb-2.5">
+                        아직 학습 유형 테스트를 받지 않았어요
+                      </p>
+                      <Link
+                        to="/learning-test"
+                        className="inline-flex items-center gap-1.5 bg-white text-primary text-xs font-semibold px-4 py-2 rounded-lg hover:bg-white/90 transition-colors"
+                      >
+                        <Brain size={12} />
+                        테스트 받으러 가기
+                      </Link>
                     </div>
                   )}
-
-                  <select
-                    value={currentLearningType}
-                    onChange={handleLearningTypeChange}
-                    className="w-full rounded-xl bg-white/15 border border-white/30 text-white text-sm px-3 py-2.5
-                      focus:outline-none focus:ring-2 focus:ring-white/40 cursor-pointer appearance-none"
-                    style={{ backgroundImage: 'none' }}
-                  >
-                    <option value="" className="text-slate-800 bg-white">
-                      {currentLearningType ? '유형 변경하기' : '아직 테스트하지 않았어요'}
-                    </option>
-                    {TYPE_KEY_LIST.map((key) => {
-                      const t = LEARNING_TYPES[key];
-                      return (
-                        <option key={key} value={key} className="text-slate-800 bg-white">
-                          {t.emoji} {t.name}
-                        </option>
-                      );
-                    })}
-                  </select>
-
-                  <Link
-                    to="/learning-test"
-                    className="mt-2.5 flex items-center justify-center gap-1 text-xs text-white/70 hover:text-white transition-colors"
-                  >
-                    <Brain size={11} />
-                    {currentLearningType ? '테스트 다시 하기 →' : '학습 유형 테스트하기 →'}
-                  </Link>
                 </div>
               )}
             </div>
