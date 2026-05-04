@@ -79,7 +79,12 @@ export default function AICompareResult() {
         }),
       });
       if (!res.ok) throw new Error('서버 오류가 발생했습니다.');
-      setResults(await res.json());
+      const data: AcademyResult[] = await res.json();
+      setResults(data);
+      localStorage.setItem('lastRecommendation', JSON.stringify({
+        results: data.map(({ id, name, rating, matchScore }) => ({ id, name, rating, matchScore })),
+        savedAt: new Date().toISOString(),
+      }));
     } catch (e) {
       setError(e instanceof Error ? e.message : 'AI 분석 중 오류가 발생했습니다.');
     } finally {
