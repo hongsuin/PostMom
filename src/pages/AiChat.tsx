@@ -17,8 +17,8 @@ interface Message {
 interface Session {
   id: number;
   title: string;
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const SUGGESTED = [
@@ -70,7 +70,7 @@ function groupByDate(sessions: Session[]) {
 
   const groups: Record<string, Session[]> = { '오늘': [], '어제': [], '지난 주': [] };
   sessions.forEach(s => {
-    const d = new Date(s.updated_at).toDateString();
+    const d = new Date(s.updatedAt).toDateString();
     if (d === today) groups['오늘'].push(s);
     else if (d === yesterday) groups['어제'].push(s);
     else groups['지난 주'].push(s);
@@ -159,12 +159,12 @@ export default function AiChat() {
       const res = await fetch(`${SERVER_URL}/api/sessions/${session.id}/messages`, { headers });
       if (!res.ok) return;
       const rows = await res.json();
-      const loaded: Message[] = rows.map((r: { id: number; role: string; content: string; sources: { source: string; page: number }[] | null; created_at: string }) => ({
+      const loaded: Message[] = rows.map((r: { id: number; role: string; content: string; sources: { source: string; page: number }[] | null; createdAt: string }) => ({
         id: String(r.id),
         role: r.role as 'user' | 'bot',
         content: r.content,
         sources: r.sources ?? undefined,
-        time: new Date(r.created_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
+        time: new Date(r.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
       }));
       setMessages(loaded);
       setCurrentSessionId(session.id);
@@ -325,7 +325,7 @@ export default function AiChat() {
                       <div className="truncate flex-1">
                         <div className="text-[13px] font-medium text-white truncate">{item.title}</div>
                         <div className="text-[11px] truncate" style={{ color: '#D4EDE0' }}>
-                          {new Date(item.updated_at).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+                          {new Date(item.updatedAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
                         </div>
                       </div>
                       <button
