@@ -51,6 +51,14 @@ function getTime() {
   return new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
 }
 
+function chatErrorMessage(status: number): string {
+  if (status === 401) return '로그인이 만료되었습니다. 다시 로그인해주세요.';
+  if (status === 403) return '접근 권한이 없습니다.';
+  if (status === 502 || status === 503 || status === 504) return 'RAG 서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.';
+  if (status >= 500) return '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+  return '요청 처리 중 오류가 발생했습니다.';
+}
+
 function formatSource(src: string) {
   return src.split(/[\\/]/).pop()?.replace(/^\[pdf\]/, '') ?? src;
 }
@@ -208,7 +216,10 @@ export default function AiChat() {
         headers: { ...headers, 'Content-Type': 'application/json' },
         body: JSON.stringify(currentSessionId ? { question, sessionId: currentSessionId } : { question }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        const msg = chatErrorMessage(res.status);
+        throw new Error(msg);
+      }
       const data = await res.json();
 
       setMessages(prev => [...prev, {
@@ -224,11 +235,14 @@ export default function AiChat() {
         setCurrentSessionId(data.sessionId);
         await fetchSessions();
       }
-    } catch {
+    } catch (err) {
+      const content = err instanceof Error
+        ? err.message
+        : '알 수 없는 오류가 발생했습니다.';
       setMessages(prev => [...prev, {
         id: (Date.now() + 1).toString(),
         role: 'bot',
-        content: '연결 오류가 발생했습니다. 서버 상태를 확인해주세요.',
+        content,
         time: getTime(),
       }]);
     } finally {
