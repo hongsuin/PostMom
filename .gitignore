@@ -5,3 +5,4 @@ dist/
 .env.*.local
 vite.out.log
 vite.err.log
+.claude/
