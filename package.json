@@ -4,8 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently --names \"FRONT,NODE,RAG\" \"vite\" \"node server/index.js\" \"cd ..\\postmom-rag && venv\\Scripts\\uvicorn main:app --reload --port 8000\"",
+    "dev": "concurrently --names \"FRONT,NODE,RAG\" \"npm run dev:front\" \"npm run dev:node\" \"npm run dev:rag\"",
     "dev:front": "vite",
+    "dev:node": "node server/index.js",
+    "dev:rag": "node scripts/start-rag.js",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
