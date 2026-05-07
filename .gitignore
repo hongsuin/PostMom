@@ -6,3 +6,4 @@ dist/
 vite.out.log
 vite.err.log
 .claude/
+.vite/
