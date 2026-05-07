@@ -176,7 +176,8 @@ export default function AiChat() {
     e.stopPropagation();
     const headers = await getAuthHeader();
     if (!headers) return;
-    await fetch(`${SERVER_URL}/api/sessions/${sessionId}`, { method: 'DELETE', headers });
+    const res = await fetch(`${SERVER_URL}/api/sessions/${sessionId}`, { method: 'DELETE', headers });
+    if (!res.ok) return;
     if (currentSessionId === sessionId) {
       setMessages([]);
       setCurrentSessionId(null);
