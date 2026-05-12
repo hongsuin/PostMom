@@ -1,11 +1,11 @@
 const { z } = require('zod');
 
 const uuidParamSchema = z.object({
-  id: z.uuid(),
+  id: z.string().uuid(),
 });
 
 const commentIdParamSchema = z.object({
-  commentId: z.uuid(),
+  commentId: z.string().uuid(),
 });
 
 const postCreateBodySchema = z.object({

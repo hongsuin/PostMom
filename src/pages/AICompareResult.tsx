@@ -78,7 +78,11 @@ export default function AICompareResult() {
           },
         }),
       });
-      if (!res.ok) throw new Error('서버 오류가 발생했습니다.');
+      if (!res.ok) {
+        if (res.status === 401) throw new Error('로그인이 만료되었습니다. 다시 로그인해주세요.');
+        if (res.status === 502) throw new Error('AI 서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.');
+        throw new Error('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      }
       const data: AcademyResult[] = await res.json();
       setResults(data);
       localStorage.setItem('lastRecommendation', JSON.stringify({
@@ -86,7 +90,11 @@ export default function AICompareResult() {
         savedAt: new Date().toISOString(),
       }));
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'AI 분석 중 오류가 발생했습니다.');
+      if (e instanceof TypeError && e.message === 'Failed to fetch') {
+        setError('서버에 연결할 수 없습니다. 서버가 실행 중인지 확인해주세요.');
+      } else {
+        setError(e instanceof Error ? e.message : 'AI 분석 중 오류가 발생했습니다.');
+      }
     } finally {
       setIsLoading(false);
     }

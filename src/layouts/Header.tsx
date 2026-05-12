@@ -23,7 +23,7 @@ export default function Header({ title, showBack = false, rightElement }: Header
           )}
           {!title && !showBack && (
             <Link to="/" aria-label="PostMom 홈">
-              <img src="/앱로고-light.svg" alt="PostMom" className="h-6 w-auto" />
+              <img src="/postmanger_light.png" alt="PostMom" className="h-6 w-auto" />
             </Link>
           )}
         </div>
