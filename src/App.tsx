@@ -1,11 +1,59 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import type { Session } from '@supabase/supabase-js';
+import { getSupabaseBrowserClient } from './lib/supabase';
+import { useOnboardingStore } from './store/onboardingStore';
+import type { OnboardingData, PriorityKey } from './store/onboardingStore';
+import type { TypeKey } from './data/learningTypes';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
+  return null;
+}
+
+function loadOnboardingFromSession(
+  session: Session | null,
+  updateData: (d: Partial<OnboardingData>) => void,
+  reset: () => void,
+) {
+  if (!session?.user) {
+    reset();
+    return;
+  }
+  const meta = session.user.user_metadata ?? {};
+  const ob = (meta.onboarding ?? {}) as Record<string, unknown>;
+
+  updateData({
+    learningType: (meta.learning_type as TypeKey) ?? '',
+    childGrade: (ob.childGrade as OnboardingData['childGrade']) ?? '',
+    englishLevel: (ob.englishLevel as OnboardingData['englishLevel']) ?? '',
+    difficulties: (ob.difficulties as string[]) ?? [],
+    priorities: (ob.priorities as PriorityKey[]) ?? [],
+    classType: (ob.classType as OnboardingData['classType']) ?? '',
+    teachingStyle: (ob.teachingStyle as OnboardingData['teachingStyle']) ?? '',
+    budgetRange: (ob.budgetRange as string) ?? '',
+    distance: (ob.distance as string) ?? '',
+    trustFactor: (ob.trustFactor as string) ?? '',
+  });
+}
+
+function LearningTypeLoader() {
+  const { updateData, reset } = useOnboardingStore();
+  useEffect(() => {
+    const supabase = getSupabaseBrowserClient();
+    // 초기 세션 즉시 복원
+    supabase.auth.getSession().then(({ data }) => {
+      loadOnboardingFromSession(data.session, updateData, reset);
+    });
+    // 로그인/로그아웃 시 동기화
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      loadOnboardingFromSession(session, updateData, reset);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
   return null;
 }
 import LearningTypeAnimOverlay from './components/LearningTypeAnimOverlay';
@@ -29,6 +77,7 @@ import MyPage from './pages/MyPage';
 import MyConsultations from './pages/MyConsultations';
 import AuthCallback from './pages/AuthCallback';
 import LearningTypeTest from './pages/LearningTypeTest';
+import AiChat from './pages/AiChat';
 
 import OnboardingStep1 from './features/onboarding/pages/OnboardingStep1';
 import OnboardingStep2 from './features/onboarding/pages/OnboardingStep2';
@@ -48,6 +97,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <LearningTypeLoader />
       <Routes>
         {/* Onboarding - no bottom nav */}
         <Route path="/onboarding/1" element={<OnboardingStep1 />} />
@@ -63,6 +113,7 @@ export default function App() {
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/learning-test" element={<LearningTypeTest />} />
         <Route path="/consult/complete" element={<ConsultComplete />} />
+        <Route path="/ai-chat" element={<AiChat />} />
         <Route path="/compare/result" element={<AICompareResult />} />
 
         {/* Admin */}

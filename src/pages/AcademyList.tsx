@@ -4,6 +4,7 @@ import { Search, Star, MapPin, Clock, ChevronRight, SlidersHorizontal } from 'lu
 import { academies } from '../data/mockData';
 import { useReviewStore, calcAvgRating } from '../store/reviewStore';
 
+//코멘트
 const SUBJECTS = ['전체', '수학', '영어']; //새 과목 생기면 여기에 추가
 const LOCATIONS = ['전체 지역', '위례', '송파', '하남']; //새 지역 여기 추가
 const SORT_OPTIONS = ['평점 높은 순', '리뷰 많은 순', '가격 낮은 순'];

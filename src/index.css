@@ -56,10 +56,21 @@
 
 * {
   box-sizing: border-box;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-body {
+*::-webkit-scrollbar {
+  display: none;
+}
+html, body {
   margin: 0;
+  height: 100%;
+  overflow: hidden;
   font-family: var(--font-inter);
+}
+#root {
+  height: 100%;
+  overflow: hidden;
 }
 
 .app-container {

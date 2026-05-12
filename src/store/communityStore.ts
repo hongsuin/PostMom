@@ -70,16 +70,46 @@ export interface CommunityComment {
   createdAt: string;
 }
 
+export interface UserCardProfile {
+  child_grade?: string;
+  english_level?: string;
+  class_type?: string;
+  teaching_style?: string;
+  budget_range?: string;
+  distance?: string;
+  learning_type?: string;
+}
+
+interface UserProfileRow extends UserCardProfile {
+  user_id: string;
+}
+
+const CARD_FIELDS: Array<keyof UserCardProfile> = [
+  'child_grade',
+  'english_level',
+  'class_type',
+  'teaching_style',
+  'budget_range',
+  'distance',
+  'learning_type',
+];
+
+function calcMatchCount(mine: UserCardProfile, other: UserProfileRow): number {
+  return CARD_FIELDS.filter((f) => mine[f] && other[f] && mine[f] === other[f]).length;
+}
+
 interface CommunityStore {
   posts: CommunityPost[];
   commentsByPost: Record<string, CommunityComment[]>;
   likedPostIds: string[];
+  similarPostIds: string[];
   loading: boolean;
   commentsLoadingByPost: Record<string, boolean>;
   hydrated: boolean;
   fetchPosts: () => Promise<void>;
   fetchPostById: (id: string) => Promise<CommunityPost | null>;
   fetchComments: (postId: string) => Promise<void>;
+  fetchSimilarPostIds: (myProfile: UserCardProfile, myUserId: string) => Promise<void>;
   addPost: (input: CommunityInsertInput) => Promise<CommunityPost>;
   updatePost: (input: CommunityUpdateInput) => Promise<CommunityPost>;
   deletePost: (postId: string) => Promise<void>;
@@ -252,6 +282,7 @@ export const useCommunityStore = create<CommunityStore>((set, get) => ({
   posts: sortPosts(mockCommunityPosts),
   commentsByPost: {},
   likedPostIds: [],
+  similarPostIds: [],
   loading: false,
   commentsLoadingByPost: {},
   hydrated: false,
@@ -284,6 +315,36 @@ export const useCommunityStore = create<CommunityStore>((set, get) => ({
       loading: false,
       hydrated: true,
     });
+  },
+
+  fetchSimilarPostIds: async (myProfile, myUserId) => {
+    const posts = get().posts;
+    const authorIds = [...new Set(
+      posts
+        .filter((p) => p.userId && p.userId !== myUserId)
+        .map((p) => p.userId as string),
+    )];
+    if (authorIds.length === 0) return;
+
+    const supabase = getSupabaseBrowserClient();
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('user_id, child_grade, english_level, class_type, teaching_style, budget_range, distance, learning_type')
+      .in('user_id', authorIds);
+
+    if (error || !data) return;
+
+    const similarUserIds = new Set(
+      (data as UserProfileRow[])
+        .filter((profile) => calcMatchCount(myProfile, profile) >= 2)
+        .map((p) => p.user_id),
+    );
+
+    const ids = posts
+      .filter((p) => p.userId && similarUserIds.has(p.userId))
+      .map((p) => p.id);
+
+    set({ similarPostIds: ids });
   },
 
   fetchPostById: async (id) => {
