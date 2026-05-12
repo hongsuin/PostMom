@@ -6,7 +6,6 @@ import { useCompareStore } from '../store/compareStore';
 import { LEARNING_TYPES } from '../data/learningTypes';
 import { getSupabaseBrowserClient } from '../lib/supabase';
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001';
 const GUIDE_ICONS = [BookOpen, Users, Target];
 
 interface AcademyResult {
@@ -63,7 +62,7 @@ export default function AICompareResult() {
       const headers = await getAuthHeader();
       if (!headers) { setError('로그인이 필요합니다.'); return; }
 
-      const res = await fetch(`${SERVER_URL}/api/compare`, {
+      const res = await fetch('/api/compare', {
         method: 'POST',
         headers: { ...headers, 'Content-Type': 'application/json' },
         body: JSON.stringify({
