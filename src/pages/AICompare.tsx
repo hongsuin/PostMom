@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useCompareStore } from '../store/compareStore';
 import { useOnboardingStore } from '../store/onboardingStore';
 import { LEARNING_TYPES } from '../data/learningTypes';
+import { useReviewStore, calcAvgRating } from '../store/reviewStore';
 
 const SUBJECT_COLORS: Record<string, string> = {
   수학: 'bg-blue-50 text-blue-700',
@@ -16,6 +17,7 @@ export default function AICompare() {
   const navigate = useNavigate();
   const setCompare = useCompareStore((s) => s.setSelected);
   const { data: onboarding } = useOnboardingStore();
+  const { getReviews } = useReviewStore();
   const [selected, setSelected] = useState<string[]>([]);
 
   const learningType = onboarding.learningType;
@@ -23,7 +25,9 @@ export default function AICompare() {
 
   function handleCompare() {
     if (selected.length < 2) return;
-    const selectedAcademies = academies.filter((a) => selected.includes(a.id));
+    const selectedAcademies = academies
+      .filter((a) => selected.includes(a.id))
+      .map((a) => ({ ...a, rating: calcAvgRating(a.reviews, getReviews(a.id), a.rating) }));
     setCompare(selected, selectedAcademies);
     navigate('/compare/result');
   }
@@ -136,7 +140,7 @@ export default function AICompare() {
                       </span>
                       <div className="flex items-center gap-1 text-slate-700">
                         <Star size={11} className="fill-yellow-400 text-yellow-400" />
-                        <span className="font-semibold">{a.rating}</span>
+                        <span className="font-semibold">{calcAvgRating(a.reviews, getReviews(a.id), a.rating)}</span>
                         <span className="text-slate-400">({a.reviewCount})</span>
                       </div>
                     </div>
