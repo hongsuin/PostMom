@@ -5,6 +5,7 @@ import { LEARNING_TYPES, TYPE_KEY_LIST } from '../data/learningTypes';
 import type { TypeKey } from '../data/learningTypes';
 import { useOnboardingStore } from '../store/onboardingStore';
 import { useLearningTypeAnimStore } from '../store/learningTypeAnimStore';
+import { getSupabaseBrowserClient } from '../lib/supabase';
 
 // ── 설문 문항 ───────────────────────────────────────────────────────
 const QUESTIONS = [
@@ -101,11 +102,11 @@ function IntroScreen({ onStart }: { onStart: () => void }) {
 
   // 각 유형별 그로우 색상 (Tailwind 미지원이므로 inline)
   const glowColors: Record<string, string> = {
-    competitive: '251,191,36',   // yellow-400
-    explorer:    '96,165,250',   // blue-400
-    systematic:  '74,222,128',   // green-400
-    social:      '192,132,252',  // purple-400
-    independent: '251,113,133',  // rose-400
+    competitive: '180,83,9',    // amber-700
+    explorer:    '67,56,202',   // indigo-700
+    systematic:  '15,118,110',  // teal-700
+    social:      '109,40,217',  // violet-700
+    independent: '190,18,60',   // rose-700
   };
   const glow = glowColors[TYPE_KEY_LIST[idx]];
 
@@ -145,39 +146,29 @@ function IntroScreen({ onStart }: { onStart: () => void }) {
 
           {/* 메인 카드 */}
           <div
-            className={`relative rounded-3xl bg-gradient-to-br ${t.color} p-8 text-white shadow-2xl overflow-hidden`}
+            className="relative rounded-3xl overflow-hidden"
             style={{
+              background: 'rgba(255,255,255,0.82)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: '0 0 0 1px rgba(0,0,0,0.06), 0 4px 20px rgba(0,0,0,0.08)',
               opacity: visible ? 1 : 0,
               transform: visible ? 'translateY(0) scale(1)' : 'translateY(6px) scale(0.98)',
               transition: 'opacity 0.22s ease, transform 0.22s ease',
             }}
           >
-            {/* 배경 장식 원 */}
-            <div className="absolute -right-8 -top-8 w-36 h-36 rounded-full bg-white/10" />
-            <div className="absolute -right-3 -bottom-10 w-24 h-24 rounded-full bg-white/10" />
-
-            <div className="relative text-center">
-              {/* 이모지 */}
-              <div className="text-7xl mb-4 drop-shadow-lg">{t.emoji}</div>
-
-              {/* 유형명 */}
-              <h2 className="font-lora text-2xl font-bold mb-2 drop-shadow">{t.name}</h2>
-
-              {/* 한 줄 설명 */}
-              <p className="text-sm text-white/85 leading-relaxed line-clamp-2 px-2">
-                {t.desc}
-              </p>
-
-              {/* 강점 배지 */}
-              <div className="mt-4 flex flex-wrap justify-center gap-2">
-                {t.strengths.map((s) => (
-                  <span
-                    key={s}
-                    className="rounded-full bg-white/20 px-3 py-1 text-xs font-medium backdrop-blur-sm"
-                  >
-                    ✓ {s}
-                  </span>
-                ))}
+            <div className="flex items-center gap-5 px-7 py-6">
+              <img src={t.image} alt={t.name} className="w-24 h-24 object-contain shrink-0" />
+              <div className="flex-1 min-w-0">
+                <h2 className="font-lora text-xl font-bold text-slate-900 mb-1">{t.name}</h2>
+                <p className="text-xs text-slate-500 leading-relaxed line-clamp-2 mb-3">{t.desc}</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {t.strengths.map((s) => (
+                    <span key={s} className="rounded-full bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-xs font-medium text-slate-600">
+                      ✓ {s}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -211,7 +202,7 @@ function IntroScreen({ onStart }: { onStart: () => void }) {
       <div className="flex flex-col gap-3">
         <button
           onClick={onStart}
-          className="w-full rounded-2xl bg-primary py-4 text-base font-semibold text-white shadow-sm transition-all hover:opacity-90 hover:scale-[1.01] active:scale-[0.99]"
+          className="w-full rounded-2xl bg-white py-4 text-base font-semibold text-slate-900 shadow-sm transition-all hover:opacity-90 hover:scale-[1.01] active:scale-[0.99]"
         >
           테스트 시작하기 →
         </button>
@@ -267,8 +258,10 @@ export default function LearningTypeTest() {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!selectedType) return;
+    const supabase = getSupabaseBrowserClient();
+    await supabase.auth.updateUser({ data: { learning_type: selectedType } });
     updateData({ learningType: selectedType });
     setSaved(true);
     setPending(selectedType, 'save');
@@ -277,7 +270,6 @@ export default function LearningTypeTest() {
   };
 
   const handleSkip = () => {
-    if (selectedType) setPending(selectedType, 'skip');
     window.scrollTo(0, 0);
     navigate('/academies');
   };
@@ -385,20 +377,27 @@ export default function LearningTypeTest() {
             <div className="lg:col-span-2 space-y-4">
               {/* 메인 유형 카드 */}
               <div
-                className={`rounded-3xl bg-gradient-to-br ${displayData.color} p-7 text-white shadow-lg transition-all duration-300`}
+                className="rounded-3xl overflow-hidden transition-all duration-300"
+                style={{
+                  background: 'rgba(255,255,255,0.82)',
+                  backdropFilter: 'blur(16px)',
+                  WebkitBackdropFilter: 'blur(16px)',
+                  boxShadow: '0 0 0 1px rgba(0,0,0,0.06), 0 4px 20px rgba(0,0,0,0.08)',
+                }}
               >
-                <div className="mb-3 text-5xl">{displayData.emoji}</div>
-                <h2 className="font-lora text-2xl font-semibold mb-2">{displayData.name}</h2>
-                <p className="text-white/90 leading-relaxed text-sm">{displayData.desc}</p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {displayData.strengths.map((s) => (
-                    <span
-                      key={s}
-                      className="rounded-full bg-white/20 px-3 py-1 text-xs font-medium"
-                    >
-                      ✓ {s}
-                    </span>
-                  ))}
+                <div className="flex items-center gap-6 px-8 py-7">
+                  <img src={displayData.image} alt={displayData.name} className="w-28 h-28 object-contain shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <h2 className="font-lora text-2xl font-semibold text-slate-900 mb-2">{displayData.name}</h2>
+                    <p className="text-slate-500 leading-relaxed text-sm mb-4">{displayData.desc}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {displayData.strengths.map((s) => (
+                        <span key={s} className="rounded-full bg-slate-100 border border-slate-200 px-3 py-1 text-xs font-medium text-slate-600">
+                          ✓ {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
 

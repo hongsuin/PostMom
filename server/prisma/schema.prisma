@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ChatSession {
+  id        Int       @id @default(autoincrement())
+  userId    String    @db.Uuid
+  title     String    @default("새 상담")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  messages  ChatMessage[]
+
+  @@index([userId])
+  @@map("chat_sessions")
+}
+
+model ChatMessage {
+  id        Int         @id @default(autoincrement())
+  sessionId Int
+  role      String
+  content   String
+  sources   Json?
+  createdAt DateTime    @default(now())
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@map("chat_messages")
+}

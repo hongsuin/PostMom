@@ -3,9 +3,9 @@ import SiteHeader from './SiteHeader';
 
 export default function UserLayout() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="h-full flex flex-col overflow-y-auto bg-slate-50">
       <SiteHeader />
-      <main className="pt-16">
+      <main className="pt-16 flex-1">
         <Outlet />
       </main>
     </div>
