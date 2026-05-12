@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Star, CheckCircle, ArrowLeft, AlertCircle, Award, BookOpen, Users, Target, Lightbulb } from 'lucide-react';
+import { Star, CheckCircle, ArrowLeft, AlertCircle, BookOpen, Users, Target, Lightbulb } from 'lucide-react';
 import { useOnboardingStore } from '../store/onboardingStore';
 import { useCompareStore } from '../store/compareStore';
 import { LEARNING_TYPES } from '../data/learningTypes';
