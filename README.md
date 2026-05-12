@@ -10,21 +10,25 @@
 postmom-new/
 ├── src/                        # 프론트엔드 (React + Vite)
 │   ├── pages/                  # 페이지 컴포넌트
+│   ├── components/             # 공통 컴포넌트
 │   ├── features/
-│   │   ├── onboarding/         # 온보딩 5단계
-│   │   └── admin/              # 관리자 페이지
+│   │   ├── onboarding/         # 온보딩 5단계 + 로딩
+│   │   └── admin/              # 관리자 페이지 (대시보드, 리드, 프로필, 크레딧, 미리보기)
 │   ├── store/                  # Zustand 전역 상태
 │   ├── data/                   # 목업 데이터 / 상수
 │   ├── lib/                    # Supabase 클라이언트 등
-│   └── layouts/                # 공통 레이아웃
+│   └── layouts/                # 공통 레이아웃 (UserLayout, AdminLayout)
 ├── server/                     # 백엔드 (Express.js)
 │   ├── app.js                  # API 라우터
 │   ├── index.js                # 서버 엔트리
+│   ├── schemas/                # Zod 스키마 검증
+│   │   ├── chat.schema.js
+│   │   └── community.schema.js
 │   └── prisma/
 │       └── schema.prisma       # DB 스키마 (chat_sessions, chat_messages)
 ├── docs/
 │   └── data-storage.md         # 데이터 저장 위치 정리
-└── public/                     # 정적 파일 (영상, 이미지 등)
+└── public/                     # 정적 파일 (로고, 영상, 이미지 등)
 ```
 
 ---
@@ -41,6 +45,9 @@ postmom-new/
 | 백엔드 | Express.js v5 |
 | AI | Google Gemini API (학원 비교 분석) |
 | ORM | Prisma v5 (노무상담 대화 저장) |
+| 보안 | Helmet, express-rate-limit, jsonwebtoken |
+| 유효성 검사 | Zod |
+| API 문서 | Swagger UI (swagger-ui-express) |
 | 동시 실행 | concurrently |
 
 ---
@@ -50,16 +57,32 @@ postmom-new/
 | 경로 | 설명 |
 |---|---|
 | `/` | 메인 홈 — 내 카드, 추천 결과 표시 |
+| `/login` | 로그인 |
+| `/signup` | 회원가입 |
+| `/auth/callback` | OAuth 인증 콜백 |
 | `/onboarding/1~5` | 자녀 정보 입력 (로그인 필수) |
+| `/onboarding/loading` | AI 맞춤 추천 로딩 |
 | `/learning-test` | 학습 유형 테스트 |
 | `/academies` | 학원 목록 |
 | `/academies/:id` | 학원 상세 |
-| `/compare` | AI 비교 학원 선택 |
+| `/compare` | AI 비교 학원 선택 (별점 연동) |
 | `/compare/result` | AI 비교 결과 리포트 |
 | `/ai-chat` | AI 노무상담 |
-| `/community` | 커뮤니티 |
+| `/community` | 커뮤니티 목록 |
+| `/community/write` | 커뮤니티 글쓰기 |
+| `/community/:id` | 커뮤니티 게시글 상세 |
+| `/community/:id/edit` | 커뮤니티 글 수정 |
+| `/consult/:id` | 상담 신청 |
+| `/consult/complete` | 상담 신청 완료 |
+| `/leveltest/:id` | 레벨 테스트 신청 |
 | `/mypage` | 마이페이지 |
+| `/mypage/consultations` | 내 상담 내역 |
 | `/admin` | 관리자 대시보드 |
+| `/admin/leads` | 관리자 — 리드 목록 |
+| `/admin/leads/:id` | 관리자 — 리드 상세 |
+| `/admin/profile` | 관리자 — 학원 프로필 |
+| `/admin/credit` | 관리자 — 크레딧 |
+| `/admin/preview` | 관리자 — 미리보기 |
 
 ---
 
