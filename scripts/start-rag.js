@@ -7,7 +7,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const isWin = process.platform === 'win32';
-const ragDir = resolve(process.env.POSTMOM_RAG_DIR || process.env.RAG_DIR || join(__dirname, '../../postmom-rag'));
+const localRagDir = join(__dirname, '../rag');
+const siblingRagDir = join(__dirname, '../../postmom-rag');
+const configuredRagDir = process.env.POSTMOM_RAG_DIR || process.env.RAG_DIR;
+const ragDir = resolve(configuredRagDir || (existsSync(localRagDir) ? localRagDir : siblingRagDir));
 const appTarget = process.env.RAG_APP || 'main:app';
 const port = process.env.RAG_PORT || '8000';
 
@@ -34,6 +37,16 @@ function resolvePythonCommand() {
     const pythonPath = venvPythonPath(venvName);
     if (existsSync(pythonPath)) {
       return { command: pythonPath, args: ['-m', 'uvicorn'], label: `${venvName} virtualenv` };
+    }
+  }
+
+  if (ragDir !== resolve(siblingRagDir)) {
+    for (const venvName of ['venv', '.venv']) {
+      const siblingPythonPath = join(siblingRagDir, venvName, isWin ? 'Scripts\\python.exe' : 'bin/python');
+      if (existsSync(siblingPythonPath)) {
+        console.warn(`[RAG] No virtualenv found in "${ragDir}"; using sibling ${venvName} virtualenv for local development.`);
+        return { command: siblingPythonPath, args: ['-m', 'uvicorn'], label: `sibling ${venvName} virtualenv` };
+      }
     }
   }
 
