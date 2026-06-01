@@ -391,14 +391,24 @@ app.post(
       data: { sessionId: session.id, role: 'user', content: question },
     });
 
-    const ragRes = await fetch(`${RAG_URL}/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question }),
-    });
+    let ragRes;
+    try {
+      ragRes = await fetch(`${RAG_URL}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question }),
+      });
+    } catch (err) {
+      throw new AppError('RAG_UNAVAILABLE', 'RAG server is not reachable.', 503, {
+        url: RAG_URL,
+        cause: err?.message,
+      });
+    }
 
     if (!ragRes.ok) {
-      throw new AppError('RAG_ERROR', 'RAG 서버 오류', 502);
+      throw new AppError('RAG_ERROR', 'RAG server returned an error.', 502, {
+        status: ragRes.status,
+      });
     }
 
     const ragData = await ragRes.json();
